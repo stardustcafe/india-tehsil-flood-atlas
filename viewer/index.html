@@ -7,7 +7,7 @@
 :root {
   --bg: #e9eeec; --panel: #f7f9f8; --ink: #13201d; --muted: #586864; --line: #cfd9d5;
   --accent: #1d5d77; --accent-soft: #d7e7ee; --map-bg: #dbe3e0; --nodata: #b4bfbb;
-  --edge: rgba(19, 32, 29, .28); --state-edge: rgba(19, 32, 29, .7); --focus: #1d5d77;
+  --edge: rgba(19, 32, 29, .28); --state-edge: rgba(19, 32, 29, .7); --focus: #1d5d77; --river: #1f6fa8;
   /* sequential risk ramp, low → high */
   --r0: #f7f1d6; --r1: #f4d68e; --r2: #eeab5d; --r3: #df753d; --r4: #c0423b; --r5: #8d2046; --r6: #4c1240;
   /* GFSM source class colours (Waleed et al. 2026) */
@@ -19,14 +19,14 @@
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0d1315; --panel: #131b1e; --ink: #e3ebe8; --muted: #93a39f; --line: #25343a;
   --accent: #79bcd6; --accent-soft: #1b3440; --map-bg: #0a1012; --nodata: #3a464a;
-  --edge: rgba(227, 235, 232, .16); --state-edge: rgba(227, 235, 232, .55); --focus: #79bcd6;
+  --edge: rgba(227, 235, 232, .16); --state-edge: rgba(227, 235, 232, .55); --focus: #79bcd6; --river: #6ab4e6;
   --r0: #23343a; --r1: #4e5232; --r2: #93702a; --r3: #d08b26; --r4: #f0663a; --r5: #ff3f5f; --r6: #ffa3c6;
   color-scheme: dark;
 } }
 :root[data-theme="dark"] {
   --bg: #0d1315; --panel: #131b1e; --ink: #e3ebe8; --muted: #93a39f; --line: #25343a;
   --accent: #79bcd6; --accent-soft: #1b3440; --map-bg: #0a1012; --nodata: #3a464a;
-  --edge: rgba(227, 235, 232, .16); --state-edge: rgba(227, 235, 232, .55); --focus: #79bcd6;
+  --edge: rgba(227, 235, 232, .16); --state-edge: rgba(227, 235, 232, .55); --focus: #79bcd6; --river: #6ab4e6;
   --r0: #23343a; --r1: #4e5232; --r2: #93702a; --r3: #d08b26; --r4: #f0663a; --r5: #ff3f5f; --r6: #ffa3c6;
   color-scheme: dark;
 }
@@ -61,6 +61,8 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(
 .gleg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
 .gleg i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; outline: 1px solid var(--line); }
 .hint { margin: 0; color: var(--muted); font-size: 11.5px; }
+.check { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; cursor: pointer; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
 select, input[type="search"] { font: 14px var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; width: 100%; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 
@@ -185,6 +187,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
         </div>
         <p class="hint">Pixels are about 150 m at zoom 10 (most common 30 m class per pixel). Zooming further enlarges them.</p>
       </div>
+      <label class="check" id="ctxRow" hidden><input type="checkbox" id="ctx" checked> Place names and rivers (OpenStreetMap)</label>
     </div>
 
     <div class="field">
@@ -246,7 +249,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
     </div>
     <div class="tip" id="tip" hidden></div>
     <article class="card" id="card" hidden aria-live="polite"></article>
-    <div class="attrib" id="attrib" hidden>Labels © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a></div>
+    <div class="attrib" id="attrib" hidden><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> · <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">© OpenMapTiles</a> · Data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</div>
     <div class="loading" id="loading">Loading 6,820 sub-districts…</div>
   </main>
 </div>
@@ -344,7 +347,10 @@ function applyTheme() {
   map.setPaintProperty("state-edges", "line-color", css("--state-edge"));
   map.setPaintProperty("coast", "line-color", css("--state-edge"));
   map.setPaintProperty("hl", "line-color", css("--ink"));
-  map.getSource("labels")?.setTiles(labelTiles());
+  if (map.getLayer("rivers")) {
+    map.setPaintProperty("rivers", "line-color", css("--river"));
+    for (const id of ["places", "villages"]) Object.entries(labelPaint()).forEach(([k, v]) => map.setPaintProperty(id, k, v));
+  }
   applyPaint(); renderLegend(); renderTop();
 }
 
@@ -435,6 +441,7 @@ function bindUI() {
     if (S.view === "raster" && S.rop < 0.5) { S.rop = 1; $("rop").value = 100; $("ropOut").textContent = "100%"; }
     applyPaint();
   });
+  $("ctx").addEventListener("change", e => CONTEXT_LAYERS.forEach(id => map.getLayer(id) && map.setLayoutProperty(id, "visibility", e.target.checked ? "visible" : "none")));
   $("rop").addEventListener("input", e => { S.rop = e.target.value / 100; $("ropOut").textContent = e.target.value + "%"; applyRaster(); });
   $("modeSeg").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
@@ -496,17 +503,28 @@ function bindMap() {
   });
 }
 
-/* ---------- place-name labels (labels only: no third-party boundary lines) ---------- */
-const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
-const labelTiles = () => "abcd".split("").map(s => `https://${s}.basemaps.cartocdn.com/${isDark() ? "dark" : "light"}_only_labels/{z}/{x}/{y}@2x.png`);
-async function addLabels() {
-  try {  // hosts that block external tiles (sandboxed previews) simply skip the labels
-    const r = await fetch(labelTiles()[0].replace("{z}/{x}/{y}", "5/22/13"), { mode: "cors" });
+/* ---------- context from OpenStreetMap via OpenFreeMap: place names and rivers only (no boundary lines) ---------- */
+const OFM = "https://tiles.openfreemap.org/planet";
+const CONTEXT_LAYERS = ["rivers", "places", "villages"];
+const placeName = ["coalesce", ["get", "name:en"], ["get", "name_en"], ["get", "name"]];
+const labelPaint = () => ({ "text-color": css("--ink"), "text-halo-color": css("--panel"), "text-halo-width": 1.4 });
+async function addContext() {
+  try {  // hosts that block external tiles (sandboxed previews) simply skip this layer
+    const r = await fetch(OFM);
     if (!r.ok) return;
   } catch { return; }
-  map.addSource("labels", { type: "raster", tiles: labelTiles(), tileSize: 256, maxzoom: 18 });
-  map.addLayer({ id: "labels", type: "raster", source: "labels", paint: { "raster-fade-duration": 0 } });
+  map.addSource("ofm", { type: "vector", url: OFM });
+  map.addLayer({ id: "rivers", type: "line", source: "ofm", "source-layer": "waterway", filter: ["==", ["get", "class"], "river"],
+    paint: { "line-color": css("--river"), "line-opacity": 0.9, "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 8, 1.1, 12, 2.4] } });
+  map.addLayer({ id: "places", type: "symbol", source: "ofm", "source-layer": "place", filter: ["in", ["get", "class"], ["literal", ["city", "town"]]],
+    layout: { "text-field": placeName, "text-font": ["Noto Sans Regular"], "symbol-sort-key": ["get", "rank"], "text-padding": 4, "text-max-width": 8,
+      "text-size": ["interpolate", ["linear"], ["zoom"], 4, ["match", ["get", "class"], "city", 11, 9.5], 10, ["match", ["get", "class"], "city", 15, 12.5]] },
+    paint: labelPaint() });
+  map.addLayer({ id: "villages", type: "symbol", source: "ofm", "source-layer": "place", minzoom: 10, filter: ["==", ["get", "class"], "village"],
+    layout: { "text-field": placeName, "text-font": ["Noto Sans Regular"], "text-size": 11, "text-padding": 4 },
+    paint: labelPaint() });
   $("attrib").hidden = false;
+  $("ctxRow").hidden = false;
 }
 
 /* ---------- boot ---------- */
@@ -532,7 +550,7 @@ async function addLabels() {
 
   map = new maplibregl.Map({
     container: "map",
-    style: { version: 8, sources: {}, layers: [{ id: "bg", type: "background", paint: { "background-color": css("--map-bg") } }] },
+    style: { version: 8, glyphs: "https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf", sources: {}, layers: [{ id: "bg", type: "background", paint: { "background-color": css("--map-bg") } }] },
     bounds: [[68, 6.3], [97.6, 37.3]], fitBoundsOptions: { padding: 24 },
     maxBounds: [[52, -2], [114, 44]], attributionControl: false, dragRotate: false, pitchWithRotate: false, renderWorldCopies: false,
   });
@@ -553,7 +571,7 @@ async function addLabels() {
     map.addLayer({ id: "hl", type: "line", source: "adm3", paint: {
       "line-color": css("--ink"),
       "line-width": ["case", ["boolean", ["feature-state", "sel"], false], 2.6, ["boolean", ["feature-state", "hover"], false], 1.4, 0] } });
-    bindMap(); refresh(); addLabels();
+    bindMap(); refresh(); addContext();
     $("loading").hidden = true;
   });
 })();

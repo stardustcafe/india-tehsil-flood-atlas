@@ -15,7 +15,7 @@ third-party datasets and carry their licences:
   *Scientific Data*. https://doi.org/10.1038/s41597-026-08338-1 (data: https://doi.org/10.5281/zenodo.20568218, CC BY 4.0)
 - geoBoundaries: Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative
   boundaries. *PLoS ONE* 15(4): e0231866. Source: Pathways Data Pvt. Ltd., lgdirectory.gov.in. ODbL 1.0.
-- Viewer place-name labels: © OpenStreetMap contributors, © CARTO.
+- Viewer place names and rivers: © OpenStreetMap contributors (ODbL), served by OpenFreeMap using the OpenMapTiles schema.
 
 Under ODbL, if you publicly use an adapted version of the sub-district database, you must offer that
 adapted database under ODbL as well.
