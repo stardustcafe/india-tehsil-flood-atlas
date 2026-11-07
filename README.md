@@ -1,4 +1,6 @@
-# gfsmxpop — Flood vulnerability mapping for India
+# India Tehsil Flood Atlas
+
+**Live map:** https://stardustcafe.github.io/india-tehsil-flood-atlas/
 
 Exploratory research coupling the Global Flood Susceptibility Map (GFSM v1, 30 m) with
 socio-economic and demographic indicators to build an open flood vulnerability map for India.
