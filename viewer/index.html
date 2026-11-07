@@ -1,0 +1,560 @@
+<title>India Tehsil Flood Atlas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: full-height app — control panel on the left (stacks under the map on phones), WebGL map fills the rest. */
+:root {
+  --bg: #e9eeec; --panel: #f7f9f8; --ink: #13201d; --muted: #586864; --line: #cfd9d5;
+  --accent: #1d5d77; --accent-soft: #d7e7ee; --map-bg: #dbe3e0; --nodata: #b4bfbb;
+  --edge: rgba(19, 32, 29, .28); --state-edge: rgba(19, 32, 29, .7); --focus: #1d5d77;
+  /* sequential risk ramp, low → high */
+  --r0: #f7f1d6; --r1: #f4d68e; --r2: #eeab5d; --r3: #df753d; --r4: #c0423b; --r5: #8d2046; --r6: #4c1240;
+  /* GFSM source class colours (Waleed et al. 2026) */
+  --g1: #2c7bb6; --g2: #abd9e9; --g3: #ffffbf; --g4: #fdae61; --g5: #d7191c;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d1315; --panel: #131b1e; --ink: #e3ebe8; --muted: #93a39f; --line: #25343a;
+  --accent: #79bcd6; --accent-soft: #1b3440; --map-bg: #0a1012; --nodata: #3a464a;
+  --edge: rgba(227, 235, 232, .16); --state-edge: rgba(227, 235, 232, .55); --focus: #79bcd6;
+  --r0: #23343a; --r1: #4e5232; --r2: #93702a; --r3: #d08b26; --r4: #f0663a; --r5: #ff3f5f; --r6: #ffa3c6;
+  color-scheme: dark;
+} }
+:root[data-theme="dark"] {
+  --bg: #0d1315; --panel: #131b1e; --ink: #e3ebe8; --muted: #93a39f; --line: #25343a;
+  --accent: #79bcd6; --accent-soft: #1b3440; --map-bg: #0a1012; --nodata: #3a464a;
+  --edge: rgba(227, 235, 232, .16); --state-edge: rgba(227, 235, 232, .55); --focus: #79bcd6;
+  --r0: #23343a; --r1: #4e5232; --r2: #93702a; --r3: #d08b26; --r4: #f0663a; --r5: #ff3f5f; --r6: #ffa3c6;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--body); overflow: hidden; }
+.app { display: grid; grid-template-columns: minmax(320px, 370px) 1fr; height: 100%; }
+
+/* ---------- panel ---------- */
+.panel { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto;
+  display: flex; flex-direction: column; gap: 18px; padding-block: 18px 22px;
+  padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: 18px; min-width: 0; }
+.brand h1 { font: 760 26px/1.02 var(--display); font-stretch: 78%; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+.brand p { margin: 6px 0 0; color: var(--muted); font-size: 13px; max-width: 34ch; }
+.eyebrow { font: 600 10.5px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+
+.summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; padding: 12px 0; border-block: 1px solid var(--line); }
+.summary .big { grid-column: 1 / -1; }
+.summary .v { font: 700 22px/1.1 var(--display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
+.summary .big .v { font-size: 34px; }
+.summary .k { color: var(--muted); font-size: 12px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--bg); padding: 4px; border-radius: 8px; }
+.seg button { font: 500 12.5px/1.2 var(--body); color: var(--muted); background: transparent; border: 0; border-radius: 6px; padding: 8px 6px; cursor: pointer; text-align: center; }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+.seg.two { grid-template-columns: 1fr 1fr; }
+.seg.three { grid-template-columns: 1.3fr 1fr 1fr; }
+.raster-ctl { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.gleg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
+.gleg i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; outline: 1px solid var(--line); }
+.hint { margin: 0; color: var(--muted); font-size: 11.5px; }
+select, input[type="search"] { font: 14px var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; width: 100%; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.search { position: relative; }
+.results { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18); overflow: hidden; }
+.results button { display: block; width: 100%; text-align: left; border: 0; background: transparent; color: var(--ink); padding: 8px 10px; font: 13px var(--body); cursor: pointer; }
+.results button:hover, .results button.on { background: var(--accent-soft); }
+.results small { color: var(--muted); }
+
+.thr-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.thr-row output { font: 500 13px var(--mono); }
+input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+/* legend + histogram */
+.hist { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; align-items: end; height: 58px; }
+.hist div { background: var(--line); border-radius: 2px 2px 0 0; min-height: 2px; position: relative; }
+.ramp { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; height: 12px; margin-top: 2px; }
+.ramp span { border-radius: 2px; }
+.ticks { display: grid; grid-template-columns: repeat(7, 1fr); font: 10.5px/1.2 var(--mono); color: var(--muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
+.ticks span { transform: translateX(-50%); white-space: nowrap; }
+.ticks span:first-child { visibility: hidden; }
+.legend-note { display: flex; justify-content: space-between; color: var(--muted); font-size: 11.5px; margin-top: 6px; gap: 8px; }
+.legend-note i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--nodata); vertical-align: -1px; margin-right: 4px; }
+
+.top ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.top li button { display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: center; width: 100%; text-align: left; background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--ink); padding: 7px 2px; cursor: pointer; font: 13px var(--body); }
+.top li button:hover { background: var(--accent-soft); }
+.top .rk { font: 500 11px var(--mono); color: var(--muted); }
+.top .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.top .nm small { color: var(--muted); }
+.top .val { font: 500 12.5px var(--mono); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 6px; }
+.top .val i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+
+.credits { color: var(--muted); font-size: 11.5px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); }
+.credits a { color: var(--accent); }
+
+/* ---------- map ---------- */
+.stage { position: relative; min-width: 0; }
+#map { position: absolute; inset: 0; background: var(--map-bg); }
+.maplibregl-map { overflow: hidden; position: relative; -webkit-tap-highlight-color: transparent; }
+.maplibregl-canvas { position: absolute; left: 0; top: 0; }
+.maplibregl-canvas-container.maplibregl-interactive { cursor: grab; }
+.maplibregl-canvas-container.maplibregl-interactive:active { cursor: grabbing; }
+
+.zoom { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.zoom button { width: 36px; height: 34px; border: 0; background: transparent; color: var(--ink); font: 600 17px/1 var(--body); cursor: pointer; }
+.zoom button + button { border-top: 1px solid var(--line); }
+.zoom button:hover { background: var(--accent-soft); }
+
+.tip { position: absolute; pointer-events: none; z-index: 4; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 7px; padding: 7px 9px; font-size: 12.5px; box-shadow: 0 6px 18px rgba(0,0,0,.18); max-width: 260px; }
+.tip b { display: block; font-weight: 600; }
+.tip small { color: var(--muted); }
+.tip .tv { font: 500 12px var(--mono); margin-top: 3px; }
+
+.card { position: absolute; z-index: 3; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: min(330px, calc(100% - 24px)); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.22); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.card header { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
+.card h2 { font: 720 21px/1.08 var(--display); font-stretch: 82%; margin: 0; text-wrap: balance; }
+.card .where { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.card .x { border: 0; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+.card .x:hover { color: var(--ink); background: var(--bg); }
+.comp { display: flex; height: 14px; border-radius: 3px; overflow: hidden; outline: 1px solid var(--line); }
+.comp span { height: 100%; }
+.cls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; font: 10.5px/1.25 var(--body); color: var(--muted); }
+.cls div { display: flex; flex-direction: column; gap: 1px; }
+.cls b { font: 500 12px var(--mono); color: var(--ink); }
+.cls i { display: block; width: 100%; height: 3px; border-radius: 2px; margin-bottom: 3px; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin: 0; }
+.facts dt { color: var(--muted); font-size: 11.5px; }
+.facts dd { margin: 0; font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
+.flag { font-size: 12px; color: var(--muted); background: var(--bg); border-radius: 6px; padding: 6px 8px; }
+
+.attrib { position: absolute; z-index: 2; left: max(8px, env(safe-area-inset-left, 0px)); bottom: calc(6px + env(safe-area-inset-bottom, 0px)); font-size: 10.5px; color: var(--muted); background: var(--panel); opacity: .85; padding: 2px 6px; border-radius: 4px; }
+.attrib a { color: inherit; }
+.loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 6; background: var(--map-bg); color: var(--muted); font: 500 13px var(--mono); }
+
+@media (max-width: 760px) {
+  body { overflow: auto; }
+  .app { grid-template-columns: 1fr; grid-template-rows: 62vh auto; height: auto; min-height: 100%; }
+  .stage { order: -1; height: 62vh; }
+  .panel { border-right: 0; border-top: 1px solid var(--line); overflow: visible; padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); }
+  .card { left: 12px; right: 12px; width: auto; bottom: 12px; padding: 12px 14px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+
+<div class="app">
+  <aside class="panel" aria-label="Map controls">
+    <div class="brand">
+      <p class="eyebrow">GFSM v1 · 30 m · sub-district</p>
+      <h1>India Tehsil Flood Atlas</h1>
+      <p>Flood susceptibility for 6,820 tehsils, talukas and mandals, summarised from the Global Flood Susceptibility Map.</p>
+    </div>
+
+    <section class="summary" aria-live="polite">
+      <div class="big"><div class="v" id="sumPct">–</div><div class="k" id="sumPctK">of land rated High or Very High</div></div>
+      <div><div class="v" id="sumKm">–</div><div class="k">km² High or Very High</div></div>
+      <div><div class="v" id="sumN">–</div><div class="k" id="sumNK">sub-districts over half High+</div></div>
+    </section>
+
+    <div class="field">
+      <label class="eyebrow" for="q">Find a sub-district</label>
+      <div class="search">
+        <input type="search" id="q" placeholder="e.g. Majuli, Sonawari, Gosaba" autocomplete="off" aria-controls="results">
+        <div class="results" id="results" hidden></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="eyebrow" id="layerLbl">Layers</span>
+      <div class="seg three" role="group" aria-labelledby="layerLbl" id="layerSeg">
+        <button type="button" data-v="summary" aria-pressed="true">Sub-district summary</button>
+        <button type="button" data-v="raster" aria-pressed="false">GFSM 30 m</button>
+        <button type="button" data-v="overlay" aria-pressed="false">Overlay</button>
+      </div>
+      <div class="raster-ctl" id="rasterCtl" hidden>
+        <div class="thr-row"><label class="eyebrow" for="rop" style="margin:0">GFSM opacity</label><output id="ropOut" for="rop">70%</output></div>
+        <input type="range" id="rop" min="0" max="100" step="5" value="70">
+        <div class="gleg" aria-label="GFSM classes">
+          <span><i style="background:var(--g1)"></i>Very Low</span><span><i style="background:var(--g2)"></i>Low</span>
+          <span><i style="background:var(--g3)"></i>Moderate</span><span><i style="background:var(--g4)"></i>High</span>
+          <span><i style="background:var(--g5)"></i>Very High</span>
+        </div>
+        <p class="hint">Pixels are about 150 m at zoom 10 (most common 30 m class per pixel). Zooming further enlarges them.</p>
+      </div>
+    </div>
+
+    <div class="field">
+      <span class="eyebrow" id="metricLbl">Colour by</span>
+      <div class="seg" role="group" aria-labelledby="metricLbl" id="metricSeg">
+        <button type="button" data-m="h" aria-pressed="true">% High + Very High</button>
+        <button type="button" data-m="p5" aria-pressed="false">% Very High</button>
+        <button type="button" data-m="m" aria-pressed="false">Mean class (1–5)</button>
+        <button type="button" data-m="hk" aria-pressed="false">High-risk area km²</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="eyebrow" for="st">State / UT</label>
+      <select id="st"><option value="">All India</option></select>
+    </div>
+
+    <div class="field">
+      <span class="eyebrow" id="modeLbl">Class breaks</span>
+      <div class="seg two" role="group" aria-labelledby="modeLbl" id="modeSeg">
+        <button type="button" data-k="quantile" aria-pressed="true">Relative (quantiles)</button>
+        <button type="button" data-k="fixed" aria-pressed="false">Absolute (fixed)</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="legend" id="legend">
+        <div class="hist" id="hist" aria-hidden="true"></div>
+        <div class="ramp" id="ramp"></div>
+        <div class="ticks" id="ticks"></div>
+        <div class="legend-note"><span id="legendCap">Sub-districts per class</span><span><i></i>No GFSM data</span></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="thr-row"><label class="eyebrow" for="thr" style="margin:0">Fade below</label><output id="thrOut" for="thr">off</output></div>
+      <input type="range" id="thr" min="0" max="100" step="1" value="0">
+    </div>
+
+    <section class="top">
+      <p class="eyebrow" id="topLbl">Highest in India</p>
+      <ol id="topList"></ol>
+    </section>
+
+    <footer class="credits">
+      Susceptibility: GFSM v1, Waleed et al. (2026), <a href="https://doi.org/10.1038/s41597-026-08338-1" target="_blank" rel="noopener">Scientific Data</a>, CC BY 4.0.
+      Boundaries: <a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoBoundaries</a> IND ADM3 (LGD 2018), ODbL.
+      Areas are true ground areas, corrected for Mercator distortion. Raster tiles built with gdal2tiles.
+      Susceptibility is a baseline, not a forecast.
+    </footer>
+  </aside>
+
+  <main class="stage">
+    <div id="map" aria-label="Flood susceptibility map of India by sub-district"></div>
+    <div class="zoom">
+      <button type="button" id="zin" aria-label="Zoom in">+</button>
+      <button type="button" id="zout" aria-label="Zoom out">−</button>
+      <button type="button" id="zfit" aria-label="Fit to selection" style="font-size:13px">⤢</button>
+    </div>
+    <div class="tip" id="tip" hidden></div>
+    <article class="card" id="card" hidden aria-live="polite"></article>
+    <div class="attrib" id="attrib" hidden>Labels © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a></div>
+    <div class="loading" id="loading">Loading 6,820 sub-districts…</div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/maplibre-gl/4.7.1/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script>
+const METRICS = {
+  h:  { label: "% High + Very High", fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1 },
+  p5: { label: "% Very High",        fmt: v => v.toFixed(1) + "%", fixed: [2, 5, 10, 20, 35, 60], step: 1 },
+  m:  { label: "Mean class",         fmt: v => v.toFixed(2),       fixed: [1.2, 1.4, 1.7, 2, 2.5, 3], step: 0.05 },
+  hk: { label: "High-risk area",     fmt: v => fmtNum(v, v < 10 ? 1 : 0) + " km²", fixed: [5, 15, 40, 100, 250, 600], step: 5 },
+};
+const CLASS_NAMES = ["Very Low", "Low", "Moderate", "High", "Very High"];
+const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], view: "summary", rop: 0.7 };
+
+/* ---------- GFSM raster tiles: gdal2tiles output packed into bundles (scripts/05_bundle_gfsm_tiles.py) ---------- */
+const GF = { index: null, bundles: new Map() };
+const EMPTY_TILE = new Promise(res => { const c = document.createElement("canvas"); c.width = c.height = 1; c.toBlob(b => res(b.arrayBuffer()), "image/png"); });
+function gfsmIndex() {
+  return GF.index ??= fetch("data/gfsm/index.json").then(r => { if (!r.ok) throw new Error("GFSM tile index " + r.status); return r.json(); });
+}
+function gfsmBundle(i, name) {
+  if (!GF.bundles.has(i)) GF.bundles.set(i, fetch("data/gfsm/" + name).then(r => { if (!r.ok) throw new Error(name + " " + r.status); return r.arrayBuffer(); })
+    .catch(e => { GF.bundles.delete(i); throw e; }));
+  return GF.bundles.get(i);
+}
+maplibregl.addProtocol("gfsm", async params => {
+  const idx = await gfsmIndex(), t = idx.tiles[params.url.slice("gfsm://".length)];
+  if (!t) return { data: (await EMPTY_TILE).slice(0) };
+  const buf = await gfsmBundle(t[0], idx.bundles[t[0]]);
+  return { data: buf.slice(t[1], t[1] + t[2]) };
+});
+let P = [], FEAT = [], BBOX = [], map;
+
+const $ = id => document.getElementById(id);
+const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const ramp = () => [0, 1, 2, 3, 4, 5, 6].map(i => css("--r" + i));
+const fmtNum = (v, d = 0) => v.toLocaleString("en-IN", { maximumFractionDigits: d, minimumFractionDigits: d });
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function bboxOf(g) {
+  let x0 = 180, y0 = 90, x1 = -180, y1 = -90;
+  const walk = c => { if (typeof c[0] === "number") { if (c[0] < x0) x0 = c[0]; if (c[0] > x1) x1 = c[0]; if (c[1] < y0) y0 = c[1]; if (c[1] > y1) y1 = c[1]; } else c.forEach(walk); };
+  walk(g.coordinates); return [x0, y0, x1, y1];
+}
+const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
+const inScope = p => !S.state || p.s === S.state;
+const valid = p => p.q === 0;
+
+/* ---------- classification ---------- */
+function computeBreaks() {
+  const m = S.metric;
+  let b;
+  if (S.mode === "fixed") b = METRICS[m].fixed.slice();
+  else {
+    const vals = P.filter(p => valid(p) && inScope(p)).map(p => p[m]).sort((a, c) => a - c);
+    b = [1, 2, 3, 4, 5, 6].map(k => vals[Math.min(vals.length - 1, Math.floor(k * vals.length / 7))] ?? 0);
+  }
+  for (let i = 1; i < b.length; i++) if (b[i] <= b[i - 1]) b[i] = b[i - 1] + 1e-6; // step needs strictly ascending
+  S.breaks = b;
+}
+const binOf = v => { let i = 0; while (i < S.breaks.length && v >= S.breaks[i]) i++; return i; };
+
+/* ---------- ranks ---------- */
+function computeRanks() {
+  const m = S.metric, order = P.filter(valid).sort((a, b) => b[m] - a[m]);
+  const per = {};
+  order.forEach((p, i) => { p._rn = i + 1; per[p.s] = (per[p.s] || 0) + 1; p._rs = per[p.s]; });
+  S.nValid = order.length; S.perState = per;
+}
+
+/* ---------- map paint ---------- */
+function applyPaint() {
+  if (!map || !map.getLayer("gfsm")) return;
+  const C = ramp(), step = ["step", ["get", S.metric], C[0]];
+  S.breaks.forEach((b, i) => step.push(b, C[i + 1]));
+  map.setPaintProperty("adm3-fill", "fill-color", ["case", ["==", ["get", "q"], 1], css("--nodata"), step]);
+  const conds = [];
+  if (S.state) conds.push(["==", ["get", "s"], S.state]);
+  if (S.thr > 0) conds.push([">=", ["get", S.metric], S.thr]);
+  const on = S.view === "raster" ? 0 : 0.95, off = S.view === "raster" ? 0 : 0.12;
+  map.setPaintProperty("adm3-fill", "fill-opacity", conds.length ? ["case", ["all", ...conds], on, off] : on);
+  applyRaster();
+}
+function applyRaster() {
+  const show = S.view !== "summary";
+  map.setLayoutProperty("gfsm", "visibility", show ? "visible" : "none");
+  map.setPaintProperty("gfsm", "raster-opacity", S.view === "raster" ? Math.max(S.rop, 0.05) : S.rop);
+}
+function applyTheme() {
+  if (!map) return;
+  map.setPaintProperty("bg", "background-color", css("--map-bg"));
+  map.setPaintProperty("adm3-edges", "line-color", css("--edge"));
+  map.setPaintProperty("state-edges", "line-color", css("--state-edge"));
+  map.setPaintProperty("coast", "line-color", css("--state-edge"));
+  map.setPaintProperty("hl", "line-color", css("--ink"));
+  map.getSource("labels")?.setTiles(labelTiles());
+  applyPaint(); renderLegend(); renderTop();
+}
+
+/* ---------- panel rendering ---------- */
+function renderSummary() {
+  const sc = P.filter(p => valid(p) && inScope(p));
+  const va = sc.reduce((s, p) => s + p.va, 0), hk = sc.reduce((s, p) => s + p.hk, 0);
+  $("sumPct").textContent = va ? (100 * hk / va).toFixed(1) + "%" : "–";
+  $("sumPctK").textContent = `of ${S.state || "India"}'s land rated High or Very High`;
+  $("sumKm").textContent = fmtNum(hk);
+  $("sumN").textContent = fmtNum(sc.filter(p => p.h >= 50).length) + " / " + fmtNum(sc.length);
+}
+function renderLegend() {
+  const counts = new Array(7).fill(0);
+  P.forEach(p => { if (valid(p) && inScope(p)) counts[binOf(p[S.metric])]++; });
+  const max = Math.max(...counts, 1), C = ramp();
+  $("hist").innerHTML = counts.map((c, i) => `<div style="height:${Math.max(3, 100 * c / max)}%;background:${C[i]};opacity:.55" title="${c} sub-districts"></div>`).join("");
+  $("ramp").innerHTML = C.map((c, i) => `<span style="background:var(--r${i})"></span>`).join("");
+  const f = METRICS[S.metric].fmt;
+  $("ticks").innerHTML = ["", ...S.breaks].map(b => `<span>${b === "" ? "" : f(b).replace(" km²", "")}</span>`).join("");
+  $("legendCap").textContent = S.mode === "quantile" ? `7 equal-count classes${S.state ? " within " + S.state : ""}` : "Fixed thresholds, comparable across states";
+}
+function renderTop() {
+  const m = S.metric, f = METRICS[m].fmt, C = ramp();
+  const top = P.filter(p => valid(p) && inScope(p)).sort((a, b) => b[m] - a[m]).slice(0, 10);
+  $("topLbl").textContent = `Highest ${METRICS[m].label.toLowerCase().replace("% ", "")} in ${S.state || "India"}`;
+  $("topList").innerHTML = top.map((p, i) => `<li><button type="button" data-i="${p.i}">
+    <span class="rk">${i + 1}</span>
+    <span class="nm">${esc(p.n)} <small>· ${esc(p.d)}${S.state ? "" : ", " + esc(p.s)}</small></span>
+    <span class="val"><i style="background:${C[binOf(p[m])]}"></i>${f(p[m])}</span></button></li>`).join("");
+}
+function renderThreshold() {
+  const m = S.metric, vals = P.filter(valid).map(p => p[m]);
+  const r = $("thr"); r.max = m === "hk" ? 1000 : m === "m" ? 5 : 100; r.step = METRICS[m].step; r.min = 0;
+  r.value = S.thr;
+  $("thrOut").textContent = S.thr > 0 ? "≥ " + METRICS[m].fmt(+S.thr) : "off";
+}
+function renderCard() {
+  const card = $("card"), p = S.sel == null ? null : P[S.sel];
+  if (!p) { card.hidden = true; return; }
+  const comp = [p.p1, p.p2, p.p3, p.p4, p.p5];
+  card.innerHTML = `
+    <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
+      <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
+    ${p.q ? `<div class="flag">GFSM has no data for this sub-district (small islands are outside its coverage).</div>` : `
+    <div class="comp" role="img" aria-label="Share of area by susceptibility class">${comp.map((v, i) => `<span style="width:${v}%;background:var(--g${i + 1})"></span>`).join("")}</div>
+    <div class="cls">${comp.map((v, i) => `<div><i style="background:var(--g${i + 1})"></i><b>${v.toFixed(1)}%</b>${CLASS_NAMES[i]}</div>`).join("")}</div>
+    <dl class="facts">
+      <div><dt>High + Very High</dt><dd>${p.h.toFixed(1)}%</dd></div>
+      <div><dt>Mean class</dt><dd>${p.m.toFixed(2)} / 5</dd></div>
+      <div><dt>High-risk area</dt><dd>${fmtNum(p.hk, 1)} km²</dd></div>
+      <div><dt>Total area</dt><dd>${fmtNum(p.a, 1)} km²</dd></div>
+      <div><dt>Rank in India</dt><dd>${fmtNum(p._rn)} / ${fmtNum(S.nValid)}</dd></div>
+      <div><dt>Rank in state</dt><dd>${fmtNum(p._rs)} / ${fmtNum(S.perState[p.s])}</dd></div>
+    </dl>
+    <div class="where">Ranked by ${METRICS[S.metric].label.toLowerCase()}.</div>`}`;
+  card.hidden = false;
+  $("cardX").onclick = () => select(null);
+}
+function refresh({ breaks = true } = {}) {
+  if (breaks) computeBreaks();
+  applyPaint(); renderLegend(); renderTop(); renderSummary(); renderCard();
+}
+
+/* ---------- interaction ---------- */
+function setFS(i, key, val) { if (i != null) map.setFeatureState({ source: "adm3", id: i }, { [key]: val }); }
+function select(i, fly = false) {
+  setFS(S.sel, "sel", false); S.sel = i; setFS(i, "sel", true); renderCard();
+  if (i != null && fly) map.fitBounds(BBOX[i], { padding: 80, maxZoom: 10, duration: 900 });
+}
+function fitScope() {
+  const box = S.sel != null ? BBOX[S.sel] : S.state ? unionBox(P.filter(inScope).map(p => BBOX[p.i])) : [68, 6.3, 97.6, 37.3];
+  map.fitBounds(box, { padding: 40, maxZoom: 10, duration: 800 });
+}
+
+function bindUI() {
+  $("metricSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.metric = b.dataset.m; S.thr = 0;
+    [...$("metricSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    computeRanks(); renderThreshold(); refresh();
+  });
+  $("layerSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.view = b.dataset.v;
+    [...$("layerSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    $("rasterCtl").hidden = S.view === "summary";
+    if (S.view === "raster" && S.rop < 0.5) { S.rop = 1; $("rop").value = 100; $("ropOut").textContent = "100%"; }
+    applyPaint();
+  });
+  $("rop").addEventListener("input", e => { S.rop = e.target.value / 100; $("ropOut").textContent = e.target.value + "%"; applyRaster(); });
+  $("modeSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.mode = b.dataset.k;
+    [...$("modeSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    refresh();
+  });
+  $("st").addEventListener("change", e => {
+    S.state = e.target.value;
+    if (S.sel != null && S.state && P[S.sel].s !== S.state) select(null);
+    refresh(); fitScope();
+  });
+  $("thr").addEventListener("input", e => { S.thr = +e.target.value; renderThreshold(); applyPaint(); });
+  $("topList").addEventListener("click", e => { const b = e.target.closest("button"); if (b) select(+b.dataset.i, true); });
+  $("zin").onclick = () => map.zoomIn(); $("zout").onclick = () => map.zoomOut(); $("zfit").onclick = fitScope;
+
+  // search
+  const q = $("q"), res = $("results"); let hits = [], cur = 0;
+  const show = () => {
+    const t = q.value.trim().toLowerCase();
+    if (t.length < 2) { res.hidden = true; return; }
+    const starts = [], incl = [];
+    for (const p of P) { const n = p.n.toLowerCase(); if (n.startsWith(t)) starts.push(p); else if (n.includes(t) || p.d?.toLowerCase().startsWith(t)) incl.push(p); }
+    hits = starts.concat(incl).slice(0, 8); cur = 0;
+    res.innerHTML = hits.length ? hits.map((p, k) => `<button type="button" data-i="${p.i}" class="${k === 0 ? "on" : ""}">${esc(p.n)} <small>· ${esc(p.d)}, ${esc(p.s)}</small></button>`).join("")
+      : `<button type="button" disabled>No sub-district matches “${esc(q.value)}”</button>`;
+    res.hidden = false;
+  };
+  const pick = i => { res.hidden = true; q.value = P[i].n; if (S.state && P[i].s !== S.state) { S.state = ""; $("st").value = ""; refresh(); } select(i, true); };
+  q.addEventListener("input", show);
+  q.addEventListener("keydown", e => {
+    if (res.hidden || !hits.length) return;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); cur = (cur + (e.key === "ArrowDown" ? 1 : hits.length - 1)) % hits.length; [...res.children].forEach((b, k) => b.classList.toggle("on", k === cur)); }
+    else if (e.key === "Enter") { e.preventDefault(); pick(hits[cur].i); }
+    else if (e.key === "Escape") res.hidden = true;
+  });
+  res.addEventListener("mousedown", e => { const b = e.target.closest("button[data-i]"); if (b) { e.preventDefault(); pick(+b.dataset.i); } });
+  q.addEventListener("blur", () => setTimeout(() => res.hidden = true, 120));
+
+  // theme changes (system setting or viewer toggle)
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
+  new MutationObserver(applyTheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+
+function bindMap() {
+  const tip = $("tip");
+  map.on("mousemove", "adm3-fill", e => {
+    const f = e.features[0]; if (!f) return;
+    if (S.hover !== f.id) { setFS(S.hover, "hover", false); S.hover = f.id; setFS(f.id, "hover", true); }
+    const p = P[f.id], m = S.metric;
+    tip.innerHTML = `<b>${esc(p.n)}</b><small>${esc(p.d)}, ${esc(p.s)}</small><div class="tv">${p.q ? "No GFSM data" : METRICS[m].label + ": " + METRICS[m].fmt(p[m])}</div>`;
+    const W = map.getContainer().clientWidth, x = e.point.x + 14, y = e.point.y + 14;
+    tip.style.left = (x + 240 > W ? e.point.x - 250 : x) + "px"; tip.style.top = y + "px"; tip.hidden = false;
+  });
+  map.on("mouseleave", "adm3-fill", () => { setFS(S.hover, "hover", false); S.hover = null; tip.hidden = true; });
+  map.on("click", e => {
+    const f = map.queryRenderedFeatures(e.point, { layers: ["adm3-fill"] })[0];
+    select(f ? f.id : null);
+  });
+}
+
+/* ---------- place-name labels (labels only: no third-party boundary lines) ---------- */
+const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches; };
+const labelTiles = () => "abcd".split("").map(s => `https://${s}.basemaps.cartocdn.com/${isDark() ? "dark" : "light"}_only_labels/{z}/{x}/{y}@2x.png`);
+async function addLabels() {
+  try {  // hosts that block external tiles (sandboxed previews) simply skip the labels
+    const r = await fetch(labelTiles()[0].replace("{z}/{x}/{y}", "5/22/13"), { mode: "cors" });
+    if (!r.ok) return;
+  } catch { return; }
+  map.addSource("labels", { type: "raster", tiles: labelTiles(), tileSize: 256, maxzoom: 18 });
+  map.addLayer({ id: "labels", type: "raster", source: "labels", paint: { "raster-fade-duration": 0 } });
+  $("attrib").hidden = false;
+}
+
+/* ---------- boot ---------- */
+(async function boot() {
+  let topo;
+  try {
+    const r = await fetch("data/india_adm3.topo.json");
+    if (!r.ok) throw new Error(r.status);
+    topo = await r.json();
+  } catch (err) {
+    $("loading").textContent = "Map data did not load. If you opened this file directly, serve the folder instead: python -m http.server";
+    return;
+  }
+  const fc = topojson.feature(topo, topo.objects.adm3);
+  fc.features.forEach(f => { f.id = f.properties.i; });
+  FEAT = fc.features; P = FEAT.map(f => f.properties); BBOX = FEAT.map(f => bboxOf(f.geometry));
+  const adm3Edges = topojson.mesh(topo, topo.objects.adm3, (a, b) => a !== b);
+  const stateEdges = topojson.mesh(topo, topo.objects.states, (a, b) => a !== b);
+  const coast = topojson.mesh(topo, topo.objects.states, (a, b) => a === b);
+
+  [...new Set(P.map(p => p.s))].sort().forEach(s => $("st").insertAdjacentHTML("beforeend", `<option>${esc(s)}</option>`));
+  computeRanks(); computeBreaks(); renderThreshold(); bindUI();
+
+  map = new maplibregl.Map({
+    container: "map",
+    style: { version: 8, sources: {}, layers: [{ id: "bg", type: "background", paint: { "background-color": css("--map-bg") } }] },
+    bounds: [[68, 6.3], [97.6, 37.3]], fitBoundsOptions: { padding: 24 },
+    maxBounds: [[52, -2], [114, 44]], attributionControl: false, dragRotate: false, pitchWithRotate: false, renderWorldCopies: false,
+  });
+  map.touchZoomRotate.disableRotation();
+  map.on("load", () => {
+    map.addSource("adm3", { type: "geojson", data: fc, tolerance: 0.25, buffer: 32 });
+    map.addSource("adm3Edges", { type: "geojson", data: adm3Edges, tolerance: 0.4 });
+    map.addSource("stateEdges", { type: "geojson", data: stateEdges });
+    map.addSource("coast", { type: "geojson", data: coast });
+    map.addSource("gfsm", { type: "raster", tiles: ["gfsm://{z}/{x}/{y}"], tileSize: 256, minzoom: 4, maxzoom: 10, bounds: [68, 6.3, 97.6, 37.3] });
+    map.addLayer({ id: "adm3-fill", type: "fill", source: "adm3", paint: { "fill-color": css("--r0"), "fill-antialias": false } });
+    map.addLayer({ id: "gfsm", type: "raster", source: "gfsm", layout: { visibility: "none" },
+      paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.rop } });
+    gfsmIndex().catch(() => {});  // warm the index so the first toggle is instant
+    map.addLayer({ id: "adm3-edges", type: "line", source: "adm3Edges", paint: { "line-color": css("--edge"), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.15, 7, 0.5, 10, 1] } });
+    map.addLayer({ id: "state-edges", type: "line", source: "stateEdges", paint: { "line-color": css("--state-edge"), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.7, 8, 1.6] } });
+    map.addLayer({ id: "coast", type: "line", source: "coast", paint: { "line-color": css("--state-edge"), "line-width": 0.8 } });
+    map.addLayer({ id: "hl", type: "line", source: "adm3", paint: {
+      "line-color": css("--ink"),
+      "line-width": ["case", ["boolean", ["feature-state", "sel"], false], 2.6, ["boolean", ["feature-state", "hover"], false], 1.4, 0] } });
+    bindMap(); refresh(); addLabels();
+    $("loading").hidden = true;
+  });
+})();
+</script>

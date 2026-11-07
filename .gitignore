@@ -1,0 +1,15 @@
+# environments
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+
+# large or re-downloadable data (rebuild with scripts/01-05)
+data/raw/
+data/interim/
+data/processed/*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
