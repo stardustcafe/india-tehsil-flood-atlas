@@ -34,3 +34,5 @@ jobs:
           path: viewer
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          timeout: 1800000  # ms; the default 10 min is sometimes too short for the tile bundles
