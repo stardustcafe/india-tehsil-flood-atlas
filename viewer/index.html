@@ -218,7 +218,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
     <section class="field places" id="placesField" hidden>
       <div class="thr-row">
         <span class="eyebrow" style="margin:0" id="placesLbl">Places to visit</span>
-        <label class="check" style="margin:0"><input type="checkbox" id="plOn" checked> Show</label>
+        <label class="check" style="margin:0"><input type="checkbox" id="plOn"> Show</label>
       </div>
       <div class="cats" id="plCats" role="group" aria-labelledby="placesLbl"></div>
       <label class="check"><input type="checkbox" id="plHigh"> Only sites on High or Very High land</label>
@@ -657,7 +657,7 @@ const PLACE_CATS = {
   attraction: { label: "Other attractions", color: "#3b3f45", g: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>' },
 };
 const GFSM_COLORS = ["", "--g1", "--g2", "--g3", "--g4", "--g5"];
-const PL = { data: null, on: true, high: false, cats: new Set(Object.keys(PLACE_CATS)), sel: null };
+const PL = { data: null, on: false, high: false, cats: new Set(Object.keys(PLACE_CATS)), sel: null };
 const badgeSvg = (c, unesco) => `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
   <circle cx="12" cy="12" r="11" fill="${c.color}" stroke="${unesco ? "#f2c230" : "#fff"}" stroke-width="${unesco ? 2 : 1.4}"/>
   <g fill="#fff" transform="translate(12 12) scale(.6) translate(-12 -12)">${c.g}</g></svg>`;
@@ -734,7 +734,7 @@ async function addPlaces() {
   map.addSource("places", { type: "geojson", data: fc });
   const icon = ["concat", "pl-", ["get", "c"], ["case", ["==", ["get", "u"], 1], "-u", ""]];
   map.addLayer({ id: "places-pt", type: "symbol", source: "places", filter: placeFilter(), layout: {
-      "icon-image": icon, "symbol-sort-key": ["-", 0, ["get", "k"]],
+      visibility: PL.on ? "visible" : "none", "icon-image": icon, "symbol-sort-key": ["-", 0, ["get", "k"]],
       "icon-size": ["interpolate", ["linear"], ["zoom"], 4, 0.62, 8, 0.85, 12, 1.05],
       "icon-padding": ["interpolate", ["linear"], ["zoom"], 4, 6, 10, 1],
       "text-field": ["step", ["zoom"], "", 8, ["get", "n"]], "text-font": ["Noto Sans Regular"], "text-size": 11,
@@ -759,7 +759,11 @@ function bindPlacesUI() {
     const k = e.target.dataset.c; if (!k) return;
     e.target.checked ? PL.cats.add(k) : PL.cats.delete(k); applyPlaces(); renderPlaces();
   });
-  $("plTop").addEventListener("click", e => { const b = e.target.closest("button"); if (b) selectPlace(+b.dataset.p, true); });
+  $("plTop").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (!PL.on) { PL.on = $("plOn").checked = true; applyPlaces(); }  // show the layer so the picked site is visible
+    selectPlace(+b.dataset.p, true);
+  });
 }
 
 /* ---------- boot ---------- */
