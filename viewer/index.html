@@ -12,6 +12,8 @@
   --r0: #f7f1d6; --r1: #f4d68e; --r2: #eeab5d; --r3: #df753d; --r4: #c0423b; --r5: #8d2046; --r6: #4c1240;
   /* GFSM source class colours (Waleed et al. 2026) */
   --g1: #2c7bb6; --g2: #abd9e9; --g3: #ffffbf; --g4: #fdae61; --g5: #d7191c;
+  /* population density classes (scripts/07_build_pop_tiles.py) */
+  --d1: #e9e3f2; --d2: #c5b3dc; --d3: #9d84c4; --d4: #7652a8; --d5: #52307f; --d6: #2a1450;
   --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
   --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -47,6 +49,7 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(
 
 .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; padding: 12px 0; border-block: 1px solid var(--line); }
 .summary .big { grid-column: 1 / -1; }
+.summary .src { grid-column: 1 / -1; color: var(--muted); font-size: 11.5px; margin-top: -4px; }
 .summary .v { font: 700 22px/1.1 var(--display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
 .summary .big .v { font-size: 34px; }
 .summary .k { color: var(--muted); font-size: 12px; }
@@ -56,7 +59,6 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(
 .seg button { font: 500 12.5px/1.2 var(--body); color: var(--muted); background: transparent; border: 0; border-radius: 6px; padding: 8px 6px; cursor: pointer; text-align: center; }
 .seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
 .seg.two { grid-template-columns: 1fr 1fr; }
-.seg.three { grid-template-columns: 1.3fr 1fr 1fr; }
 .raster-ctl { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
 .gleg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
 .gleg i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; outline: 1px solid var(--line); }
@@ -153,13 +155,16 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
     <div class="brand">
       <p class="eyebrow">GFSM v1 · 30 m · sub-district</p>
       <h1>India Tehsil Flood Atlas</h1>
-      <p>Flood susceptibility for 6,820 tehsils, talukas and mandals, summarised from the Global Flood Susceptibility Map.</p>
+      <p>Flood susceptibility, and the people living with it, for 6,820 tehsils, talukas and mandals, summarised from the Global Flood Susceptibility Map.</p>
     </div>
 
     <section class="summary" aria-live="polite">
       <div class="big"><div class="v" id="sumPct">–</div><div class="k" id="sumPctK">of land rated High or Very High</div></div>
+      <div id="sumXBox"><div class="v" id="sumX">–</div><div class="k">people in High or Very High areas</div></div>
+      <div id="sumXpBox"><div class="v" id="sumXp">–</div><div class="k">of the population</div></div>
       <div><div class="v" id="sumKm">–</div><div class="k">km² High or Very High</div></div>
       <div><div class="v" id="sumN">–</div><div class="k" id="sumNK">sub-districts over half High+</div></div>
+      <div class="src" id="sumSrc"></div>
     </section>
 
     <div class="field">
@@ -172,20 +177,30 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 
     <div class="field">
       <span class="eyebrow" id="layerLbl">Layers</span>
-      <div class="seg three" role="group" aria-labelledby="layerLbl" id="layerSeg">
+      <div class="seg" role="group" aria-labelledby="layerLbl" id="layerSeg">
         <button type="button" data-v="summary" aria-pressed="true">Sub-district summary</button>
         <button type="button" data-v="raster" aria-pressed="false">GFSM 30 m</button>
-        <button type="button" data-v="overlay" aria-pressed="false">Overlay</button>
+        <button type="button" data-v="overlay" aria-pressed="false">GFSM over summary</button>
+        <button type="button" data-v="pop" aria-pressed="false">Population 1 km</button>
       </div>
       <div class="raster-ctl" id="rasterCtl" hidden>
-        <div class="thr-row"><label class="eyebrow" for="rop" style="margin:0">GFSM opacity</label><output id="ropOut" for="rop">70%</output></div>
+        <div class="seg" role="group" aria-label="Population shown" id="popKindSeg" hidden>
+          <button type="button" data-k="high" aria-pressed="true">In High + Very High</button>
+          <button type="button" data-k="all" aria-pressed="false">All people</button>
+        </div>
+        <div class="thr-row"><label class="eyebrow" for="rop" style="margin:0" id="ropLbl">GFSM opacity</label><output id="ropOut" for="rop">70%</output></div>
         <input type="range" id="rop" min="0" max="100" step="5" value="70">
-        <div class="gleg" aria-label="GFSM classes">
+        <div class="gleg" id="popLeg" aria-label="People per km²" hidden>
+          <span><i style="background:var(--d1)"></i>1–10</span><span><i style="background:var(--d2)"></i>10–50</span>
+          <span><i style="background:var(--d3)"></i>50–250</span><span><i style="background:var(--d4)"></i>250–1k</span>
+          <span><i style="background:var(--d5)"></i>1k–5k</span><span><i style="background:var(--d6)"></i>5k+ people/km²</span>
+        </div>
+        <div class="gleg" id="gfsmLeg" aria-label="GFSM classes">
           <span><i style="background:var(--g1)"></i>Very Low</span><span><i style="background:var(--g2)"></i>Low</span>
           <span><i style="background:var(--g3)"></i>Moderate</span><span><i style="background:var(--g4)"></i>High</span>
           <span><i style="background:var(--g5)"></i>Very High</span>
         </div>
-        <p class="hint">Pixels are about 150 m at zoom 10 (most common 30 m class per pixel). Zooming further enlarges them.</p>
+        <p class="hint" id="rasterHint">Pixels are about 150 m at zoom 10 (most common 30 m class per pixel). Zooming further enlarges them.</p>
       </div>
       <label class="check" id="ctxRow" hidden><input type="checkbox" id="ctx" checked> Place names and rivers (OpenStreetMap)</label>
     </div>
@@ -197,7 +212,15 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
         <button type="button" data-m="p5" aria-pressed="false">% Very High</button>
         <button type="button" data-m="m" aria-pressed="false">Mean class (1–5)</button>
         <button type="button" data-m="hk" aria-pressed="false">High-risk area km²</button>
+        <button type="button" data-m="x" aria-pressed="false">People in High+</button>
+        <button type="button" data-m="xp" aria-pressed="false">% people in High+</button>
       </div>
+    </div>
+
+    <div class="field" id="srcField" hidden>
+      <span class="eyebrow" id="srcLbl">Population data (2020)</span>
+      <div class="seg" role="group" aria-labelledby="srcLbl" id="srcSeg"></div>
+      <p class="hint" id="srcHint"></p>
     </div>
 
     <div class="field">
@@ -235,6 +258,9 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
     <footer class="credits">
       Susceptibility: GFSM v1, Waleed et al. (2026), <a href="https://doi.org/10.1038/s41597-026-08338-1" target="_blank" rel="noopener">Scientific Data</a>, CC BY 4.0.
       Boundaries: <a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoBoundaries</a> IND ADM3 (LGD 2018), ODbL.
+      Population 2020: <a href="https://doi.org/10.7927/H4PN93PB" target="_blank" rel="noopener">GPW v4.11</a> (CIESIN, NASA SEDAC) and
+      <a href="https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE" target="_blank" rel="noopener">GHS-POP R2023A</a> (EC JRC), CC BY 4.0.
+      Each 1 km cell's people are split across the 30 m GFSM land area inside it.
       Areas are true ground areas, corrected for Mercator distortion. Raster tiles built with gdal2tiles.
       Susceptibility is a baseline, not a forecast.
     </footer>
@@ -261,26 +287,32 @@ const METRICS = {
   h:  { label: "% High + Very High", fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1 },
   p5: { label: "% Very High",        fmt: v => v.toFixed(1) + "%", fixed: [2, 5, 10, 20, 35, 60], step: 1 },
   m:  { label: "Mean class",         fmt: v => v.toFixed(2),       fixed: [1.2, 1.4, 1.7, 2, 2.5, 3], step: 0.05 },
-  hk: { label: "High-risk area",     fmt: v => fmtNum(v, v < 10 ? 1 : 0) + " km²", fixed: [5, 15, 40, 100, 250, 600], step: 5 },
+  hk: { label: "High-risk area",     fmt: v => fmtNum(v, v < 10 ? 1 : 0) + " km²", tick: v => fmtNum(v), fixed: [5, 15, 40, 100, 250, 600], step: 5, max: 1000 },
+  x:  { label: "People in High+",    fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true },
+  xp: { label: "% people in High+",  fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1, pop: true },
+};
+const POP_SOURCES = {
+  gpw: { label: "GPW v4.11", hint: "GPW spreads each census sub-district's count evenly over its area, so it cannot tell whether settlements sit on the floodplain or above it." },
+  ghs: { label: "GHS-POP", hint: "GHS-POP places people by built-up volume mapped from satellite imagery, so it follows where settlements actually are." },
 };
 const CLASS_NAMES = ["Very Low", "Low", "Moderate", "High", "Very High"];
-const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], view: "summary", rop: 0.7 };
+const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], view: "summary", rop: 0.7, src: "gpw", popKind: "high", srcs: [] };
 
-/* ---------- GFSM raster tiles: gdal2tiles output packed into bundles (scripts/05_bundle_gfsm_tiles.py) ---------- */
-const GF = { index: null, bundles: new Map() };
+/* ---------- raster tiles: gdal2tiles output packed into bundles (scripts/05_bundle_gfsm_tiles.py), URL tiles://{set}/{z}/{x}/{y} ---------- */
+const TILESETS = new Map(), BUNDLES = new Map();
 const EMPTY_TILE = new Promise(res => { const c = document.createElement("canvas"); c.width = c.height = 1; c.toBlob(b => res(b.arrayBuffer()), "image/png"); });
-function gfsmIndex() {
-  return GF.index ??= fetch("data/gfsm/index.json").then(r => { if (!r.ok) throw new Error("GFSM tile index " + r.status); return r.json(); });
+const fetchOk = (url, as) => fetch(url).then(r => { if (!r.ok) throw new Error(url + " " + r.status); return r[as](); });
+function cached(cache, key, load) {
+  if (!cache.has(key)) cache.set(key, load().catch(e => { cache.delete(key); throw e; }));
+  return cache.get(key);
 }
-function gfsmBundle(i, name) {
-  if (!GF.bundles.has(i)) GF.bundles.set(i, fetch("data/gfsm/" + name).then(r => { if (!r.ok) throw new Error(name + " " + r.status); return r.arrayBuffer(); })
-    .catch(e => { GF.bundles.delete(i); throw e; }));
-  return GF.bundles.get(i);
-}
-maplibregl.addProtocol("gfsm", async params => {
-  const idx = await gfsmIndex(), t = idx.tiles[params.url.slice("gfsm://".length)];
+const tileIndex = set => cached(TILESETS, set, () => fetchOk(`data/${set}/index.json`, "json"));
+const tileBundle = (set, name) => cached(BUNDLES, set + "/" + name, () => fetchOk(`data/${set}/${name}`, "arrayBuffer"));
+maplibregl.addProtocol("tiles", async params => {
+  const [set, ...zxy] = params.url.slice("tiles://".length).split("/");
+  const idx = await tileIndex(set), t = idx.tiles[zxy.join("/")];
   if (!t) return { data: (await EMPTY_TILE).slice(0) };
-  const buf = await gfsmBundle(t[0], idx.bundles[t[0]]);
+  const buf = await tileBundle(set, idx.bundles[t[0]]);
   return { data: buf.slice(t[1], t[1] + t[2]) };
 });
 let P = [], FEAT = [], BBOX = [], map;
@@ -289,6 +321,9 @@ const $ = id => document.getElementById(id);
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const ramp = () => [0, 1, 2, 3, 4, 5, 6].map(i => css("--r" + i));
 const fmtNum = (v, d = 0) => v.toLocaleString("en-IN", { maximumFractionDigits: d, minimumFractionDigits: d });
+// Indian units: 1 lakh = 100,000, 1 crore = 10,000,000
+const fmtPeople = v => v >= 1e7 ? (v / 1e7).toFixed(v >= 1e9 ? 1 : 2) + " crore" : v >= 1e5 ? (v / 1e5).toFixed(2) + " lakh" : fmtNum(Math.round(v));
+const fmtShort = v => v >= 1e5 ? +(v / 1e5).toFixed(1) + "L" : v >= 1e3 ? +(v / 1e3).toFixed(1) + "k" : fmtNum(v);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
 function bboxOf(g) {
@@ -299,6 +334,18 @@ function bboxOf(g) {
 const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
 const inScope = p => !S.state || p.s === S.state;
 const valid = p => p.q === 0;
+
+/* population per source: {src}T people, {src}X people in High + Very High (scripts/06_population_exposure.py) */
+function deriveSource() {
+  const T = S.src + "T", X = S.src + "X";
+  P.forEach(p => { p.pt = p[T] ?? 0; p.x = p[X] ?? 0; p.xp = p.pt > 0 ? 100 * p.x / p.pt : 0; });
+}
+// map-side value of the current metric; the derived population fields are not in the GeoJSON source
+function metricExpr() {
+  if (S.metric === "x") return ["get", S.src + "X"];
+  if (S.metric === "xp") return ["*", 100, ["/", ["get", S.src + "X"], ["max", 1, ["get", S.src + "T"]]]];
+  return ["get", S.metric];
+}
 
 /* ---------- classification ---------- */
 function computeBreaks() {
@@ -325,20 +372,35 @@ function computeRanks() {
 /* ---------- map paint ---------- */
 function applyPaint() {
   if (!map || !map.getLayer("gfsm")) return;
-  const C = ramp(), step = ["step", ["get", S.metric], C[0]];
+  const C = ramp(), step = ["step", metricExpr(), C[0]];
   S.breaks.forEach((b, i) => step.push(b, C[i + 1]));
   map.setPaintProperty("adm3-fill", "fill-color", ["case", ["==", ["get", "q"], 1], css("--nodata"), step]);
   const conds = [];
   if (S.state) conds.push(["==", ["get", "s"], S.state]);
-  if (S.thr > 0) conds.push([">=", ["get", S.metric], S.thr]);
-  const on = S.view === "raster" ? 0 : 0.95, off = S.view === "raster" ? 0 : 0.12;
+  if (S.thr > 0) conds.push([">=", metricExpr(), S.thr]);
+  const bare = S.view === "raster" || S.view === "pop", on = bare ? 0 : 0.95, off = bare ? 0 : 0.12;
   map.setPaintProperty("adm3-fill", "fill-opacity", conds.length ? ["case", ["all", ...conds], on, off] : on);
   applyRaster();
 }
+let POP_LAYERS = [];
 function applyRaster() {
-  const show = S.view !== "summary";
+  const show = S.view === "raster" || S.view === "overlay", popSet = `pop_${S.src}_${S.popKind}`;
   map.setLayoutProperty("gfsm", "visibility", show ? "visible" : "none");
   map.setPaintProperty("gfsm", "raster-opacity", S.view === "raster" ? Math.max(S.rop, 0.05) : S.rop);
+  for (const id of POP_LAYERS) {
+    map.setLayoutProperty(id, "visibility", S.view === "pop" && id === popSet ? "visible" : "none");
+    map.setPaintProperty(id, "raster-opacity", Math.max(S.rop, 0.05));
+  }
+}
+function renderRasterCtl() {
+  const pop = S.view === "pop";
+  $("rasterCtl").hidden = S.view === "summary";
+  $("popKindSeg").hidden = $("popLeg").hidden = !pop;
+  $("gfsmLeg").hidden = pop;
+  $("ropLbl").textContent = pop ? "Population opacity" : "GFSM opacity";
+  $("rasterHint").textContent = pop
+    ? `${POP_SOURCES[S.src]?.label ?? S.src} people per km² of each 1 km cell${S.popKind === "high" ? ", counting only people on land rated High or Very High" : ""}.`
+    : "Pixels are about 150 m at zoom 10 (most common 30 m class per pixel). Zooming further enlarges them.";
 }
 function applyTheme() {
   if (!map) return;
@@ -358,6 +420,12 @@ function applyTheme() {
 function renderSummary() {
   const sc = P.filter(p => valid(p) && inScope(p));
   const va = sc.reduce((s, p) => s + p.va, 0), hk = sc.reduce((s, p) => s + p.hk, 0);
+  const pt = sc.reduce((s, p) => s + p.pt, 0), x = sc.reduce((s, p) => s + p.x, 0);
+  if (S.srcs.length) {
+    $("sumX").textContent = fmtPeople(x);
+    $("sumXp").textContent = pt ? (100 * x / pt).toFixed(1) + "%" : "–";
+    $("sumSrc").textContent = `Population: ${POP_SOURCES[S.src].label}, 2020, ${fmtPeople(pt)} people in ${S.state || "India"}.`;
+  }
   $("sumPct").textContent = va ? (100 * hk / va).toFixed(1) + "%" : "–";
   $("sumPctK").textContent = `of ${S.state || "India"}'s land rated High or Very High`;
   $("sumKm").textContent = fmtNum(hk);
@@ -370,7 +438,8 @@ function renderLegend() {
   $("hist").innerHTML = counts.map((c, i) => `<div style="height:${Math.max(3, 100 * c / max)}%;background:${C[i]};opacity:.55" title="${c} sub-districts"></div>`).join("");
   $("ramp").innerHTML = C.map((c, i) => `<span style="background:var(--r${i})"></span>`).join("");
   const f = METRICS[S.metric].fmt;
-  $("ticks").innerHTML = ["", ...S.breaks].map(b => `<span>${b === "" ? "" : f(b).replace(" km²", "")}</span>`).join("");
+  const tick = METRICS[S.metric].tick ?? f;
+  $("ticks").innerHTML = ["", ...S.breaks].map(b => `<span>${b === "" ? "" : tick(b)}</span>`).join("");
   $("legendCap").textContent = S.mode === "quantile" ? `7 equal-count classes${S.state ? " within " + S.state : ""}` : "Fixed thresholds, comparable across states";
 }
 function renderTop() {
@@ -384,7 +453,7 @@ function renderTop() {
 }
 function renderThreshold() {
   const m = S.metric, vals = P.filter(valid).map(p => p[m]);
-  const r = $("thr"); r.max = m === "hk" ? 1000 : m === "m" ? 5 : 100; r.step = METRICS[m].step; r.min = 0;
+  const r = $("thr"); r.max = METRICS[m].max ?? (m === "m" ? 5 : 100); r.step = METRICS[m].step; r.min = 0;
   r.value = S.thr;
   $("thrOut").textContent = S.thr > 0 ? "≥ " + METRICS[m].fmt(+S.thr) : "off";
 }
@@ -403,10 +472,14 @@ function renderCard() {
       <div><dt>Mean class</dt><dd>${p.m.toFixed(2)} / 5</dd></div>
       <div><dt>High-risk area</dt><dd>${fmtNum(p.hk, 1)} km²</dd></div>
       <div><dt>Total area</dt><dd>${fmtNum(p.a, 1)} km²</dd></div>
+      ${S.srcs.length ? `<div><dt>People in High+</dt><dd>${fmtPeople(p.x)}</dd></div>
+      <div><dt>Share of people in High+</dt><dd>${p.xp.toFixed(1)}%</dd></div>
+      <div><dt>Population</dt><dd>${fmtPeople(p.pt)}</dd></div>` : ""}
       <div><dt>Rank in India</dt><dd>${fmtNum(p._rn)} / ${fmtNum(S.nValid)}</dd></div>
       <div><dt>Rank in state</dt><dd>${fmtNum(p._rs)} / ${fmtNum(S.perState[p.s])}</dd></div>
     </dl>
-    <div class="where">Ranked by ${METRICS[S.metric].label.toLowerCase()}.</div>`}`;
+    ${S.srcs.length > 1 ? `<div class="where">People in High+ by source: ${S.srcs.map(k => `${POP_SOURCES[k].label} ${fmtPeople(p[k + "X"] ?? 0)}`).join(" · ")}.</div>` : ""}
+    <div class="where">Ranked by ${METRICS[S.metric].label.toLowerCase()}${METRICS[S.metric].pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`}`;
   card.hidden = false;
   $("cardX").onclick = () => select(null);
 }
@@ -437,9 +510,21 @@ function bindUI() {
     const b = e.target.closest("button"); if (!b) return;
     S.view = b.dataset.v;
     [...$("layerSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
-    $("rasterCtl").hidden = S.view === "summary";
-    if (S.view === "raster" && S.rop < 0.5) { S.rop = 1; $("rop").value = 100; $("ropOut").textContent = "100%"; }
-    applyPaint();
+    if ((S.view === "raster" || S.view === "pop") && S.rop < 0.5) { S.rop = 1; $("rop").value = 100; $("ropOut").textContent = "100%"; }
+    renderRasterCtl(); applyPaint();
+  });
+  $("popKindSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.popKind = b.dataset.k;
+    [...$("popKindSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    renderRasterCtl(); applyRaster();
+  });
+  $("srcSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.src = b.dataset.s;
+    [...$("srcSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    $("srcHint").textContent = POP_SOURCES[S.src].hint;
+    deriveSource(); computeRanks(); renderRasterCtl(); refresh();
   });
   $("ctx").addEventListener("change", e => CONTEXT_LAYERS.forEach(id => map.getLayer(id) && map.setLayoutProperty(id, "visibility", e.target.checked ? "visible" : "none")));
   $("rop").addEventListener("input", e => { S.rop = e.target.value / 100; $("ropOut").textContent = e.target.value + "%"; applyRaster(); });
@@ -546,7 +631,16 @@ async function addContext() {
   const coast = topojson.mesh(topo, topo.objects.states, (a, b) => a === b);
 
   [...new Set(P.map(p => p.s))].sort().forEach(s => $("st").insertAdjacentHTML("beforeend", `<option>${esc(s)}</option>`));
-  computeRanks(); computeBreaks(); renderThreshold(); bindUI();
+  S.srcs = Object.keys(POP_SOURCES).filter(k => (k + "T") in P[0]);
+  if (!S.srcs.includes(S.src)) S.src = S.srcs[0] ?? "";
+  if (S.srcs.length) {
+    $("srcSeg").innerHTML = S.srcs.map(k => `<button type="button" data-s="${k}" aria-pressed="${k === S.src}">${POP_SOURCES[k].label}</button>`).join("");
+    $("srcHint").textContent = POP_SOURCES[S.src].hint;
+    $("srcField").hidden = false;
+  } else {  // data built without population
+    document.querySelectorAll('[data-m="x"], [data-m="xp"], [data-v="pop"], #sumXBox, #sumXpBox').forEach(el => el.remove());
+  }
+  deriveSource(); computeRanks(); computeBreaks(); renderThreshold(); bindUI();
 
   map = new maplibregl.Map({
     container: "map",
@@ -560,11 +654,15 @@ async function addContext() {
     map.addSource("adm3Edges", { type: "geojson", data: adm3Edges, tolerance: 0.4 });
     map.addSource("stateEdges", { type: "geojson", data: stateEdges });
     map.addSource("coast", { type: "geojson", data: coast });
-    map.addSource("gfsm", { type: "raster", tiles: ["gfsm://{z}/{x}/{y}"], tileSize: 256, minzoom: 4, maxzoom: 10, bounds: [68, 6.3, 97.6, 37.3] });
+    map.addSource("gfsm", { type: "raster", tiles: ["tiles://gfsm/{z}/{x}/{y}"], tileSize: 256, minzoom: 4, maxzoom: 10, bounds: [68, 6.3, 97.6, 37.3] });
+    POP_LAYERS = S.srcs.flatMap(k => [`pop_${k}_high`, `pop_${k}_all`]);
+    POP_LAYERS.forEach(id => map.addSource(id, { type: "raster", tiles: [`tiles://${id}/{z}/{x}/{y}`], tileSize: 256, minzoom: 4, maxzoom: 8, bounds: [68, 6.3, 97.6, 37.3] }));
     map.addLayer({ id: "adm3-fill", type: "fill", source: "adm3", paint: { "fill-color": css("--r0"), "fill-antialias": false } });
     map.addLayer({ id: "gfsm", type: "raster", source: "gfsm", layout: { visibility: "none" },
       paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.rop } });
-    gfsmIndex().catch(() => {});  // warm the index so the first toggle is instant
+    POP_LAYERS.forEach(id => map.addLayer({ id, type: "raster", source: id, layout: { visibility: "none" },
+      paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": 1 } }));
+    tileIndex("gfsm").catch(() => {});  // warm the index so the first toggle is instant
     map.addLayer({ id: "adm3-edges", type: "line", source: "adm3Edges", paint: { "line-color": css("--edge"), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.15, 7, 0.5, 10, 1] } });
     map.addLayer({ id: "state-edges", type: "line", source: "stateEdges", paint: { "line-color": css("--state-edge"), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.7, 8, 1.6] } });
     map.addLayer({ id: "coast", type: "line", source: "coast", paint: { "line-color": css("--state-edge"), "line-width": 0.8 } });

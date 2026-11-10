@@ -13,6 +13,8 @@ socio-economic and demographic indicators to build an open flood vulnerability m
 | GFSM tile index | same Zenodo record | `data/raw/gfsm/tile_index/` |
 | India boundary (India point-of-view) | Natural Earth 10m `admin_0_countries_ind` | `data/raw/boundaries/` |
 | Sub-district (ADM3), district, state boundaries | [geoBoundaries](https://www.geoboundaries.org) gbOpen IND (LGD-derived, ODbL 1.0) | `data/raw/boundaries/geoboundaries/` |
+| Population 2020, GPW v4.11 UN WPP-adjusted count, 30″ | [NASA SEDAC / CIESIN](https://doi.org/10.7927/H4PN93PB) (Earthdata login, CC BY 4.0) | `data/raw/population/gpw/` |
+| Population 2020, GHS-POP R2023A, EPSG:4326 30″ | [EC JRC GHSL](https://ghsl.jrc.ec.europa.eu/download.php?ds=pop) (no login, CC BY 4.0) | `data/raw/population/ghs/` |
 
 ## Outputs
 
@@ -28,6 +30,26 @@ District/state names come from a spatial join and may differ from official paren
 
 GFSM classes: 0 NoData, 1 Very Low, 2 Low, 3 Moderate, 4 High, 5 Very High.
 
+### Population exposure
+
+`scripts/06_population_exposure.py --source {gpw,ghs}` → `data/processed/`
+
+- `india_adm3_pop_{source}.csv`: people per sub-district by GFSM class, `pop_high_or_above`, `pct_pop_high_or_above`.
+- `india_adm3_flood_exposure.csv`: the GFSM table joined with every source, columns prefixed `gpw_` / `ghs_`.
+  (`india_adm3_flood_exposure.geojson` adds geometry; it is not committed because of its size. Join the CSV
+  to `india_adm3_gfsm.geojson` on `adm3_id`.)
+- `{source}2020_india_pop.tif`, `{source}2020_india_pop_high.tif`: 30″ grids of people and of people on
+  High + Very High land, India only.
+
+Method: every 1°×1° GFSM tile holds exactly 120×120 population cells. Each 30 m pixel is assigned to its
+(sub-district, population cell, class), and a cell's people are shared out in proportion to the true area of
+each part over the cell's GFSM land area (classes 1–5, including land across the border, so border cells are
+not over-counted). GFSM NoData pixels, mostly water, get no people.
+
+The two sources answer different questions. GPW spreads each Census 2011 sub-district's count evenly over its
+area, so its exposure is close to population × High+ area share. GHS-POP distributes people by built-up
+volume, so it follows where settlements actually are. Report both.
+
 ## Reproduce
 
 ```bash
@@ -38,6 +60,11 @@ python -m venv .venv
 .venv/Scripts/python scripts/03_build_viewer_data.py           # TopoJSON for the viewer (needs Node/npx)
 bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster tiles z4-10 (GDAL >= 3.x, ~1.5 min)
 .venv/Scripts/python scripts/05_bundle_gfsm_tiles.py           # pack tiles into bundles for the viewer
+# population: unzip GPW into data/raw/population/gpw/ and GHS-POP into data/raw/population/ghs/, then
+.venv/Scripts/python scripts/06_population_exposure.py --source gpw --workers 3   # ~4 min each; workers limited by RAM
+.venv/Scripts/python scripts/06_population_exposure.py --source ghs --workers 3
+.venv/Scripts/python scripts/07_build_pop_tiles.py             # 1 km population tiles z4-8 for the viewer
+.venv/Scripts/python scripts/03_build_viewer_data.py           # rerun to add population to the TopoJSON
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size

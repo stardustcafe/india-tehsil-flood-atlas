@@ -13,3 +13,4 @@ data/processed/*.log
 .DS_Store
 Thumbs.db
 .vscode/
+data/processed/india_adm3_flood_exposure.geojson

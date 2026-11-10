@@ -1,4 +1,6 @@
-"""Build compact TopoJSON for the web viewer from data/processed/india_adm3_gfsm.geojson.
+"""Build compact TopoJSON for the web viewer from data/processed/india_adm3_gfsm.geojson
+(or india_adm3_flood_exposure.geojson when 06_population_exposure.py has run, adding
+`{source}T` population and `{source}X` population in High + Very High per source, e.g. gpwT, ghsX).
 
 Keeps short property keys, then uses mapshaper (via npx) for topology-preserving
 simplification (no gaps/overlaps between neighbours) and adds a dissolved state layer.
@@ -15,7 +17,9 @@ from pathlib import Path
 import geopandas as gpd
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "data" / "processed" / "india_adm3_gfsm.geojson"
+SRC = ROOT / "data" / "processed" / "india_adm3_flood_exposure.geojson"
+if not SRC.exists():
+    SRC = ROOT / "data" / "processed" / "india_adm3_gfsm.geojson"
 OUT = ROOT / "viewer" / "data" / "india_adm3.topo.json"
 TMP = ROOT / "data" / "interim" / "viewer_adm3.geojson"
 
@@ -38,6 +42,11 @@ def main():
     out["hk"] = (g["km2_high"] + g["km2_very_high"]).round(1)  # high+very high area, km2
     out["va"] = g["gfsm_valid_km2"].round(1)  # area with GFSM data, km2
     out["q"] = (g["qa_flag"] == "no_gfsm").astype(int)
+    for col in g.columns:
+        if col.endswith("_pop_total"):
+            src = col.removesuffix("_pop_total")
+            out[f"{src}T"] = g[col].fillna(0).round().astype(int)
+            out[f"{src}X"] = g[f"{src}_pop_high_or_above"].fillna(0).round().astype(int)
     out["i"] = range(len(out))
     out = gpd.GeoDataFrame(out, geometry=g.geometry, crs=g.crs)
 
