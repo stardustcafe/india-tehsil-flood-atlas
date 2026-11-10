@@ -14,6 +14,7 @@ socio-economic and demographic indicators to build an open flood vulnerability m
 | India boundary (India point-of-view) | Natural Earth 10m `admin_0_countries_ind` | `data/raw/boundaries/` |
 | Sub-district (ADM3), district, state boundaries | [geoBoundaries](https://www.geoboundaries.org) gbOpen IND (LGD-derived, ODbL 1.0) | `data/raw/boundaries/geoboundaries/` |
 | Population 2020, GPW v4.11 UN WPP-adjusted count, 30″ | [NASA SEDAC / CIESIN](https://doi.org/10.7927/H4PN93PB) (Earthdata login, CC BY 4.0) | `data/raw/population/gpw/` |
+| Places to visit (tourism, heritage, religious, nature) | OpenStreetMap via Overpass (ODbL) + Wikidata sitelinks (CC0) | `data/raw/places/` (API cache) |
 | Population 2020, GHS-POP R2023A, EPSG:4326 30″ | [EC JRC GHSL](https://ghsl.jrc.ec.europa.eu/download.php?ds=pop) (no login, CC BY 4.0) | `data/raw/population/ghs/` |
 
 ## Outputs
@@ -50,6 +51,18 @@ The two sources answer different questions. GPW spreads each Census 2011 sub-dis
 area, so its exposure is close to population × High+ area share. GHS-POP distributes people by built-up
 volume, so it follows where settlements actually are. Report both.
 
+### Places to visit
+
+`scripts/08_tourism_places.py` → `data/processed/india_places.{csv,geojson}`, `viewer/data/places.geojson`
+
+OSM features tagged as tourism (attraction, museum, viewpoint, zoo, theme park), historic (fort, palace,
+monument, archaeological site, ...), places of worship, beaches, waterfalls, parks and protected areas, kept
+only when they carry a `wikidata` tag. OSM has no visitor numbers, so the Wikidata link is the notability
+filter and the number of Wikipedia/Wikimedia editions about a place (`sitelinks`) is the prominence score.
+Each place is put in one of ten categories and gets its sub-district, the GFSM class of the 30 m pixel at its
+point (`gfsm_class`) and the share of High + Very High land within 250 m (`pct_high_250m`). Large sites
+(parks, forts) are represented by their centre point.
+
 ## Reproduce
 
 ```bash
@@ -65,6 +78,7 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/python scripts/06_population_exposure.py --source ghs --workers 3
 .venv/Scripts/python scripts/07_build_pop_tiles.py             # 1 km population tiles z4-8 for the viewer
 .venv/Scripts/python scripts/03_build_viewer_data.py           # rerun to add population to the TopoJSON
+.venv/Scripts/python scripts/08_tourism_places.py              # places to visit from OSM + Wikidata
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size

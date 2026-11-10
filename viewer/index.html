@@ -98,6 +98,16 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .top .val { font: 500 12.5px var(--mono); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 6px; }
 .top .val i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
 
+/* places to visit */
+.cats { display: flex; flex-direction: column; }
+.cats label { display: grid; grid-template-columns: 18px 22px 1fr auto; gap: 6px; align-items: center; padding: 4px 2px; font-size: 12.5px; cursor: pointer; border-top: 1px solid var(--line); }
+.cats label:first-child { border-top: 0; }
+.cats input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0; }
+.cats img { width: 20px; height: 20px; display: block; }
+.cats .ct { font: 500 11px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.chip { display: inline-block; padding: 1px 7px; border-radius: 4px; font: 500 12px var(--mono); color: #13201d; }
+.card .links { display: flex; gap: 12px; font-size: 12.5px; }
+.card .links a { color: var(--accent); }
 .credits { color: var(--muted); font-size: 11.5px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); }
 .credits a { color: var(--accent); }
 
@@ -205,6 +215,20 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
       <label class="check" id="ctxRow" hidden><input type="checkbox" id="ctx" checked> Place names and rivers (OpenStreetMap)</label>
     </div>
 
+    <section class="field places" id="placesField" hidden>
+      <div class="thr-row">
+        <span class="eyebrow" style="margin:0" id="placesLbl">Places to visit</span>
+        <label class="check" style="margin:0"><input type="checkbox" id="plOn" checked> Show</label>
+      </div>
+      <div class="cats" id="plCats" role="group" aria-labelledby="placesLbl"></div>
+      <label class="check"><input type="checkbox" id="plHigh"> Only sites on High or Very High land</label>
+      <p class="hint" id="plHint"></p>
+      <div class="top">
+        <p class="eyebrow" id="plTopLbl" style="margin-top:6px">Best-known sites on High+ land</p>
+        <ol id="plTop"></ol>
+      </div>
+    </section>
+
     <div class="field">
       <span class="eyebrow" id="metricLbl">Colour by</span>
       <div class="seg" role="group" aria-labelledby="metricLbl" id="metricSeg">
@@ -261,6 +285,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
       Population 2020: <a href="https://doi.org/10.7927/H4PN93PB" target="_blank" rel="noopener">GPW v4.11</a> (CIESIN, NASA SEDAC) and
       <a href="https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE" target="_blank" rel="noopener">GHS-POP R2023A</a> (EC JRC), CC BY 4.0.
       Each 1 km cell's people are split across the 30 m GFSM land area inside it.
+      Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).
       Areas are true ground areas, corrected for Mercator distortion. Raster tiles built with gdal2tiles.
       Susceptibility is a baseline, not a forecast.
     </footer>
@@ -413,6 +438,7 @@ function applyTheme() {
     map.setPaintProperty("rivers", "line-color", css("--river"));
     for (const id of ["places", "villages"]) Object.entries(labelPaint()).forEach(([k, v]) => map.setPaintProperty(id, k, v));
   }
+  if (map.getLayer("places-pt")) Object.entries(labelPaint()).forEach(([k, v]) => map.setPaintProperty("places-pt", k, v));
   applyPaint(); renderLegend(); renderTop();
 }
 
@@ -459,7 +485,7 @@ function renderThreshold() {
 }
 function renderCard() {
   const card = $("card"), p = S.sel == null ? null : P[S.sel];
-  if (!p) { card.hidden = true; return; }
+  if (!p) { if (PL.sel != null) renderPlaceCard(); else card.hidden = true; return; }
   const comp = [p.p1, p.p2, p.p3, p.p4, p.p5];
   card.innerHTML = `
     <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
@@ -491,6 +517,7 @@ function refresh({ breaks = true } = {}) {
 /* ---------- interaction ---------- */
 function setFS(i, key, val) { if (i != null) map.setFeatureState({ source: "adm3", id: i }, { [key]: val }); }
 function select(i, fly = false) {
+  if (i != null && PL.sel != null) { map.setFeatureState({ source: "places", id: PL.sel }, { sel: false }); PL.sel = null; }
   setFS(S.sel, "sel", false); S.sel = i; setFS(i, "sel", true); renderCard();
   if (i != null && fly) map.fitBounds(BBOX[i], { padding: 80, maxZoom: 10, duration: 900 });
 }
@@ -537,7 +564,7 @@ function bindUI() {
   $("st").addEventListener("change", e => {
     S.state = e.target.value;
     if (S.sel != null && S.state && P[S.sel].s !== S.state) select(null);
-    refresh(); fitScope();
+    refresh(); applyPlaces(); renderPlaces(); fitScope();
   });
   $("thr").addEventListener("input", e => { S.thr = +e.target.value; renderThreshold(); applyPaint(); });
   $("topList").addEventListener("click", e => { const b = e.target.closest("button"); if (b) select(+b.dataset.i, true); });
@@ -583,6 +610,9 @@ function bindMap() {
   });
   map.on("mouseleave", "adm3-fill", () => { setFS(S.hover, "hover", false); S.hover = null; tip.hidden = true; });
   map.on("click", e => {
+    const pl = map.getLayer("places-pt") && map.queryRenderedFeatures(e.point, { layers: ["places-pt"] })[0];
+    if (pl) { selectPlace(pl.id); return; }
+    if (PL.sel != null) selectPlace(null);
     const f = map.queryRenderedFeatures(e.point, { layers: ["adm3-fill"] })[0];
     select(f ? f.id : null);
   });
@@ -610,6 +640,126 @@ async function addContext() {
     paint: labelPaint() });
   $("attrib").hidden = false;
   $("ctxRow").hidden = false;
+}
+
+/* ---------- places to visit (scripts/08_tourism_places.py): OSM features with Wikidata links ---------- */
+// glyphs drawn white on a coloured badge, 24-unit box
+const PLACE_CATS = {
+  heritage:   { label: "Forts, palaces and monuments", color: "#8a5a2b", g: '<path d="M4 20V8h2.5v2H9V8h2.5v2h1V8H15v2h2.5V8H20v12h-5.5v-4.5a2.5 2.5 0 0 0-5 0V20z"/>' },
+  religious:  { label: "Temples, mosques, churches, shrines", color: "#b8326e", g: '<path d="M12 2.5l1.3 2.7L18.5 12v8h-4v-4a2.5 2.5 0 0 0-5 0v4h-4v-8l5.2-6.8z"/>' },
+  museum:     { label: "Museums and galleries", color: "#4b4f9c", g: '<path d="M12 3l9 5H3zM5 10h2.2v7H5zm3.9 0h2.2v7H8.9zm4 0h2.2v7h-2.2zm3.9 0H19v7h-2.2zM3 18.5h18V21H3z"/>' },
+  beach:      { label: "Beaches", color: "#0e8f8e", g: '<path d="M12 4a8 8 0 0 0-8 7h16a8 8 0 0 0-8-7zM11 11h2v6h-2z"/><path d="M3 19.2c2 0 2.3-1.4 4.5-1.4s2.5 1.4 4.5 1.4 2.3-1.4 4.5-1.4 2.5 1.4 4.5 1.4" fill="none" stroke="#fff" stroke-width="1.8"/>' },
+  waterfall:  { label: "Waterfalls", color: "#1c7fc2", g: '<path d="M3 4h7v3H3zm11 0h7v3h-7zM9.2 8h1.8v9H9.2zm3.8 0h1.8v9H13zM4 18h16v3H4z"/>' },
+  wildlife:   { label: "National parks, sanctuaries, zoos", color: "#2e7d32", g: '<circle cx="6.5" cy="10" r="2.1"/><circle cx="10" cy="6.3" r="2.1"/><circle cx="14" cy="6.3" r="2.1"/><circle cx="17.5" cy="10" r="2.1"/><ellipse cx="12" cy="15.5" rx="4.6" ry="3.9"/>' },
+  park:       { label: "Parks and gardens", color: "#5f8f1c", g: '<circle cx="12" cy="9" r="6"/><path d="M11 13h2v8h-2z"/>' },
+  viewpoint:  { label: "Viewpoints and caves", color: "#56656f", g: '<path d="M2 20l7-11.5 4.2 6.3 2.3-3.3L22 20z"/>' },
+  amusement:  { label: "Theme and water parks", color: "#c7900c", g: '<circle cx="12" cy="10" r="6" fill="none" stroke="#fff" stroke-width="1.8"/><path d="M12 4v12M6 10h12M7.8 5.8l8.4 8.4M16.2 5.8l-8.4 8.4" stroke="#fff" stroke-width="1.2"/><path d="M12 10l-5 10h10z"/>' },
+  attraction: { label: "Other attractions", color: "#3b3f45", g: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>' },
+};
+const GFSM_COLORS = ["", "--g1", "--g2", "--g3", "--g4", "--g5"];
+const PL = { data: null, on: true, high: false, cats: new Set(Object.keys(PLACE_CATS)), sel: null };
+const badgeSvg = (c, unesco) => `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24">
+  <circle cx="12" cy="12" r="11" fill="${c.color}" stroke="${unesco ? "#f2c230" : "#fff"}" stroke-width="${unesco ? 2 : 1.4}"/>
+  <g fill="#fff" transform="translate(12 12) scale(.6) translate(-12 -12)">${c.g}</g></svg>`;
+const svgUrl = s => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(s);
+function loadIcon(id, svg) {
+  return new Promise(res => { const im = new Image(48, 48); im.onload = () => { if (!map.hasImage(id)) map.addImage(id, im, { pixelRatio: 2 }); res(); }; im.onerror = res; im.src = svgUrl(svg); });
+}
+const CAT_TYPE = { place_of_worship: "place of worship", archaeological_site: "archaeological site", city_gate: "city gate", national_park: "national park",
+  protected_area: "protected area", nature_reserve: "nature reserve", theme_park: "theme park", water_park: "water park", cave_entrance: "cave", hot_spring: "hot spring" };
+const placeInScope = p => (!S.state || p.s === S.state);
+function placeFilter() {
+  const f = ["all", ["in", ["get", "c"], ["literal", [...PL.cats]]]];
+  if (PL.high) f.push([">=", ["get", "g"], 4]);
+  if (S.state) f.push(["==", ["get", "s"], S.state]);
+  return f;
+}
+function applyPlaces() {
+  if (!map?.getLayer("places-pt")) return;
+  map.setLayoutProperty("places-pt", "visibility", PL.on ? "visible" : "none");
+  map.setFilter("places-pt", placeFilter());
+}
+function renderPlaces() {
+  if (!PL.data) return;
+  const sc = PL.data.filter(placeInScope), by = {};
+  sc.forEach(p => { const b = by[p.c] ??= { n: 0, h: 0 }; b.n++; if (p.g >= 4) b.h++; });
+  $("plCats").innerHTML = Object.entries(PLACE_CATS).map(([k, c]) => `<label title="${esc(c.label)}">
+    <input type="checkbox" data-c="${k}" ${PL.cats.has(k) ? "checked" : ""}><img src="${svgUrl(badgeSvg(c))}" alt="">
+    <span>${esc(c.label)}</span><span class="ct">${fmtNum(by[k]?.n ?? 0)} · ${by[k]?.n ? Math.round(100 * by[k].h / by[k].n) : 0}% High+</span></label>`).join("");
+  const tot = sc.length, hi = sc.filter(p => p.g >= 4).length;
+  $("plHint").textContent = `${fmtNum(tot)} notable sites in ${S.state || "India"}; ${fmtNum(hi)} (${tot ? (100 * hi / tot).toFixed(1) : 0}%) stand on land rated High or Very High. Gold ring: UNESCO World Heritage. Better-known sites win where icons overlap.`;
+  const top = sc.filter(p => p.g >= 4 && PL.cats.has(p.c)).slice(0, 8);  // data is sorted by prominence
+  $("plTopLbl").textContent = `Best-known sites on High+ land in ${S.state || "India"}`;
+  $("plTop").innerHTML = top.map((p, i) => `<li><button type="button" data-p="${p._i}">
+    <span class="rk">${i + 1}</span><span class="nm">${esc(p.n)} <small>· ${esc(p.a)}${S.state ? "" : ", " + esc(p.s)}</small></span>
+    <span class="val"><img src="${svgUrl(badgeSvg(PLACE_CATS[p.c], p.u))}" alt="" width="16" height="16"></span></button></li>`).join("");
+}
+function selectPlace(i, fly = false) {
+  if (PL.sel != null) map.setFeatureState({ source: "places", id: PL.sel }, { sel: false });
+  PL.sel = i;
+  if (i != null) {
+    setFS(S.sel, "sel", false); S.sel = null;
+    map.setFeatureState({ source: "places", id: i }, { sel: true });
+    if (fly) map.flyTo({ center: PL.feats[i].geometry.coordinates, zoom: Math.max(map.getZoom(), 12), duration: 900 });
+  }
+  renderPlaceCard();
+}
+function renderPlaceCard() {
+  const card = $("card"), p = PL.sel == null ? null : PL.data[PL.sel];
+  if (!p) { if (S.sel == null) card.hidden = true; return; }
+  const c = PLACE_CATS[p.c], type = CAT_TYPE[p.t] ?? String(p.t).replace(/_/g, " ");
+  const [lon, lat] = PL.feats[p._i].geometry.coordinates;
+  card.innerHTML = `
+    <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(c.label.split(",")[0])} · ${esc(type)}${p.u ? " · UNESCO World Heritage" : ""}</div>
+      <div class="where">${esc(p.a)}, ${esc(p.d)} district · ${esc(p.s)}</div></div>
+      <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
+    <dl class="facts">
+      <div><dt>GFSM class at site</dt><dd>${p.g ? `<span class="chip" style="background:var(${GFSM_COLORS[p.g]})">${CLASS_NAMES[p.g - 1]}</span>` : "No data (water)"}</dd></div>
+      <div><dt>High+ land within 250 m</dt><dd>${p.h == null ? "–" : p.h.toFixed(0) + "%"}</dd></div>
+      <div><dt>Wikipedia editions</dt><dd>${fmtNum(p.k)}</dd></div>
+      <div><dt>Sub-district High+</dt><dd>${(() => { const t = P.find(q => q.n === p.a && q.d === p.d); return t && !t.q ? t.h.toFixed(1) + "%" : "–"; })()}</dd></div>
+    </dl>
+    <div class="links"><a href="https://www.wikidata.org/wiki/${encodeURIComponent(p.w)}" target="_blank" rel="noopener">Wikidata</a>
+      <a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=16/${lat}/${lon}" target="_blank" rel="noopener">OpenStreetMap</a></div>
+    <div class="where">Point location from OpenStreetMap; large sites (parks, forts) are shown at their centre.</div>`;
+  card.hidden = false;
+  $("cardX").onclick = () => selectPlace(null);
+}
+async function addPlaces() {
+  let fc;
+  try { fc = await fetchOk("data/places.geojson", "json"); } catch { return; }
+  fc.features.forEach((f, i) => { f.id = i; f.properties._i = i; f.properties.r = Object.keys(PLACE_CATS).indexOf(f.properties.c); });
+  PL.feats = fc.features; PL.data = fc.features.map(f => f.properties);
+  await Promise.all(Object.entries(PLACE_CATS).flatMap(([k, c]) => [loadIcon("pl-" + k, badgeSvg(c)), loadIcon("pl-" + k + "-u", badgeSvg(c, true))]));
+  map.addSource("places", { type: "geojson", data: fc });
+  const icon = ["concat", "pl-", ["get", "c"], ["case", ["==", ["get", "u"], 1], "-u", ""]];
+  map.addLayer({ id: "places-pt", type: "symbol", source: "places", filter: placeFilter(), layout: {
+      "icon-image": icon, "symbol-sort-key": ["-", 0, ["get", "k"]],
+      "icon-size": ["interpolate", ["linear"], ["zoom"], 4, 0.62, 8, 0.85, 12, 1.05],
+      "icon-padding": ["interpolate", ["linear"], ["zoom"], 4, 6, 10, 1],
+      "text-field": ["step", ["zoom"], "", 8, ["get", "n"]], "text-font": ["Noto Sans Regular"], "text-size": 11,
+      "text-offset": [0, 1.25], "text-anchor": "top", "text-optional": true, "text-max-width": 9, "text-padding": 3 },
+    paint: { ...labelPaint(), "icon-opacity": ["case", ["boolean", ["feature-state", "sel"], false], 1, 0.96] } });
+  $("placesField").hidden = false;
+  renderPlaces();
+  map.on("mousemove", "places-pt", e => {
+    const p = e.features[0]?.properties; if (!p) return;
+    map.getCanvas().style.cursor = "pointer";
+    const tip = $("tip");
+    tip.innerHTML = `<b>${esc(p.n)}</b><small>${esc(PLACE_CATS[p.c].label.split(",")[0])} · ${esc(p.a)}, ${esc(p.s)}</small><div class="tv">GFSM at site: ${+p.g ? CLASS_NAMES[p.g - 1] : "no data"}</div>`;
+    const W = map.getContainer().clientWidth, x = e.point.x + 14;
+    tip.style.left = (x + 240 > W ? e.point.x - 250 : x) + "px"; tip.style.top = (e.point.y + 14) + "px"; tip.hidden = false;
+  });
+  map.on("mouseleave", "places-pt", () => { map.getCanvas().style.cursor = ""; $("tip").hidden = true; });
+}
+function bindPlacesUI() {
+  $("plOn").addEventListener("change", e => { PL.on = e.target.checked; applyPlaces(); });
+  $("plHigh").addEventListener("change", e => { PL.high = e.target.checked; applyPlaces(); });
+  $("plCats").addEventListener("change", e => {
+    const k = e.target.dataset.c; if (!k) return;
+    e.target.checked ? PL.cats.add(k) : PL.cats.delete(k); applyPlaces(); renderPlaces();
+  });
+  $("plTop").addEventListener("click", e => { const b = e.target.closest("button"); if (b) selectPlace(+b.dataset.p, true); });
 }
 
 /* ---------- boot ---------- */
@@ -669,7 +819,7 @@ async function addContext() {
     map.addLayer({ id: "hl", type: "line", source: "adm3", paint: {
       "line-color": css("--ink"),
       "line-width": ["case", ["boolean", ["feature-state", "sel"], false], 2.6, ["boolean", ["feature-state", "hover"], false], 1.4, 0] } });
-    bindMap(); refresh(); addContext();
+    bindMap(); bindPlacesUI(); refresh(); addContext().then(addPlaces);
     $("loading").hidden = true;
   });
 })();
