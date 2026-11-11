@@ -120,6 +120,7 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 .t-gfsm { background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3), var(--g4), var(--g5)); }
 .t-pop { background: linear-gradient(90deg, var(--d1), var(--d3), var(--d6)); }
 .t-clim { background: linear-gradient(90deg, #a6611a, #e4ecee, #5b9bd5, #0b3a75); }
+.t-sat { background: linear-gradient(135deg, #3d5a2a, #7d7348 40%, #a89a72 55%, #2e4f63); }
 .lyr-body { padding: 4px 12px 14px 50px; display: flex; flex-direction: column; gap: 10px; background: var(--sunk); }
 .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex: none; cursor: pointer; }
 .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
@@ -251,7 +252,8 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
   .tabs { position: static; }
   .legend-box { width: min(300px, calc(100% - 70px)); max-height: calc(100% - 80px); }
   .card { left: 12px; right: 12px; width: auto; bottom: 12px; padding: 12px 14px; }
-  .attrib { display: none; }
+  .attrib { left: 8px; right: 8px; bottom: 4px; font-size: 9.5px; text-align: right; }
+  .legend-box { bottom: 26px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 </style>
@@ -375,6 +377,25 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
               <input type="range" class="op" id="opChoro" data-layer="choro" min="5" max="100" step="5" value="90"></div>
           </div>
         </li>
+        <li class="lyr off" data-layer="sat">
+          <div class="lyr-head">
+            <span class="thumb t-sat"></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrSatBody"><b>Satellite imagery</b><small id="metaSat"></small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="sat" aria-label="Show satellite imagery"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrSatBody" hidden>
+            <div class="ctl"><span class="lbl" id="satYearLbl">Year</span>
+              <div class="seg" role="group" aria-labelledby="satYearLbl" id="satYearSeg">
+                <button type="button" data-y="2024" aria-pressed="true">2024</button>
+                <button type="button" data-y="2016" aria-pressed="false">2016</button>
+              </div></div>
+            <p class="hint">Sentinel-2 cloudless by EOX: a cloud-free mosaic of 10 m Copernicus Sentinel-2 imagery, sharp to about zoom 14.
+              The 2016 mosaic is CC BY 4.0; later years are CC BY-NC-SA 4.0 (non-commercial use).
+              Switching it on lowers the sub-district statistics layer to 50% so the ground shows through.</p>
+            <div class="ctl"><div class="row"><label for="opSat">Opacity</label><output id="opSatOut">100%</output></div>
+              <input type="range" class="op" id="opSat" data-layer="sat" min="5" max="100" step="5" value="100"></div>
+          </div>
+        </li>
       </ol>
     </div>
 
@@ -423,7 +444,8 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
           Each 1 km cell's people are split across the 30 m GFSM land area inside it.</span>
         <span>Climate: <a href="https://climateknowledgeportal.worldbank.org/" target="_blank" rel="noopener">World Bank CCKP</a> CMIP6 0.25° multi-model ensemble, CC BY 4.0.</span>
         <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
-        <span>Basemap labels: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
+        <span>Satellite imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, 2018 onwards CC BY-NC-SA 4.0.</span>
+        <span>Basemap labels:<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
         <span>Areas are true ground areas, corrected for Mercator distortion. Raster tiles built with gdal2tiles.</span>
         <span><a href="https://github.com/stardustcafe/india-tehsil-flood-atlas" target="_blank" rel="noopener">Code and data on GitHub</a></span>
       </div>
@@ -467,13 +489,14 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
           <div class="ramp" id="ramp"></div>
           <div class="ticks" id="ticks"></div>
           <div class="legend-note"><span id="legendCap">Sub-districts per class</span><span><i></i>No data</span></div></div>
+        <div class="lg" id="lgSat" hidden><h3>Satellite imagery</h3><p id="satCredit"></p></div>
         <p class="lg-empty" id="lgEmpty" hidden>No layers switched on.</p>
       </div>
     </section>
 
     <div class="tip" id="tip" hidden></div>
     <article class="card float" id="card" hidden aria-live="polite"></article>
-    <div class="attrib" id="attrib" hidden><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> · <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">© OpenMapTiles</a> · Data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</div>
+    <div class="attrib" id="attrib" hidden><span id="satAttrib" hidden><a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX (Copernicus Sentinel data) · </span><span id="ofmAttrib" hidden><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> · <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">© OpenMapTiles</a> · Data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</span></div>
     <div class="loading" id="loading">Loading 6,820 sub-districts…</div>
   </main>
 </div>
@@ -500,7 +523,10 @@ const POP_SOURCES = {
 const CLASS_NAMES = ["Very Low", "Low", "Moderate", "High", "Very High"];
 const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], src: "gpw", popKind: "high", srcs: [],
   // map layers, each with its own switch and opacity (places and OSM context are handled by their own sections)
-  L: { choro: { on: true, op: 0.9 }, gfsm: { on: false, op: 0.85 }, pop: { on: false, op: 0.9 }, clim: { on: false, op: 0.85 }, bounds: { on: true } } };
+  L: { choro: { on: true, op: 0.9 }, gfsm: { on: false, op: 0.85 }, pop: { on: false, op: 0.9 }, clim: { on: false, op: 0.85 }, bounds: { on: true },
+       sat: { on: false, op: 1, year: "2024" } } };
+// Sentinel-2 cloudless mosaics by EOX (https://s2maps.eu); the 2016 layer has no year in its name
+const SAT_YEARS = { 2024: { layer: "s2cloudless-2024_3857", lic: "CC BY-NC-SA 4.0" }, 2016: { layer: "s2cloudless_3857", lic: "CC BY 4.0" } };
 
 /* ---------- raster tiles: gdal2tiles output packed into bundles (scripts/05_bundle_gfsm_tiles.py), URL tiles://{set}/{z}/{x}/{y} ---------- */
 const TILESETS = new Map(), BUNDLES = new Map();
@@ -602,6 +628,12 @@ function applyRaster() {
     map.setPaintProperty("clim", "raster-opacity", L.clim.op);
   }
   map.setLayoutProperty("adm3-edges", "visibility", vis(L.bounds.on));
+  for (const y in SAT_YEARS) {
+    map.setLayoutProperty("sat" + y, "visibility", vis(L.sat.on && y === L.sat.year));
+    map.setPaintProperty("sat" + y, "raster-opacity", L.sat.op);
+  }
+  $("satAttrib").hidden = !L.sat.on;
+  $("attrib").hidden = $("satAttrib").hidden && $("ofmAttrib").hidden;
 }
 const scenLabel = () => `${SSP_INFO[CL.ssp][0]} · ${perLabel(CL.per)}`;
 const layerOn = k => k === "places" ? PL.on : k === "ctx" ? $("ctx").checked : S.L[k].on;
@@ -611,6 +643,7 @@ function renderLayerMeta() {
   $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : "");
   if (S.srcs.length) $("metaPop").textContent = `${POP_SOURCES[S.src].label} · ${S.popKind === "high" ? "people on High+ land" : "everyone"}`;
   $("metaClim").textContent = scenLabel();
+  $("metaSat").textContent = `Sentinel-2 cloudless ${S.L.sat.year} · EOX`;
   document.querySelectorAll(".scenTxt").forEach(e => e.textContent = scenLabel());
   document.querySelectorAll(".lyr").forEach(li => li.classList.toggle("off", !layerOn(li.dataset.layer)));
 }
@@ -618,8 +651,9 @@ function renderLayerMeta() {
 function renderLegendBox() {
   const L = S.L, m = METRICS[S.metric];
   $("lgChoro").hidden = !L.choro.on; $("lgGfsm").hidden = !L.gfsm.on; $("lgPop").hidden = !L.pop.on;
-  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on;
-  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on;
+  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on;
+  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on;
+  $("satCredit").textContent = `Sentinel-2 cloudless ${L.sat.year} by EOX IT Services GmbH, contains modified Copernicus Sentinel data, ${SAT_YEARS[L.sat.year].lic}.`;
   $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.pop ? ", " + POP_SOURCES[S.src].label : "");
   if (S.srcs.length) $("lgPopT").textContent = `People per km², ${POP_SOURCES[S.src].label}${S.popKind === "high" ? ", on High+ land only" : ""}`;
   $("lgClimT").textContent = `Change in wettest 5-day rain, ${scenLabel()}`;
@@ -758,6 +792,9 @@ function bindUI() {
   document.querySelectorAll(".lyr-on").forEach(inp => inp.addEventListener("change", () => {
     const k = inp.dataset.layer; S.L[k].on = inp.checked;
     if (k === "clim" && inp.checked) updateClimImage();
+    if (k === "sat" && inp.checked && S.L.choro.on && S.L.choro.op > 0.5) {  // let the imagery show through the fill
+      S.L.choro.op = 0.5; $("opChoro").value = 50; $("opChoroOut").textContent = "50%";
+    }
     applyPaint(); renderLegendBox(); renderLayerMeta();
   }));
   document.querySelectorAll(".op").forEach(r => r.addEventListener("input", () => {
@@ -772,6 +809,12 @@ function bindUI() {
     const b = e.target.closest("button"); if (!b) return;
     S.popKind = b.dataset.k;
     [...$("popKindSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    applyRaster(); renderLayerMeta(); renderLegendBox();
+  });
+  $("satYearSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.L.sat.year = b.dataset.y;
+    [...$("satYearSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
     applyRaster(); renderLayerMeta(); renderLegendBox();
   });
   $("ctx").addEventListener("change", e => {
@@ -879,7 +922,7 @@ async function addContext() {
   map.addLayer({ id: "villages", type: "symbol", source: "ofm", "source-layer": "place", minzoom: 10, filter: ["==", ["get", "class"], "village"],
     layout: { "text-field": placeName, "text-font": ["Noto Sans Regular"], "text-size": 11, "text-padding": 4 },
     paint: labelPaint() });
-  $("attrib").hidden = false;
+  $("attrib").hidden = $("ofmAttrib").hidden = false;
   $("ctxRow").hidden = false;
 }
 
@@ -1145,6 +1188,11 @@ function bindPlacesUI() {
     map.addSource("gfsm", { type: "raster", tiles: ["tiles://gfsm/{z}/{x}/{y}"], tileSize: 256, minzoom: 4, maxzoom: 10, bounds: [68, 6.3, 97.6, 37.3] });
     POP_LAYERS = S.srcs.flatMap(k => [`pop_${k}_high`, `pop_${k}_all`]);
     POP_LAYERS.forEach(id => map.addSource(id, { type: "raster", tiles: [`tiles://${id}/{z}/{x}/{y}`], tileSize: 256, minzoom: 4, maxzoom: 8, bounds: [68, 6.3, 97.6, 37.3] }));
+    for (const [y, s] of Object.entries(SAT_YEARS)) {  // satellite basemap, under everything
+      map.addSource("sat" + y, { type: "raster", tileSize: 256, maxzoom: 14,
+        tiles: [`https://tiles.maps.eox.at/wmts/1.0.0/${s.layer}/default/g/{z}/{y}/{x}.jpg`] });
+      map.addLayer({ id: "sat" + y, type: "raster", source: "sat" + y, layout: { visibility: "none" }, paint: { "raster-fade-duration": 150 } });
+    }
     map.addLayer({ id: "adm3-fill", type: "fill", source: "adm3", paint: { "fill-color": css("--r0"), "fill-antialias": false } });
     map.addLayer({ id: "gfsm", type: "raster", source: "gfsm", layout: { visibility: "none" },
       paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.L.gfsm.op } });

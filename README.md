@@ -122,7 +122,8 @@ Serve the folder rather than opening the file directly: `python -m http.server -
 It can be hosted as-is on GitHub Pages or any static host.
 
 The sidebar has three tabs. **Layers** lists every map layer in drawing order (places, labels and rivers,
-boundaries, rainfall change, population, GFSM 30 m, sub-district statistics), each with its own switch, opacity
+boundaries, rainfall change, population, GFSM 30 m, sub-district statistics, and a Sentinel-2 cloudless satellite
+basemap by EOX for 2024 or 2016), each with its own switch, opacity
 and settings, so layers can be combined. **Statistics** holds the summary for India or the chosen state, the
 climate outlook and the rankings. **About** holds the method notes and sources. The map carries a legend for every
 visible layer and one climate-scenario control (SSP and period) that applies everywhere.

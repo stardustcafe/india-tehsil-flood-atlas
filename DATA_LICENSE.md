@@ -28,6 +28,8 @@ third-party datasets and carry their licences:
   https://climateknowledgeportal.worldbank.org/. CC BY 4.0. Based on CMIP6 model output (WCRP).
 - Places to visit: © OpenStreetMap contributors (ODbL); prominence from Wikidata (CC0).
 - Viewer place names and rivers: © OpenStreetMap contributors (ODbL), served by OpenFreeMap using the OpenMapTiles schema.
+- Viewer satellite imagery (streamed, not redistributed): Sentinel-2 cloudless (https://s2maps.eu) by EOX IT Services GmbH,
+  contains modified Copernicus Sentinel data. The 2016 mosaic is CC BY 4.0; the 2018 onwards mosaics (the viewer uses 2024) are CC BY-NC-SA 4.0, non-commercial use only.
 
 Under ODbL, if you publicly use an adapted version of the sub-district database, you must offer that
 adapted database under ODbL as well.
