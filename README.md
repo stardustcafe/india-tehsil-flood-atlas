@@ -182,6 +182,26 @@ scenario. Values for individual 20-year periods are noisy: a 100-year event esti
 varies, so read trends across periods and scenarios rather than single cells. The models leave out dams and
 embankments, and the indicator covers river flow only, not exposure.
 
+### Cyclone wind
+
+`scripts/14_cyclone_wind.py` → `data/processed/india_adm3_cyclone.csv`, `viewer/data/cyclone.json`, `viewer/data/wind_today/`, `viewer/data/wind_future/`
+
+STORM synthetic tropical cyclones (Bloemendaal et al. 2020, 2022, CC0): 10 km wind speeds at fixed return
+periods for the North Indian basin, from 10,000 years of synthetic cyclones resampled from 1980–2017 tracks. The
+future version adds the 2015–2050 climate signal of four high-resolution HighResMIP models under high
+emissions. The atlas takes the median of the four models and their range. Winds are 10-minute sustained, slightly
+below IMD's 3-minute winds, so the IMD categories applied here are conservative. Only the North Indian basin
+GeoTIFFs are read out of the archives.
+
+| People where the 1-in-100-year wind reaches very severe cyclone strength (≥ 33 m/s, 118 km/h) | Today | 2015–2050 |
+|---|---|---|
+| GPW (crore) | 16.8 | 14.8 |
+| GHS-POP (crore) | 17.3 | 15.0 |
+
+The models project fewer intense Bay of Bengal cyclones, so the strongest Odisha winds fall from about 44 to
+39 m/s, while the 1-in-10-year wind rises in many places. Future values are tied to one scenario and period, so
+they do not follow the viewer's scenario selector.
+
 ## Reproduce
 
 ```bash
@@ -204,6 +224,7 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/pip install h5py
 .venv/Scripts/python scripts/12_sea_level.py --workers 8     # AR6 sea level + DeltaDTM (~1.4 GB download, ~1 h)
 .venv/Scripts/python scripts/13_return_period.py --workers 8 # ISIMIP river flow, 465 India cut-outs (~10 GB, ~2 h)
+.venv/Scripts/python scripts/14_cyclone_wind.py             # STORM cyclone wind return periods (~5 MB of GeoTIFFs)
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size
@@ -220,14 +241,14 @@ Serve the folder rather than opening the file directly: `python -m http.server -
 It can be hosted as-is on GitHub Pages or any static host.
 
 The sidebar has four tabs. **Layers** lists every map layer in drawing order (places, labels and rivers,
-boundaries, rainfall change, 1-in-100-year flood zone, river flood frequency, low-lying coastal land, population, GFSM 30 m, sub-district statistics, and a
+boundaries, rainfall change, 1-in-100-year flood zone, river flood frequency, cyclone wind, low-lying coastal land, population, GFSM 30 m, sub-district statistics, and a
 Sentinel-2 cloudless satellite basemap by EOX for 2024 or 2016), each with its own switch, opacity and settings.
 **Findings** gives headline numbers as plain sentences for India or the chosen state, today and under the chosen
 scenario, plus rankings. **Glossary** defines the terms; underlined terms anywhere in the viewer link to it.
 **About** holds the purpose, caveats and sources. Clicking a sub-district opens a profile with Today and Future tabs.
 
 For speed on GitHub Pages the first view loads only the boundaries (0.9 MB gzipped). Climate (0.9 MB),
-flood-zone (0.6 MB), projected population (0.5 MB), river flood frequency (0.4 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
+flood-zone (0.6 MB), projected population (0.5 MB), river flood frequency (0.4 MB), cyclone wind (0.05 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
 raster layers fetch only the tile bundles in view.
 
 Tiles are selected by intersecting the GFSM tile index with India's boundary buffered by 0.1°,

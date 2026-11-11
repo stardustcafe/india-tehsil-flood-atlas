@@ -11,6 +11,7 @@ third-party datasets and carry their licences:
 | `data/processed/india_places.*`, `viewer/data/places.geojson` | OpenStreetMap + Wikidata, with GFSM v1 class | **ODbL 1.0** (from OpenStreetMap) |
 | `data/processed/*2020_india_pop*.tif`, `viewer/data/pop_*/*` | GPW v4.11 or GHS-POP R2023A, split by GFSM v1 | **CC BY 4.0** |
 | `data/processed/india_adm3_returnperiod.csv`, `viewer/data/rp.json`, `viewer/data/rivers.geojson` | ISIMIP3b daily discharge (3 hydrological × 5 climate models), DDM30 river network | **CC BY 4.0** |
+| `data/processed/india_adm3_cyclone.csv`, `viewer/data/cyclone.json`, `viewer/data/wind_*/*` | STORM tropical cyclone wind return periods, with GPW / GHS-POP | **CC BY 4.0** (STORM itself is CC0) |
 | `data/processed/india_adm3_sealevel.csv`, `viewer/data/slr.json`, `viewer/data/lowland/*` | IPCC AR6 sea-level projections + DeltaDTM v1.1, with GPW / GHS-POP | **CC BY 4.0** |
 
 ## Required attribution
@@ -36,6 +37,9 @@ third-party datasets and carry their licences:
 - River flow: ISIMIP3b water_global output (CWatM, WaterGAP2-2e, MIROC-INTEG-LAND), daily discharge, CC BY 4.0, https://data.isimip.org (Inter-Sectoral Impact Model Intercomparison Project, www.isimip.org).
   River network: DDM30 (Döll, P. & Lehner, B. 2002, J. Hydrol. 258, 214–231), as distributed by ISIMIP.
   Method after Hirabayashi, Y., et al. (2013), Global flood risk under climate change, Nature Climate Change 3, 816–821.
+- Cyclone wind: Bloemendaal, N., et al. (2020), Generation of a global synthetic tropical cyclone hazard dataset using STORM,
+  Scientific Data 7, 40; Bloemendaal, N., et al. (2022), A globally consistent local-scale assessment of future tropical cyclone
+  risk, Science Advances 8, eabm8438. Data: https://doi.org/10.4121/12705164 and https://doi.org/10.4121/14510817, CC0.
 - Sea level: Garner, G.G., Hermans, T., Kopp, R.E., et al. (2021), IPCC AR6 Sea Level Projections, regional confidence files,
   https://doi.org/10.5281/zenodo.6382554, CC BY 4.0; Fox-Kemper, B., et al. (2021), Ocean, Cryosphere and Sea Level Change,
   in Climate Change 2021: The Physical Science Basis, IPCC AR6 WGI, Chapter 9.

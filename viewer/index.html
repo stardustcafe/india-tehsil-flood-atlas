@@ -121,6 +121,7 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 .t-pop { background: linear-gradient(90deg, var(--d1), var(--d3), var(--d6)); }
 .t-clim { background: linear-gradient(90deg, #a6611a, #e4ecee, #5b9bd5, #0b3a75); }
 .t-rivers { background: linear-gradient(90deg, #4f86c6, #a5adb8, #f2b84b, #e8743b, #c63b2d, #7a1426); }
+.t-wind { background: linear-gradient(90deg, #d5efe6, #3fa38a, #0b3f3a); }
 .t-lowland { background: linear-gradient(90deg, #6a1b6a, #d6619a, #f8d8e4); }
 .t-flood { background: linear-gradient(90deg, #bfe6f0, #3a9ac2, #0b3d6e); }
 .t-sat { background: linear-gradient(135deg, #3d5a2a, #7d7348 40%, #a89a72 55%, #2e4f63); }
@@ -384,6 +385,25 @@ a.term:hover { color: var(--accent); }
               <input type="range" class="op" id="opRivers" data-layer="rivers" min="5" max="100" step="5" value="90"></div>
           </div>
         </li>
+        <li class="lyr off" data-layer="wind" id="lyrWind">
+          <div class="lyr-head">
+            <span class="thumb t-wind"></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrWindBody"><b>Cyclone wind, 1-in-100-year</b><small id="metaWind"></small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="wind" aria-label="Show cyclone wind"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrWindBody" hidden>
+            <div class="ctl"><span class="lbl" id="windWhenLbl">Show</span>
+              <div class="seg" role="group" aria-labelledby="windWhenLbl" id="windWhenSeg">
+                <button type="button" data-w="today" aria-pressed="true">Today</button>
+                <button type="button" data-w="future" aria-pressed="false">2015–2050</button>
+              </div></div>
+            <p class="hint">The strongest <a class="term" href="#g-cyclone">cyclone wind</a> expected once in 100 years on average, 10 km cells,
+              in <a class="term" href="#g-imdcat">IMD cyclone categories</a>. The 2015–2050 map is the median of 4 high-resolution climate models
+              under high emissions, whatever scenario is chosen. Source: STORM.</p>
+            <div class="ctl"><div class="row"><label for="opWind">Opacity</label><output id="opWindOut">90%</output></div>
+              <input type="range" class="op" id="opWind" data-layer="wind" min="5" max="100" step="5" value="90"></div>
+          </div>
+        </li>
         <li class="lyr off" data-layer="lowland" id="lyrLowland">
           <div class="lyr-head">
             <span class="thumb t-lowland"></span>
@@ -520,6 +540,8 @@ a.term:hover { color: var(--accent); }
         <div class="ge" id="g-depth"><dt>Flood depth</dt><dd>Modelled water depth above ground during the flood, in metres. Over 1 m is generally dangerous to people and buildings.</dd></div>
         <div class="ge" id="g-defences"><dt>Flood defences</dt><dd>Embankments, levees, sea walls and dams. The flood-zone maps leave them out, so in protected areas they show the hazard if defences fail or are overtopped, an upper bound.</dd></div>
         <div class="ge" id="g-riverine"><dt>River and coastal flooding</dt><dd>River (fluvial) floods come from rivers overtopping their banks after heavy or prolonged rain upstream. Coastal floods come from storm surges and high tides, made worse by sea-level rise.</dd></div>
+        <div class="ge" id="g-cyclone"><dt>1-in-100-year cyclone wind</dt><dd>The highest sustained wind (10-minute average, 10 m above ground) that a tropical cyclone brings to a place once in 100 years on average, from 10,000 years of synthetic cyclones (STORM). Wind drives storm surge and damage to housing, power and crops; cyclone rain adds to river and urban flooding. The 2015–2050 values add the change simulated by 4 high-resolution climate models under high emissions; in the Bay of Bengal they project fewer intense cyclones, so values there fall.</dd></div>
+        <div class="ge" id="g-imdcat"><dt>Cyclone categories (IMD)</dt><dd>The India Meteorological Department's scale: cyclonic storm 62–88 km/h (17–24 m/s), severe 89–117 km/h, very severe 118–165 km/h (33–46 m/s), extremely severe 166–220 km/h and super cyclonic above 220 km/h. IMD uses 3-minute winds, slightly stronger than the 10-minute winds here, so the atlas's categories are a little conservative.</dd></div>
         <div class="ge" id="g-pluvial"><dt>Flash and urban flooding</dt><dd>Intense local rain that overwhelms drains and small streams. The flood-zone maps do not cover it; the wettest-day rainfall indicator is the closest guide here.</dd></div>
       </dl>
       <h3>Climate projections</h3>
@@ -560,6 +582,7 @@ a.term:hover { color: var(--accent); }
         <span>Projected population: Wang, Meng &amp; Long (2022), <a href="https://doi.org/10.6084/m9.figshare.19608594" target="_blank" rel="noopener">1 km SSP population 2020–2100</a>, Scientific Data, CC BY 4.0. Used as growth rates on the 2020 counts.</span>
         <span>Sea level: <a href="https://doi.org/10.5281/zenodo.6382554" target="_blank" rel="noopener">IPCC AR6 sea-level projections</a> (Fox-Kemper et al. 2021; Garner et al. 2021), CC BY 4.0. Elevation: <a href="https://doi.org/10.4121/21997565" target="_blank" rel="noopener">DeltaDTM</a> (Pronk et al. 2024), CC BY 4.0, built from Copernicus GLO-30 © DLR e.V.</span>
         <span>River flow: <a href="https://www.isimip.org" target="_blank" rel="noopener">ISIMIP3b</a> daily discharge, CWatM, WaterGAP2-2e and MIROC-INTEG-LAND with five CMIP6 models, CC BY 4.0. Return periods after Hirabayashi et al. (2013).</span>
+        <span>Cyclone wind: <a href="https://doi.org/10.4121/12705164" target="_blank" rel="noopener">STORM</a> 10 km wind-speed return periods, present and <a href="https://doi.org/10.4121/14510817" target="_blank" rel="noopener">2015–2050</a> (Bloemendaal et al. 2020, 2022), CC0.</span>
         <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
         <span>Satellite imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, 2018 onwards CC BY-NC-SA 4.0.</span>
         <span>Basemap labels: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
@@ -600,6 +623,10 @@ a.term:hover { color: var(--accent); }
         <div class="lg" id="lgRivers" hidden><h3 id="lgRiversT">Today's 100-year river flood comes</h3>
           <div class="gleg" id="riversLeg"></div>
           <p id="lgRiversNote">Median of 15 model runs; dot size shows river flow.</p></div>
+        <div class="lg" id="lgWind" hidden><h3 id="lgWindT">Cyclone wind, 1-in-100-year</h3>
+          <div class="gleg"><span><i style="background:#8fd1bd"></i>cyclonic storm</span><span><i style="background:#3fa38a"></i>severe</span>
+          <span><i style="background:#1d7a6b"></i>very severe</span><span><i style="background:#0b3f3a"></i>extremely severe</span></div>
+          <p>10-minute winds, STORM. IMD categories.</p></div>
         <div class="lg" id="lgLowland" hidden><h3>Height above today's sea level</h3>
           <div class="gleg"><span><i style="background:#6a1b6a"></i>below 0 m</span><span><i style="background:#a8327f"></i>0–0.5 m</span>
           <span><i style="background:#d6619a"></i>0.5–1 m</span><span><i style="background:#eea2bf"></i>1–2 m</span><span><i style="background:#f8d8e4"></i>2–3 m</span></div>
@@ -644,12 +671,14 @@ const METRICS = {
   fz:  { label: "People in 100-yr flood zone, future", opt: "People in 1-in-100-year flood zone, future (projected population)", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true, zero: true },
   fzd: { label: "Change in people in flood zone", opt: "Change in people in flood zone vs today", fmt: v => (v > 0 ? "+" : v < 0 ? "−" : "") + fmtPeople(Math.abs(v)), tick: v => (v < 0 ? "−" : "") + fmtShort(Math.abs(v)), fixed: [0, 500, 2000, 5000, 20000, 50000], step: 500, max: 100000, pop: true, flood: true, zero: true },
   sl:  { label: "People below future sea level", opt: "People on land below the future mean sea level", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [100, 1000, 5000, 2e4, 5e4, 1e5], step: 100, max: 200000, pop: true, slr: true, zero: true },
+  cw:  { label: "Cyclone wind, 100-yr", opt: "1-in-100-year cyclone wind today", fmt: v => kmh(v), tick: v => Math.round(v * 3.6), fixed: [17, 24.5, 33, 38, 42, 46], step: 1, max: 50, cyc: true },
+  cwd: { label: "Change in cyclone wind", opt: "Change in 1-in-100-year cyclone wind by 2015–2050", fmt: v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v * 3.6).toFixed(0) + " km/h", tick: v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v * 3.6).toFixed(0), fixed: [-4, -2, -1, 0, 1, 2], step: 0.5, cyc: true },
   rf:  { label: "River flood frequency", opt: "How much more often today's 100-year river flood comes", fmt: v => "×" + v.toFixed(v < 10 ? 1 : 0), tick: v => "×" + (v < 10 ? +v.toFixed(1) : v.toFixed(0)), fixed: [0.8, 1, 1.25, 2, 4, 10], step: 0.1, max: 10, rp: true },
   pg:  { label: "Population change", opt: "Projected population change since 2020", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [-10, 0, 10, 20, 40, 60], step: 1, max: 100, flood: true, ssp: true },
   cf: { label: "Flood pressure",     opt: "Flood pressure (climate-adjusted)", fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
 const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People", ["x", "xp", "pg"]],
-  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["River flood frequency", ["rf"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
+  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["River flood frequency", ["rf"]], ["Cyclone wind", ["cw", "cwd"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
 const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
   gpw: { label: "GPW v4.11", hint: "GPW spreads each census sub-district's count evenly over its area, so it cannot tell whether settlements sit on the floodplain or above it." },
@@ -659,7 +688,7 @@ const CLASS_NAMES = ["Very Low", "Low", "Moderate", "High", "Very High"];
 const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], src: "gpw", popKind: "high", srcs: [],
   // map layers, each with its own switch and opacity (places and OSM context are handled by their own sections)
   L: { choro: { on: true, op: 0.9 }, gfsm: { on: false, op: 0.85 }, pop: { on: false, op: 0.9 }, clim: { on: false, op: 0.85 }, bounds: { on: true },
-       flood: { on: false, op: 0.9, when: "future" }, rivers: { on: false, op: 0.9 }, lowland: { on: false, op: 0.9 },
+       flood: { on: false, op: 0.9, when: "future" }, rivers: { on: false, op: 0.9 }, wind: { on: false, op: 0.9, when: "today" }, lowland: { on: false, op: 0.9 },
        sat: { on: false, op: 1, year: "2024" } } };
 // Sentinel-2 cloudless mosaics by EOX (https://s2maps.eu); the 2016 layer has no year in its name
 const SAT_YEARS = { 2024: { layer: "s2cloudless-2024_3857", lic: "CC BY-NC-SA 4.0" }, 2016: { layer: "s2cloudless_3857", lic: "CC BY 4.0" } };
@@ -699,7 +728,7 @@ function bboxOf(g) {
 }
 const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
 const inScope = p => !S.state || p.s === S.state;
-const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr || METRICS[m].rp;  // values arrive with lazily loaded projections
+const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr || METRICS[m].rp || METRICS[m].cyc;  // values arrive with lazily loaded projections
 const valid = p => p.q === 0 && (!isData(S.metric) || Number.isFinite(p[S.metric]));
 
 /* population per source: {src}T people, {src}X people in High + Very High (scripts/06_population_exposure.py) */
@@ -771,6 +800,10 @@ function applyRaster() {
     map.setPaintProperty("rivfreq", "circle-opacity", L.rivers.op);
     map.setPaintProperty("rivfreq", "circle-color", riverColor());
   }
+  for (const w of ["today", "future"]) {
+    map.setLayoutProperty("wind_" + w, "visibility", vis(L.wind.on && L.wind.when === w));
+    map.setPaintProperty("wind_" + w, "raster-opacity", L.wind.op);
+  }
   map.setLayoutProperty("lowland", "visibility", vis(L.lowland.on));
   map.setPaintProperty("lowland", "raster-opacity", L.lowland.op);
   const fk = floodKey();
@@ -795,6 +828,7 @@ function renderLayerMeta() {
   $("metaClim").textContent = scenLabel();
   $("metaFlood").textContent = floodLabel();
   $("metaRivers").textContent = rpLabel();
+  $("metaWind").textContent = windLabel();
   $("metaSat").textContent = `Sentinel-2 cloudless ${S.L.sat.year} · EOX`;
   document.querySelectorAll(".scenTxt").forEach(e => e.textContent = scenLabel());
   document.querySelectorAll(".lyr").forEach(li => li.classList.toggle("off", !layerOn(li.dataset.layer)));
@@ -803,8 +837,9 @@ function renderLayerMeta() {
 function renderLegendBox() {
   const L = S.L, m = METRICS[S.metric];
   $("lgChoro").hidden = !L.choro.on; $("lgGfsm").hidden = !L.gfsm.on; $("lgPop").hidden = !L.pop.on;
-  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on; $("lgFlood").hidden = !L.flood.on; $("lgLowland").hidden = !L.lowland.on; $("lgRivers").hidden = !L.rivers.on;
-  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on || L.lowland.on || L.rivers.on;
+  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on; $("lgFlood").hidden = !L.flood.on; $("lgLowland").hidden = !L.lowland.on; $("lgRivers").hidden = !L.rivers.on; $("lgWind").hidden = !L.wind.on;
+  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on || L.lowland.on || L.rivers.on || L.wind.on;
+  $("lgWindT").textContent = `Cyclone wind, 1-in-100-year, ${windLabel()}`;
   $("lgRiversT").textContent = `Today's 100-year river flood comes, ${rpLabel()}`;
   $("lgFloodT").textContent = `Flood depth, 1-in-100-year, ${floodLabel()}`;
   $("satCredit").textContent = `Sentinel-2 cloudless ${L.sat.year} by EOX IT Services GmbH, contains modified Copernicus Sentinel data, ${SAT_YEARS[L.sat.year].lic}.`;
@@ -824,6 +859,7 @@ async function setMetric(k) {
   if (METRICS[k].flood || METRICS[k].slr) await loadFlood();
   if (METRICS[k].slr) await loadSlr();
   if (METRICS[k].rp) await loadRp();
+  if (METRICS[k].cyc) await loadCyclone();
   S.metric = k; S.thr = 0;
   document.querySelectorAll(".metricSel").forEach(s => s.value = k);
   computeRanks(); renderThreshold(); refresh(); renderLayerMeta(); renderLegendBox();
@@ -832,14 +868,14 @@ function setSource(k) {
   S.src = k;
   document.querySelectorAll(".srcSel").forEach(s => s.value = k);
   document.querySelectorAll(".srcHint").forEach(e => e.textContent = POP_SOURCES[k].hint);
-  deriveSource(); deriveFlood(); deriveSlr(); deriveRp(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
+  deriveSource(); deriveFlood(); deriveSlr(); deriveRp(); deriveCyclone(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
 }
 function showTab(id) {
   document.querySelectorAll('[role="tab"]').forEach(x => {
     if (!x.closest(".tabs")) return;
     x.setAttribute("aria-selected", x.id === id); $(x.getAttribute("aria-controls")).hidden = x.id !== id;
   });
-  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadRp(); loadPlaces(); }
+  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadRp(); loadCyclone(); loadPlaces(); }
 }
 function filterGlossary() {
   const q = $("glossQ").value.trim().toLowerCase();
@@ -887,6 +923,11 @@ function renderToday() {
     const d = FL.data.data.today, fz = sumOf(sc, p => d[S.src][p.i]);
     rows.push([fmtPeople(fz), `people live in the ${term("floodzone", "1-in-100-year flood zone")} of rivers and the coast.`,
       `River ${fmtPeople(sumOf(sc, p => d[S.src + "R"][p.i]))}, coast ${fmtPeople(sumOf(sc, p => d[S.src + "C"][p.i]))} (overlapping). No flood defences assumed.`]);
+  }
+  if (CY.data && S.srcs.length) {
+    const ks = sc.map(p => CY.k.get(p.i)).filter(k => k != null), s = S.src;
+    if (ks.length) rows.push([fmtPeople(ks.reduce((a, k) => a + CY.data[s + "0"][k], 0)), `people live where the ${term("cyclone", "1-in-100-year cyclone wind")} reaches ${term("imdcat", "very severe")} strength (118 km/h or more).`,
+      `${fmtNum(ks.filter(k => CY.data.x0[k] >= 330).length)} sub-districts are exposed to it.`]);
   }
   rows.push([fmtNum(sc.filter(p => p.h >= 50).length), `of ${fmtNum(sc.length)} ${term("subdistrict", "sub-districts")} have more than half their land flood-prone.`]);
   $("scopeToday").textContent = where;
@@ -937,7 +978,7 @@ function renderCard() {
       <div><dt>Rank in ${esc(p.s)}</dt><dd>${fmtNum(p._rs)} <small>of ${fmtNum(S.perState[p.s])}</small></dd></div>` : ""}
     </dl>
     <div class="where">Ranks by ${m.opt.toLowerCase()}${m.pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`;
-  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + rpBlock(p) + slrBlock(p) + climBlock(p);
+  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + rpBlock(p) + slrBlock(p) + windBlock(p) + climBlock(p);
   card.innerHTML = `
     <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
       <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
@@ -947,7 +988,7 @@ function renderCard() {
   $("cardX").onclick = () => select(null);
   card.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { CARD_TAB = b.dataset.ct; renderCard(); });
   if (!FL.data) loadFlood();
-  if (CARD_TAB === "future") { loadClimate(); loadSlr(); loadRp(); }
+  if (CARD_TAB === "future") { loadClimate(); loadSlr(); loadRp(); loadCyclone(); }
 }
 function refresh({ breaks = true } = {}) {
   if (breaks) computeBreaks();
@@ -1018,6 +1059,12 @@ function bindUI() {
     if (matchMedia("(max-width: 760px)").matches) $("tab-gloss").scrollIntoView({ block: "start" });
   });
   $("glossQ").addEventListener("input", filterGlossary);
+  $("windWhenSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.L.wind.when = b.dataset.w;
+    [...$("windWhenSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    applyRaster(); renderLayerMeta(); renderLegendBox();
+  });
   $("floodWhenSeg").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     S.L.flood.when = b.dataset.w;
@@ -1190,6 +1237,12 @@ function renderFuture() {
           `Median: every ${years(med)}. ${fmtPeople(sumOf(twice, p => p.fz0))} people live in their river and coastal flood zones today.`]);
       }
     }
+    if (CY.data) {
+      const ks = all.map(p => CY.k.get(p.i)).filter(k => k != null), s = S.src;
+      const n0 = ks.reduce((a, k) => a + CY.data[s + "0"][k], 0), n1 = ks.reduce((a, k) => a + CY.data[s + "1"][k], 0);
+      if (n0 || n1) rows.push([fmtPeople(n1), `people would live where the ${term("cyclone", "1-in-100-year cyclone wind")} reaches very severe strength in the 2015–2050 climate, against ${fmtPeople(n0)} today (2020 population).`,
+        `Median of 4 high-resolution models, high emissions; they project fewer intense Bay of Bengal cyclones.`]);
+    }
     if (SL.data) {
       const y = G_YEAR[CL.per], D = SL.data.data[CL.ssp], cs = all.map(p => SL.k.get(p.i)).filter(k => k != null);
       if (cs.length) {
@@ -1207,7 +1260,7 @@ function renderFuture() {
   }
   $("kfFuture").innerHTML = rows.map(kfRow).join("") +
     `<p class="hint">Rainfall: median of about 30 CMIP6 models against 1995–2014. Flood zone: WRI Aqueduct, median of 5 models,
-      with SSP population from Wang et al. (2022). River flood frequency: ISIMIP, 15 hydrological model runs. Sea level: IPCC AR6, with DeltaDTM elevation.
+      with SSP population from Wang et al. (2022). River flood frequency: ISIMIP, 15 hydrological model runs. Cyclone wind: STORM. Sea level: IPCC AR6, with DeltaDTM elevation.
       ${term("screening", "Screening figures, not forecasts.")}</p>`;
 }
 function climBlock(p) {
@@ -1325,6 +1378,38 @@ function rpBlock(p) {
     <table class="ctab"><tr><th>Scenario</th>${per.map(y => `<th>${perLabel(y)}</th>`).join("")}</tr>${rows}</table>
     <div class="where" style="margin-top:4px">${rpSsp()}, ${perLabel(k)}: every ${years(d["med" + k][i] / 10)} (${term("range", "likely")} ${years(d["lo" + k][i] / 10)} to ${years(d["hi" + k][i] / 10)});
       ${d["agree" + k][i]}% of 15 ${term("ghm", "model runs")} show it coming more often. *SSP2-4.5 estimated from SSP1-2.6 and SSP3-7.0.</div></div>`;
+}
+/* ---------- cyclone wind (scripts/14_cyclone_wind.py): STORM synthetic cyclones, 10 km, today and 2015-2050 ---------- */
+const CY = { data: null, k: new Map() };
+const kmh = ms => `${Math.round(ms * 3.6)} km/h`;
+const IMD = [[46, "extremely severe"], [33, "very severe"], [24.5, "severe"], [17, "cyclonic storm"]];
+const imdCat = ms => (IMD.find(([v]) => ms >= v) || [0, "below cyclone strength"])[1];
+const windLabel = () => S.L.wind.when === "today" ? "Today (1980–2017 cyclones)" : "2015–2050 · high emissions, 4 models";
+const loadCyclone = () => once("cyclone", async () => {
+  CY.data = await fetchOk("data/cyclone.json", "json");
+  CY.data.idx.forEach((i, k) => CY.k.set(i, k));
+  deriveCyclone(); dataLoaded();
+});
+// sub-districts beyond cyclone reach have no value
+function deriveCyclone() {
+  if (!CY.data) return;
+  const D = CY.data;
+  P.forEach(p => { const k = CY.k.get(p.i); p.cw = k == null ? NaN : D.m0[k] / 10; p.cwd = k == null ? NaN : (D.m1[k] - D.m0[k]) / 10; });
+  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i },
+    { cw: Number.isFinite(p.cw) ? p.cw : null, cwd: Number.isFinite(p.cwd) ? p.cwd : null }));
+}
+function windBlock(p) {
+  const k = CY.data ? CY.k.get(p.i) : null;
+  if (k == null) return "";
+  const D = CY.data, s = S.src, w = v => `${kmh(v / 10)} <small>${(v / 10).toFixed(0)} m/s</small>`;
+  return `<div><h3>${term("cyclone", "Cyclone wind")}, 1-in-100-year</h3>
+    <table class="ctab"><tr><th></th><th>Today</th><th>2015–2050 <small>(${term("range", "range")})</small></th></tr>
+      <tr><td>Average</td><td>${w(D.m0[k])}</td><td>${w(D.m1[k])} <small>${kmh(D.lo[k] / 10)}–${kmh(D.hi[k] / 10)}</small></td></tr>
+      <tr><td>Strongest</td><td>${w(D.x0[k])}</td><td>${w(D.x1[k])}</td></tr>
+      <tr><td>1-in-10-year</td><td>${w(D.t0[k])}</td><td>${w(D.t1[k])}</td></tr></table>
+    <div class="where" style="margin-top:4px">Strongest today: ${term("imdcat", imdCat(D.x0[k] / 10))}.
+      ${S.srcs.length ? `People where it reaches very severe strength: ${fmtPeople(D[s + "0"][k])} today, ${fmtPeople(D[s + "1"][k])} in the 2015–2050 climate (2020 population).` : ""}
+      2015–2050: median of 4 models, high emissions.</div></div>`;
 }
 /* ---------- sea-level rise (scripts/12_sea_level.py): IPCC AR6 relative sea level, DeltaDTM elevation ---------- */
 const SL = { data: null, k: new Map() };
@@ -1554,6 +1639,11 @@ function bindPlacesUI() {
       map.addSource("flood_" + k, { type: "raster", tiles: [`tiles://flood_${k}/{z}/{x}/{y}`], tileSize: 256, minzoom: 4, maxzoom: 8, bounds: [68, 6.3, 97.6, 37.3] });
       map.addLayer({ id: "flood_" + k, type: "raster", source: "flood_" + k, layout: { visibility: "none" },
         paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.L.flood.op } });
+    }
+    for (const w of ["today", "future"]) {  // cyclone wind classes, z4-8
+      map.addSource("wind_" + w, { type: "raster", tiles: [`tiles://wind_${w}/{z}/{x}/{y}`], tileSize: 256, minzoom: 4, maxzoom: 8, bounds: [68, 6.3, 97.6, 37.3] });
+      map.addLayer({ id: "wind_" + w, type: "raster", source: "wind_" + w, layout: { visibility: "none" },
+        paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.L.wind.op } });
     }
     map.addSource("lowland", { type: "raster", tiles: ["tiles://lowland/{z}/{x}/{y}"], tileSize: 256, minzoom: 4, maxzoom: 10, bounds: [68, 6.3, 97.6, 37.3] });
     map.addLayer({ id: "lowland", type: "raster", source: "lowland", layout: { visibility: "none" },
