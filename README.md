@@ -202,6 +202,27 @@ The models project fewer intense Bay of Bengal cyclones, so the strongest Odisha
 39 m/s, while the 1-in-10-year wind rises in many places. Future values are tied to one scenario and period, so
 they do not follow the viewer's scenario selector.
 
+### Glacial lake outburst floods
+
+`scripts/16_glof.py` → `data/processed/india_adm3_glof.csv`, `viewer/data/glof.json`, `viewer/data/glof_lakes.geojson`
+
+GLOF hazard for Third Pole glacial lakes (Zheng et al. 2021, Nature Climate Change, CC BY 4.0). The data covers
+about 7,000 lakes mapped in 2015 and lakes expected to form in glacier-bed hollows by 2050 and 2100 under
+RCP2.6, 4.5 and 8.5. High and Very High hazard use the paper's present-day class edges. A future scenario
+counts today's dangerous lakes plus the new lakes that reach those edges. Each lake is followed downstream along
+the DDM30 river network (scripts/13) for up to 250 km of flow path, roughly how far the October 2023 Teesta
+flood did damage. A sub-district is linked to the lake if a path cell covers at least 10% of its area.
+
+| High+ hazard lakes draining into India | Today | 2050 | 2100 |
+|---|---|---|---|
+| RCP2.6 | 968 | 1,737 | 2,110 |
+| RCP4.5 | 968 | 1,815 | 2,543 |
+| RCP8.5 | 968 | 1,879 | 2,909 |
+
+Today 777 sub-districts lie within 250 km downstream of such lakes: 283 within 50 km, 262 at 50–150 km and 232
+at 150–250 km. This is a screening link at about 50 km resolution, not a flood model. It shows which places lie
+down-valley from dangerous lakes, not flood depth or timing.
+
 ## Reproduce
 
 ```bash
@@ -225,6 +246,7 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/python scripts/12_sea_level.py --workers 8     # AR6 sea level + DeltaDTM (~1.4 GB download, ~1 h)
 .venv/Scripts/python scripts/13_return_period.py --workers 8 # ISIMIP river flow, 465 India cut-outs (~10 GB, ~2 h)
 .venv/Scripts/python scripts/14_cyclone_wind.py             # STORM cyclone wind return periods (~5 MB of GeoTIFFs)
+.venv/Scripts/python scripts/16_glof.py                     # glacial lake outburst hazard (7 MB from Zenodo)
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size
@@ -241,14 +263,14 @@ Serve the folder rather than opening the file directly: `python -m http.server -
 It can be hosted as-is on GitHub Pages or any static host.
 
 The sidebar has four tabs. **Layers** lists every map layer in drawing order (places, labels and rivers,
-boundaries, rainfall change, 1-in-100-year flood zone, river flood frequency, cyclone wind, low-lying coastal land, population, GFSM 30 m, sub-district statistics, and a
+boundaries, rainfall change, 1-in-100-year flood zone, river flood frequency, cyclone wind, dangerous glacial lakes, low-lying coastal land, population, GFSM 30 m, sub-district statistics, and a
 Sentinel-2 cloudless satellite basemap by EOX for 2024 or 2016), each with its own switch, opacity and settings.
 **Findings** gives headline numbers as plain sentences for India or the chosen state, today and under the chosen
 scenario, plus rankings. **Glossary** defines the terms; underlined terms anywhere in the viewer link to it.
 **About** holds the purpose, caveats and sources. Clicking a sub-district opens a profile with Today and Future tabs.
 
 For speed on GitHub Pages the first view loads only the boundaries (0.9 MB gzipped). Climate (0.9 MB),
-flood-zone (0.6 MB), projected population (0.5 MB), river flood frequency (0.4 MB), cyclone wind (0.05 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
+flood-zone (0.6 MB), projected population (0.5 MB), river flood frequency (0.4 MB), cyclone wind (0.05 MB), glacial lakes (0.1 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
 raster layers fetch only the tile bundles in view.
 
 Tiles are selected by intersecting the GFSM tile index with India's boundary buffered by 0.1°,

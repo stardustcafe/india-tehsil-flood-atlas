@@ -122,6 +122,7 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 .t-clim { background: linear-gradient(90deg, #a6611a, #e4ecee, #5b9bd5, #0b3a75); }
 .t-rivers { background: linear-gradient(90deg, #4f86c6, #a5adb8, #f2b84b, #e8743b, #c63b2d, #7a1426); }
 .t-wind { background: linear-gradient(90deg, #d5efe6, #3fa38a, #0b3f3a); }
+.t-glof { background: radial-gradient(circle at 35% 50%, #e8743b 0 22%, transparent 24%), radial-gradient(circle at 70% 50%, #7a1426 0 22%, transparent 24%), var(--panel, #fff); }
 .t-lowland { background: linear-gradient(90deg, #6a1b6a, #d6619a, #f8d8e4); }
 .t-flood { background: linear-gradient(90deg, #bfe6f0, #3a9ac2, #0b3d6e); }
 .t-sat { background: linear-gradient(135deg, #3d5a2a, #7d7348 40%, #a89a72 55%, #2e4f63); }
@@ -404,6 +405,25 @@ a.term:hover { color: var(--accent); }
               <input type="range" class="op" id="opWind" data-layer="wind" min="5" max="100" step="5" value="90"></div>
           </div>
         </li>
+        <li class="lyr off" data-layer="glof" id="lyrGlof">
+          <div class="lyr-head">
+            <span class="thumb t-glof"></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrGlofBody"><b>Dangerous glacial lakes</b><small id="metaGlof"></small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="glof" aria-label="Show dangerous glacial lakes"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrGlofBody" hidden>
+            <div class="ctl"><span class="lbl" id="glofWhenLbl">Show</span>
+              <div class="seg" role="group" aria-labelledby="glofWhenLbl" id="glofWhenSeg">
+                <button type="button" data-w="today" aria-pressed="false">Today</button>
+                <button type="button" data-w="future" aria-pressed="true">Future scenario</button>
+              </div></div>
+            <p class="hint">Glacial lakes with High or Very High <a class="term" href="#g-glof">outburst-flood hazard</a> that drain into India,
+              including lakes expected to form as glaciers retreat. Future maps use the RCP nearest the chosen scenario, for 2050 or 2100. Source: Zheng et al. (2021).</p>
+            <button type="button" class="linkbtn scen-open">Change scenario or period</button>
+            <div class="ctl"><div class="row"><label for="opGlof">Opacity</label><output id="opGlofOut">90%</output></div>
+              <input type="range" class="op" id="opGlof" data-layer="glof" min="5" max="100" step="5" value="90"></div>
+          </div>
+        </li>
         <li class="lyr off" data-layer="lowland" id="lyrLowland">
           <div class="lyr-head">
             <span class="thumb t-lowland"></span>
@@ -542,6 +562,7 @@ a.term:hover { color: var(--accent); }
         <div class="ge" id="g-riverine"><dt>River and coastal flooding</dt><dd>River (fluvial) floods come from rivers overtopping their banks after heavy or prolonged rain upstream. Coastal floods come from storm surges and high tides, made worse by sea-level rise.</dd></div>
         <div class="ge" id="g-cyclone"><dt>1-in-100-year cyclone wind</dt><dd>The highest sustained wind (10-minute average, 10 m above ground) that a tropical cyclone brings to a place once in 100 years on average, from 10,000 years of synthetic cyclones (STORM). Wind drives storm surge and damage to housing, power and crops; cyclone rain adds to river and urban flooding. The 2015–2050 values add the change simulated by 4 high-resolution climate models under high emissions; in the Bay of Bengal they project fewer intense cyclones, so values there fall.</dd></div>
         <div class="ge" id="g-imdcat"><dt>Cyclone categories (IMD)</dt><dd>The India Meteorological Department's scale: cyclonic storm 62–88 km/h (17–24 m/s), severe 89–117 km/h, very severe 118–165 km/h (33–46 m/s), extremely severe 166–220 km/h and super cyclonic above 220 km/h. IMD uses 3-minute winds, slightly stronger than the 10-minute winds here, so the atlas's categories are a little conservative.</dd></div>
+        <div class="ge" id="g-glof"><dt>Glacial lake outburst flood (GLOF)</dt><dd>A sudden release of water from a lake held back by a glacier or a loose moraine, often set off by ice or rock falling into it. The flood surge can run hundreds of kilometres down the valley, as on the Teesta in October 2023. Hazard scores (Zheng et al. 2021) combine lake volume, dam type, slopes and the chance of ice or rock falls. As glaciers retreat, new lakes form in the hollows they leave. The atlas links a sub-district to lakes within 250 km upstream along the river network, at about 50 km resolution, so it shows which places lie down-valley from dangerous lakes, not how deep a flood would be.</dd></div>
         <div class="ge" id="g-pluvial"><dt>Flash and urban flooding</dt><dd>Intense local rain that overwhelms drains and small streams. The flood-zone maps do not cover it; the wettest-day rainfall indicator is the closest guide here.</dd></div>
       </dl>
       <h3>Climate projections</h3>
@@ -583,6 +604,7 @@ a.term:hover { color: var(--accent); }
         <span>Sea level: <a href="https://doi.org/10.5281/zenodo.6382554" target="_blank" rel="noopener">IPCC AR6 sea-level projections</a> (Fox-Kemper et al. 2021; Garner et al. 2021), CC BY 4.0. Elevation: <a href="https://doi.org/10.4121/21997565" target="_blank" rel="noopener">DeltaDTM</a> (Pronk et al. 2024), CC BY 4.0, built from Copernicus GLO-30 © DLR e.V.</span>
         <span>River flow: <a href="https://www.isimip.org" target="_blank" rel="noopener">ISIMIP3b</a> daily discharge, CWatM, WaterGAP2-2e and MIROC-INTEG-LAND with five CMIP6 models, CC BY 4.0. Return periods after Hirabayashi et al. (2013).</span>
         <span>Cyclone wind: <a href="https://doi.org/10.4121/12705164" target="_blank" rel="noopener">STORM</a> 10 km wind-speed return periods, present and <a href="https://doi.org/10.4121/14510817" target="_blank" rel="noopener">2015–2050</a> (Bloemendaal et al. 2020, 2022), CC0.</span>
+        <span>Glacial lakes: <a href="https://doi.org/10.5281/zenodo.4477945" target="_blank" rel="noopener">Zheng et al. (2021)</a> GLOF hazard for present and projected Third Pole lakes, CC BY 4.0.</span>
         <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
         <span>Satellite imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, 2018 onwards CC BY-NC-SA 4.0.</span>
         <span>Basemap labels: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
@@ -627,6 +649,10 @@ a.term:hover { color: var(--accent); }
           <div class="gleg"><span><i style="background:#8fd1bd"></i>cyclonic storm</span><span><i style="background:#3fa38a"></i>severe</span>
           <span><i style="background:#1d7a6b"></i>very severe</span><span><i style="background:#0b3f3a"></i>extremely severe</span></div>
           <p>10-minute winds, STORM. IMD categories.</p></div>
+        <div class="lg" id="lgGlof" hidden><h3 id="lgGlofT">Dangerous glacial lakes</h3>
+          <div class="gleg"><span><i style="background:#e8743b;border-radius:50%"></i>High hazard</span><span><i style="background:#7a1426;border-radius:50%"></i>Very High hazard</span>
+          <span><i style="background:#fff;border:2px solid #7a1426;border-radius:50%"></i>new lake (glacier retreat)</span></div>
+          <p>Zheng et al. (2021). Lakes draining into India within 250 km.</p></div>
         <div class="lg" id="lgLowland" hidden><h3>Height above today's sea level</h3>
           <div class="gleg"><span><i style="background:#6a1b6a"></i>below 0 m</span><span><i style="background:#a8327f"></i>0–0.5 m</span>
           <span><i style="background:#d6619a"></i>0.5–1 m</span><span><i style="background:#eea2bf"></i>1–2 m</span><span><i style="background:#f8d8e4"></i>2–3 m</span></div>
@@ -673,12 +699,14 @@ const METRICS = {
   sl:  { label: "People below future sea level", opt: "People on land below the future mean sea level", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [100, 1000, 5000, 2e4, 5e4, 1e5], step: 100, max: 200000, pop: true, slr: true, zero: true },
   cw:  { label: "Cyclone wind, 100-yr", opt: "1-in-100-year cyclone wind today", fmt: v => kmh(v), tick: v => Math.round(v * 3.6), fixed: [17, 24.5, 33, 38, 42, 46], step: 1, max: 50, cyc: true },
   cwd: { label: "Change in cyclone wind", opt: "Change in 1-in-100-year cyclone wind by 2015–2050", fmt: v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v * 3.6).toFixed(0) + " km/h", tick: v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v * 3.6).toFixed(0), fixed: [-4, -2, -1, 0, 1, 2], step: 0.5, cyc: true },
+  gl0: { label: "Dangerous glacial lakes, today", opt: "Dangerous glacial lakes upstream, today", fmt: v => fmtNum(v), tick: v => fmtNum(v), fixed: [1, 2, 5, 10, 20, 50], step: 1, max: 100, glof: true },
+  gl:  { label: "Dangerous glacial lakes, future", opt: "Dangerous glacial lakes upstream, future", fmt: v => fmtNum(v), tick: v => fmtNum(v), fixed: [1, 2, 5, 10, 20, 50], step: 1, max: 100, glof: true },
   rf:  { label: "River flood frequency", opt: "How much more often today's 100-year river flood comes", fmt: v => "×" + v.toFixed(v < 10 ? 1 : 0), tick: v => "×" + (v < 10 ? +v.toFixed(1) : v.toFixed(0)), fixed: [0.8, 1, 1.25, 2, 4, 10], step: 0.1, max: 10, rp: true },
   pg:  { label: "Population change", opt: "Projected population change since 2020", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [-10, 0, 10, 20, 40, 60], step: 1, max: 100, flood: true, ssp: true },
   cf: { label: "Flood pressure",     opt: "Flood pressure (climate-adjusted)", fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
 const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People", ["x", "xp", "pg"]],
-  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["River flood frequency", ["rf"]], ["Cyclone wind", ["cw", "cwd"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
+  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["River flood frequency", ["rf"]], ["Cyclone wind", ["cw", "cwd"]], ["Glacial lake outburst floods", ["gl0", "gl"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
 const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
   gpw: { label: "GPW v4.11", hint: "GPW spreads each census sub-district's count evenly over its area, so it cannot tell whether settlements sit on the floodplain or above it." },
@@ -688,7 +716,7 @@ const CLASS_NAMES = ["Very Low", "Low", "Moderate", "High", "Very High"];
 const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], src: "gpw", popKind: "high", srcs: [],
   // map layers, each with its own switch and opacity (places and OSM context are handled by their own sections)
   L: { choro: { on: true, op: 0.9 }, gfsm: { on: false, op: 0.85 }, pop: { on: false, op: 0.9 }, clim: { on: false, op: 0.85 }, bounds: { on: true },
-       flood: { on: false, op: 0.9, when: "future" }, rivers: { on: false, op: 0.9 }, wind: { on: false, op: 0.9, when: "today" }, lowland: { on: false, op: 0.9 },
+       flood: { on: false, op: 0.9, when: "future" }, rivers: { on: false, op: 0.9 }, wind: { on: false, op: 0.9, when: "today" }, glof: { on: false, op: 0.9, when: "future" }, lowland: { on: false, op: 0.9 },
        sat: { on: false, op: 1, year: "2024" } } };
 // Sentinel-2 cloudless mosaics by EOX (https://s2maps.eu); the 2016 layer has no year in its name
 const SAT_YEARS = { 2024: { layer: "s2cloudless-2024_3857", lic: "CC BY-NC-SA 4.0" }, 2016: { layer: "s2cloudless_3857", lic: "CC BY 4.0" } };
@@ -728,7 +756,7 @@ function bboxOf(g) {
 }
 const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
 const inScope = p => !S.state || p.s === S.state;
-const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr || METRICS[m].rp || METRICS[m].cyc;  // values arrive with lazily loaded projections
+const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr || METRICS[m].rp || METRICS[m].cyc || METRICS[m].glof;  // values arrive with lazily loaded projections
 const valid = p => p.q === 0 && (!isData(S.metric) || Number.isFinite(p[S.metric]));
 
 /* population per source: {src}T people, {src}X people in High + Very High (scripts/06_population_exposure.py) */
@@ -804,6 +832,15 @@ function applyRaster() {
     map.setLayoutProperty("wind_" + w, "visibility", vis(L.wind.on && L.wind.when === w));
     map.setPaintProperty("wind_" + w, "raster-opacity", L.wind.op);
   }
+  if (map.getLayer("glof")) {
+    const k = glofLayerKey();
+    map.setLayoutProperty("glof", "visibility", vis(L.glof.on));
+    map.setFilter("glof", [">", ["get", k], 0]);
+    map.setPaintProperty("glof", "circle-opacity", L.glof.op);
+    map.setPaintProperty("glof", "circle-stroke-opacity", L.glof.op);
+    map.setPaintProperty("glof", "circle-color", ["case", ["all", ["==", ["get", "now"], 0], ["!=", k, "now"]], "#fff", ["==", ["get", k], 2], "#7a1426", "#e8743b"]);
+    map.setPaintProperty("glof", "circle-stroke-color", ["case", ["==", ["get", k], 2], "#7a1426", "#b5502a"]);
+  }
   map.setLayoutProperty("lowland", "visibility", vis(L.lowland.on));
   map.setPaintProperty("lowland", "raster-opacity", L.lowland.op);
   const fk = floodKey();
@@ -823,12 +860,13 @@ const layerOn = k => k === "places" ? PL.on : k === "ctx" ? $("ctx").checked : S
 // one-line state under each layer name, and dimmed rows for layers that are off
 function renderLayerMeta() {
   const m = METRICS[S.metric];
-  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.ssp || m.slr ? ` · ${sspPopLabel()}` : m.rp ? ` · ${rpLabel()}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())} map, ${sspNum()} population` : "");
+  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.ssp || m.slr ? ` · ${sspPopLabel()}` : m.rp ? ` · ${rpLabel()}` : S.metric === "gl" ? ` · ${glofLabel(glofKey())}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())} map, ${sspNum()} population` : "");
   if (S.srcs.length) $("metaPop").textContent = `${POP_SOURCES[S.src].label} · ${S.popKind === "high" ? "people on High+ land" : "everyone"}`;
   $("metaClim").textContent = scenLabel();
   $("metaFlood").textContent = floodLabel();
   $("metaRivers").textContent = rpLabel();
   $("metaWind").textContent = windLabel();
+  $("metaGlof").textContent = glofLabel(glofLayerKey());
   $("metaSat").textContent = `Sentinel-2 cloudless ${S.L.sat.year} · EOX`;
   document.querySelectorAll(".scenTxt").forEach(e => e.textContent = scenLabel());
   document.querySelectorAll(".lyr").forEach(li => li.classList.toggle("off", !layerOn(li.dataset.layer)));
@@ -837,13 +875,14 @@ function renderLayerMeta() {
 function renderLegendBox() {
   const L = S.L, m = METRICS[S.metric];
   $("lgChoro").hidden = !L.choro.on; $("lgGfsm").hidden = !L.gfsm.on; $("lgPop").hidden = !L.pop.on;
-  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on; $("lgFlood").hidden = !L.flood.on; $("lgLowland").hidden = !L.lowland.on; $("lgRivers").hidden = !L.rivers.on; $("lgWind").hidden = !L.wind.on;
-  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on || L.lowland.on || L.rivers.on || L.wind.on;
+  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on; $("lgFlood").hidden = !L.flood.on; $("lgLowland").hidden = !L.lowland.on; $("lgRivers").hidden = !L.rivers.on; $("lgWind").hidden = !L.wind.on; $("lgGlof").hidden = !L.glof.on;
+  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on || L.lowland.on || L.rivers.on || L.wind.on || L.glof.on;
+  $("lgGlofT").textContent = `Dangerous glacial lakes, ${glofLabel(glofLayerKey())}`;
   $("lgWindT").textContent = `Cyclone wind, 1-in-100-year, ${windLabel()}`;
   $("lgRiversT").textContent = `Today's 100-year river flood comes, ${rpLabel()}`;
   $("lgFloodT").textContent = `Flood depth, 1-in-100-year, ${floodLabel()}`;
   $("satCredit").textContent = `Sentinel-2 cloudless ${L.sat.year} by EOX IT Services GmbH, contains modified Copernicus Sentinel data, ${SAT_YEARS[L.sat.year].lic}.`;
-  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.ssp || m.slr ? ", " + sspPopLabel() : m.rp ? ", " + rpLabel() : S.metric === "fz0" ? "" : m.flood ? `, ${aqLabel(aqKey())} map, ${sspNum()} population` : "")
+  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.ssp || m.slr ? ", " + sspPopLabel() : m.rp ? ", " + rpLabel() : S.metric === "gl" ? ", " + glofLabel(glofKey()) : S.metric === "fz0" ? "" : m.flood ? `, ${aqLabel(aqKey())} map, ${sspNum()} population` : "")
     + (m.pop ? ", " + POP_SOURCES[S.src].label : "");
   if (S.srcs.length) $("lgPopT").textContent = `People per km², ${POP_SOURCES[S.src].label}${S.popKind === "high" ? ", on High+ land only" : ""}`;
   $("lgClimT").textContent = `Change in wettest 5-day rain, ${scenLabel()}`;
@@ -860,6 +899,7 @@ async function setMetric(k) {
   if (METRICS[k].slr) await loadSlr();
   if (METRICS[k].rp) await loadRp();
   if (METRICS[k].cyc) await loadCyclone();
+  if (METRICS[k].glof) await loadGlof();
   S.metric = k; S.thr = 0;
   document.querySelectorAll(".metricSel").forEach(s => s.value = k);
   computeRanks(); renderThreshold(); refresh(); renderLayerMeta(); renderLegendBox();
@@ -868,14 +908,14 @@ function setSource(k) {
   S.src = k;
   document.querySelectorAll(".srcSel").forEach(s => s.value = k);
   document.querySelectorAll(".srcHint").forEach(e => e.textContent = POP_SOURCES[k].hint);
-  deriveSource(); deriveFlood(); deriveSlr(); deriveRp(); deriveCyclone(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
+  deriveSource(); deriveFlood(); deriveSlr(); deriveRp(); deriveCyclone(); deriveGlof(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
 }
 function showTab(id) {
   document.querySelectorAll('[role="tab"]').forEach(x => {
     if (!x.closest(".tabs")) return;
     x.setAttribute("aria-selected", x.id === id); $(x.getAttribute("aria-controls")).hidden = x.id !== id;
   });
-  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadRp(); loadCyclone(); loadPlaces(); }
+  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadRp(); loadCyclone(); loadGlof(); loadPlaces(); }
 }
 function filterGlossary() {
   const q = $("glossQ").value.trim().toLowerCase();
@@ -923,6 +963,11 @@ function renderToday() {
     const d = FL.data.data.today, fz = sumOf(sc, p => d[S.src][p.i]);
     rows.push([fmtPeople(fz), `people live in the ${term("floodzone", "1-in-100-year flood zone")} of rivers and the coast.`,
       `River ${fmtPeople(sumOf(sc, p => d[S.src + "R"][p.i]))}, coast ${fmtPeople(sumOf(sc, p => d[S.src + "C"][p.i]))} (overlapping). No flood defences assumed.`]);
+  }
+  if (GL.data) {
+    const ks = sc.map(p => GL.k.get(p.i)).filter(k => k != null && GL.data.nown[k] > 0);
+    if (ks.length) rows.push([fmtNum(ks.length), `${term("subdistrict", "sub-districts")} lie within 250 km downstream of ${term("glof", "dangerous glacial lakes")}, ${fmtNum(ks.filter(k => GL.data.nowd[k] <= 50).length)} of them within 50 km.`,
+      S.srcs.length ? `${fmtPeople(sumOf(sc.filter(p => { const k = GL.k.get(p.i); return k != null && GL.data.nowd[k] >= 0 && GL.data.nowd[k] <= 50; }), p => p.pt))} people live in those within 50 km.` : ""]);
   }
   if (CY.data && S.srcs.length) {
     const ks = sc.map(p => CY.k.get(p.i)).filter(k => k != null), s = S.src;
@@ -978,7 +1023,7 @@ function renderCard() {
       <div><dt>Rank in ${esc(p.s)}</dt><dd>${fmtNum(p._rs)} <small>of ${fmtNum(S.perState[p.s])}</small></dd></div>` : ""}
     </dl>
     <div class="where">Ranks by ${m.opt.toLowerCase()}${m.pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`;
-  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + rpBlock(p) + slrBlock(p) + windBlock(p) + climBlock(p);
+  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + rpBlock(p) + glofBlock(p) + slrBlock(p) + windBlock(p) + climBlock(p);
   card.innerHTML = `
     <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
       <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
@@ -988,7 +1033,7 @@ function renderCard() {
   $("cardX").onclick = () => select(null);
   card.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { CARD_TAB = b.dataset.ct; renderCard(); });
   if (!FL.data) loadFlood();
-  if (CARD_TAB === "future") { loadClimate(); loadSlr(); loadRp(); loadCyclone(); }
+  if (CARD_TAB === "future") { loadClimate(); loadSlr(); loadRp(); loadCyclone(); loadGlof(); }
 }
 function refresh({ breaks = true } = {}) {
   if (breaks) computeBreaks();
@@ -1015,6 +1060,7 @@ function bindUI() {
     const k = inp.dataset.layer; S.L[k].on = inp.checked;
     if (k === "clim" && inp.checked) loadClimate().then(() => { updateClimImage(); applyRaster(); });
     if (k === "rivers" && inp.checked) loadRivers().then(applyRaster);
+    if (k === "glof" && inp.checked) loadGlofLakes().then(applyRaster);
     if (k === "sat" && inp.checked && S.L.choro.on && S.L.choro.op > 0.5) {  // let the imagery show through the fill
       S.L.choro.op = 0.5; $("opChoro").value = 50; $("opChoroOut").textContent = "50%";
     }
@@ -1059,6 +1105,12 @@ function bindUI() {
     if (matchMedia("(max-width: 760px)").matches) $("tab-gloss").scrollIntoView({ block: "start" });
   });
   $("glossQ").addEventListener("input", filterGlossary);
+  $("glofWhenSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.L.glof.when = b.dataset.w;
+    [...$("glofWhenSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    applyRaster(); renderLayerMeta(); renderLegendBox();
+  });
   $("windWhenSeg").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     S.L.wind.when = b.dataset.w;
@@ -1237,6 +1289,11 @@ function renderFuture() {
           `Median: every ${years(med)}. ${fmtPeople(sumOf(twice, p => p.fz0))} people live in their river and coastal flood zones today.`]);
       }
     }
+    if (GL.data) {
+      const g = glofKey();
+      rows.push([fmtNum(GL.data.lakes[g]), `${term("glof", "dangerous glacial lakes")} would drain into India by ${g.slice(-4)} (${glofLabel(g).split(" · ")[0]}), against ${fmtNum(GL.data.lakes.now)} today, as retreating glaciers leave new lakes.`,
+        `Very High hazard: ${fmtNum(GL.data.vhLakes[g])}, against ${fmtNum(GL.data.vhLakes.now)} today. India-wide count, not limited to the chosen state.`]);
+    }
     if (CY.data) {
       const ks = all.map(p => CY.k.get(p.i)).filter(k => k != null), s = S.src;
       const n0 = ks.reduce((a, k) => a + CY.data[s + "0"][k], 0), n1 = ks.reduce((a, k) => a + CY.data[s + "1"][k], 0);
@@ -1260,7 +1317,7 @@ function renderFuture() {
   }
   $("kfFuture").innerHTML = rows.map(kfRow).join("") +
     `<p class="hint">Rainfall: median of about 30 CMIP6 models against 1995–2014. Flood zone: WRI Aqueduct, median of 5 models,
-      with SSP population from Wang et al. (2022). River flood frequency: ISIMIP, 15 hydrological model runs. Cyclone wind: STORM. Sea level: IPCC AR6, with DeltaDTM elevation.
+      with SSP population from Wang et al. (2022). River flood frequency: ISIMIP, 15 hydrological model runs. Cyclone wind: STORM. Glacial lakes: Zheng et al. (2021). Sea level: IPCC AR6, with DeltaDTM elevation.
       ${term("screening", "Screening figures, not forecasts.")}</p>`;
 }
 function climBlock(p) {
@@ -1279,7 +1336,7 @@ function setClimate(ssp = CL.ssp, per = CL.per) {
   CL.ssp = ssp; CL.per = per;
   [...$("sspSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.s === ssp));
   [...$("perSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.p === per));
-  deriveClimate(); deriveFlood(); deriveSlr(); deriveRp();
+  deriveClimate(); deriveFlood(); deriveSlr(); deriveRp(); deriveGlof();
   if (isData(S.metric)) computeRanks();
   if (S.L.clim.on && CL.data) updateClimImage();
   refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
@@ -1378,6 +1435,43 @@ function rpBlock(p) {
     <table class="ctab"><tr><th>Scenario</th>${per.map(y => `<th>${perLabel(y)}</th>`).join("")}</tr>${rows}</table>
     <div class="where" style="margin-top:4px">${rpSsp()}, ${perLabel(k)}: every ${years(d["med" + k][i] / 10)} (${term("range", "likely")} ${years(d["lo" + k][i] / 10)} to ${years(d["hi" + k][i] / 10)});
       ${d["agree" + k][i]}% of 15 ${term("ghm", "model runs")} show it coming more often. *SSP2-4.5 estimated from SSP1-2.6 and SSP3-7.0.</div></div>`;
+}
+/* ---------- glacial lake outburst floods (scripts/16_glof.py): Zheng et al. 2021, present and projected lakes ---------- */
+const GL = { data: null, k: new Map() };
+// RCP nearest the chosen SSP; 2020-39 and 2040-59 use the 2050 lakes, later periods the 2100 lakes
+const GL_RCP = { ssp126: "rcp26", ssp245: "rcp45", ssp370: "rcp85", ssp585: "rcp85" };
+const glofKey = () => `${GL_RCP[CL.ssp]}_${+CL.per < 2060 ? 2050 : 2100}`;
+const glofLayerKey = () => S.L.glof.when === "today" ? "now" : glofKey();
+const glofLabel = k => k === "now" ? "today (2015 lakes)" : `RCP${k[3]}.${k[4]}, ${k.slice(-4)} · nearest to ${SSP_INFO[CL.ssp][0]}`;
+const loadGlof = () => once("glof", async () => {
+  GL.data = await fetchOk("data/glof.json", "json");
+  GL.data.idx.forEach((i, k) => GL.k.set(i, k));
+  deriveGlof(); dataLoaded();
+});
+const loadGlofLakes = () => once("glofLakes", async () => {
+  map.addSource("glof", { type: "geojson", data: await fetchOk("data/glof_lakes.geojson", "json") });
+  map.addLayer({ id: "glof", type: "circle", source: "glof", layout: { visibility: "none" }, paint: {
+    "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, 2.2, 8, 5, 11, 8], "circle-stroke-width": 1 } }, "adm3-edges");
+});
+// sub-districts not downstream of a High+ lake have no value
+function deriveGlof() {
+  if (!GL.data) return;
+  const D = GL.data, g = glofKey();
+  P.forEach(p => { const k = GL.k.get(p.i); p.gl0 = k == null || !D.nown[k] ? NaN : D.nown[k]; p.gl = k == null || !D[g + "n"][k] ? NaN : D[g + "n"][k]; });
+  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i },
+    { gl0: Number.isFinite(p.gl0) ? p.gl0 : null, gl: Number.isFinite(p.gl) ? p.gl : null }));
+}
+function glofBlock(p) {
+  const k = GL.data ? GL.k.get(p.i) : null;
+  if (k == null) return "";
+  const D = GL.data, cellOf = s => `<td class="${s === glofKey() ? "on" : ""}">${fmtNum(D[s + "n"][k])} <small>${D[s + "new"][k] ? "+" + fmtNum(D[s + "new"][k]) + " new" : ""}</small></td>`;
+  const rows = ["rcp26", "rcp45", "rcp85"].map(r => `<tr><td>RCP${r[3]}.${r[4]}</td>${cellOf(r + "_2050")}${cellOf(r + "_2100")}</tr>`).join("");
+  const near = D.nowd[k] >= 0 ? `the nearest about ${fmtNum(D.nowd[k])} km upstream along the river` : "none today";
+  return `<div><h3>${term("glof", "Glacial lake outburst floods")}</h3>
+    <div class="where" style="margin:0 0 4px">Today ${fmtNum(D.nown[k])} High or Very High hazard lakes within 250 km upstream (${fmtNum(D.nowvh[k])} Very High), ${near};
+      ${fmtNum(D.nowv[k])} million m³ of water. As glaciers retreat:</div>
+    <table class="ctab"><tr><th>Scenario</th><th>2050</th><th>2100</th></tr>${rows}</table>
+    <div class="where" style="margin-top:4px">Screening link along the river network at about 50 km; not a flood depth.</div></div>`;
 }
 /* ---------- cyclone wind (scripts/14_cyclone_wind.py): STORM synthetic cyclones, 10 km, today and 2015-2050 ---------- */
 const CY = { data: null, k: new Map() };

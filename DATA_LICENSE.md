@@ -12,6 +12,7 @@ third-party datasets and carry their licences:
 | `data/processed/*2020_india_pop*.tif`, `viewer/data/pop_*/*` | GPW v4.11 or GHS-POP R2023A, split by GFSM v1 | **CC BY 4.0** |
 | `data/processed/india_adm3_returnperiod.csv`, `viewer/data/rp.json`, `viewer/data/rivers.geojson` | ISIMIP3b daily discharge (3 hydrological × 5 climate models), DDM30 river network | **CC BY 4.0** |
 | `data/processed/india_adm3_cyclone.csv`, `viewer/data/cyclone.json`, `viewer/data/wind_*/*` | STORM tropical cyclone wind return periods, with GPW / GHS-POP | **CC BY 4.0** (STORM itself is CC0) |
+| `data/processed/india_adm3_glof.csv`, `viewer/data/glof.json`, `viewer/data/glof_lakes.geojson` | Zheng et al. (2021) GLOF hazard, DDM30 river network | **CC BY 4.0** |
 | `data/processed/india_adm3_sealevel.csv`, `viewer/data/slr.json`, `viewer/data/lowland/*` | IPCC AR6 sea-level projections + DeltaDTM v1.1, with GPW / GHS-POP | **CC BY 4.0** |
 
 ## Required attribution
@@ -40,6 +41,8 @@ third-party datasets and carry their licences:
 - Cyclone wind: Bloemendaal, N., et al. (2020), Generation of a global synthetic tropical cyclone hazard dataset using STORM,
   Scientific Data 7, 40; Bloemendaal, N., et al. (2022), A globally consistent local-scale assessment of future tropical cyclone
   risk, Science Advances 8, eabm8438. Data: https://doi.org/10.4121/12705164 and https://doi.org/10.4121/14510817, CC0.
+- Glacial lakes: Zheng, G., Allen, S.K., Bao, A., et al. (2021), Increasing risk of glacial lake outburst floods from future
+  Third Pole deglaciation, Nature Climate Change 11, 411–417. Data: https://doi.org/10.5281/zenodo.4477945, CC BY 4.0.
 - Sea level: Garner, G.G., Hermans, T., Kopp, R.E., et al. (2021), IPCC AR6 Sea Level Projections, regional confidence files,
   https://doi.org/10.5281/zenodo.6382554, CC BY 4.0; Fox-Kemper, B., et al. (2021), Ocean, Cryosphere and Sea Level Change,
   in Climate Change 2021: The Physical Science Basis, IPCC AR6 WGI, Chapter 9.

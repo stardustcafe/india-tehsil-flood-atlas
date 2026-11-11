@@ -120,10 +120,12 @@ def annual_max(nc):
     return ys, np.stack([np.nanmax(d[years == y], axis=0) for y in ys]).astype(np.float32)
 
 
-def fetch(path):
-    out = AMAX / (Path(path).stem + ".npz")
+def cutout(path, reduce, out):
+    """Mask an ISIMIP file to India on the server, download it, and save reduce(nc) -> dict of arrays as npz."""
     if out.exists():
         return out
+    out.parent.mkdir(parents=True, exist_ok=True)
+    (RAW / "tmp").mkdir(parents=True, exist_ok=True)
     for attempt in range(4):
         try:
             j = requests.post(API, json={"paths": [path], "operations": [
@@ -139,10 +141,9 @@ def fetch(path):
             with zipfile.ZipFile(z) as zf:
                 name = next(n for n in zf.namelist() if n.endswith(".nc"))
                 nc = zf.extract(name, RAW / "tmp")
-            ys, a = annual_max(nc)
-            np.savez_compressed(out, years=ys, amax=a)
+            np.savez_compressed(out, **reduce(nc))
             Path(nc).unlink(); z.unlink()
-            print(f"  {Path(path).stem[:60]} {ys[0]}-{ys[-1]}", flush=True)
+            print(f"  {Path(path).stem[:70]}", flush=True)
             return out
         except Exception as e:  # server queue hiccups: start the job again
             print(f"  retry {attempt + 1} {Path(path).name}: {e}", flush=True)
@@ -150,23 +151,36 @@ def fetch(path):
     raise RuntimeError(f"failed: {path}")
 
 
-def upstream_area():
-    """km2 draining through each 0.5 deg cell of the India window, accumulated over the global DDM30 network."""
+def fetch(path):
+    def reduce(nc):
+        ys, a = annual_max(nc)
+        return {"years": ys, "amax": a}
+    return cutout(path, reduce, AMAX / (Path(path).stem + ".npz"))
+
+
+def ddm30():
+    """Global DDM30 network: (downstream cell index or -1 per cell, flattened; lat ascending; lon; land mask)."""
     nc = RAW / "geo" / Path(DDM30).name
     if not nc.exists():
         nc.parent.mkdir(parents=True, exist_ok=True)
         nc.write_bytes(requests.get("https://files.isimip.org/" + DDM30, timeout=300).content)
     with h5py.File(nc, "r") as f:
-        d, lat, lon = f["flowdirection"][:], f["lat"][:], f["lon"][:]  # lat ascending
+        d, lat, lon = f["flowdirection"][:], f["lat"][:], f["lon"][:]
     nr, ncol = d.shape
-    acc = ((111.2 * RES) ** 2 * np.cos(np.radians(lat)))[:, None] * (d < 1e19)
     tgt = np.full(d.shape, -1)
     for k, (dr, dc) in MOVES.items():
         rr, cc = np.nonzero(d == k)
         tr, tc = rr + dr, (cc + dc) % ncol
         ok = (tr >= 0) & (tr < nr)
         tgt[rr[ok], cc[ok]] = tr[ok] * ncol + tc[ok]
-    t, acc = tgt.ravel(), acc.ravel().copy()
+    return tgt.ravel(), lat, lon, d < 1e19
+
+
+def upstream_area():
+    """km2 draining through each 0.5 deg cell of the India window, accumulated over the global DDM30 network."""
+    t, lat, lon, land = ddm30()
+    shape = land.shape
+    acc = (((111.2 * RES) ** 2 * np.cos(np.radians(lat)))[:, None] * land).ravel()
     indeg = np.bincount(t[t >= 0], minlength=t.size)
     todo = list(np.nonzero(indeg == 0)[0])
     while todo:  # topological order: each cell passes its total on once everything upstream has arrived
@@ -177,7 +191,7 @@ def upstream_area():
             indeg[j] -= 1
             if indeg[j] == 0:
                 todo.append(j)
-    acc = acc.reshape(d.shape)[::-1]  # north first, like the discharge files
+    acc = acc.reshape(shape)[::-1]  # north first, like the discharge files
     r0, c0 = round((lat[-1] - (BBOX[3] - RES / 2)) / RES), round((BBOX[0] + RES / 2 - lon[0]) / RES)
     return acc[r0:r0 + NR, c0:c0 + NC]
 
