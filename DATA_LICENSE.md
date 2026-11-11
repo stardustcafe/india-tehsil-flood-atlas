@@ -10,6 +10,7 @@ third-party datasets and carry their licences:
 | `data/processed/india_adm3_climate.csv`, `viewer/data/climate.json` | World Bank CCKP CMIP6 0.25° ensemble, with GFSM v1 | **CC BY 4.0** |
 | `data/processed/india_places.*`, `viewer/data/places.geojson` | OpenStreetMap + Wikidata, with GFSM v1 class | **ODbL 1.0** (from OpenStreetMap) |
 | `data/processed/*2020_india_pop*.tif`, `viewer/data/pop_*/*` | GPW v4.11 or GHS-POP R2023A, split by GFSM v1 | **CC BY 4.0** |
+| `data/processed/india_adm3_sealevel.csv`, `viewer/data/slr.json`, `viewer/data/lowland/*` | IPCC AR6 sea-level projections + DeltaDTM v1.1, with GPW / GHS-POP | **CC BY 4.0** |
 
 ## Required attribution
 
@@ -31,6 +32,12 @@ third-party datasets and carry their licences:
   Aqueduct Floods Methodology, Technical Note, World Resources Institute. www.wri.org/publication/aqueduct-floods-methodology
 - Projected population: Wang, X., Meng, X., Long, Y. (2022), Projecting 1 km-grid population distributions from 2020
   to 2100 globally under shared socioeconomic pathways, Scientific Data 9, 563. https://doi.org/10.6084/m9.figshare.19608594, CC BY 4.0.
+- Sea level: Garner, G.G., Hermans, T., Kopp, R.E., et al. (2021), IPCC AR6 Sea Level Projections, regional confidence files,
+  https://doi.org/10.5281/zenodo.6382554, CC BY 4.0; Fox-Kemper, B., et al. (2021), Ocean, Cryosphere and Sea Level Change,
+  in Climate Change 2021: The Physical Science Basis, IPCC AR6 WGI, Chapter 9.
+- Coastal elevation: Pronk, M., Hooijer, A., Eilander, D., et al. (2024), DeltaDTM: A global coastal digital terrain model,
+  Scientific Data 11, 273. https://doi.org/10.1038/s41597-024-03091-9, CC BY 4.0. Contains Copernicus DEM GLO-30, © DLR e.V. 2010–2014
+  and © Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the European Union and ESA.
 - Viewer place names and rivers: © OpenStreetMap contributors (ODbL), served by OpenFreeMap using the OpenMapTiles schema.
 - Viewer satellite imagery (streamed, not redistributed): Sentinel-2 cloudless (https://s2maps.eu) by EOX IT Services GmbH,
   contains modified Copernicus Sentinel data. The 2016 mosaic is CC BY 4.0; the 2018 onwards mosaics (the viewer uses 2024) are CC BY-NC-SA 4.0, non-commercial use only.

@@ -120,6 +120,7 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 .t-gfsm { background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3), var(--g4), var(--g5)); }
 .t-pop { background: linear-gradient(90deg, var(--d1), var(--d3), var(--d6)); }
 .t-clim { background: linear-gradient(90deg, #a6611a, #e4ecee, #5b9bd5, #0b3a75); }
+.t-lowland { background: linear-gradient(90deg, #6a1b6a, #d6619a, #f8d8e4); }
 .t-flood { background: linear-gradient(90deg, #bfe6f0, #3a9ac2, #0b3d6e); }
 .t-sat { background: linear-gradient(135deg, #3d5a2a, #7d7348 40%, #a89a72 55%, #2e4f63); }
 .lyr-body { padding: 4px 12px 14px 50px; display: flex; flex-direction: column; gap: 10px; background: var(--sunk); }
@@ -367,6 +368,20 @@ a.term:hover { color: var(--accent); }
               <input type="range" class="op" id="opFlood" data-layer="flood" min="5" max="100" step="5" value="90"></div>
           </div>
         </li>
+        <li class="lyr off" data-layer="lowland" id="lyrLowland">
+          <div class="lyr-head">
+            <span class="thumb t-lowland"></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrLowlandBody"><b>Low-lying coastal land</b><small>Height above today's sea level</small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="lowland" aria-label="Show low-lying coastal land"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrLowlandBody" hidden>
+            <p class="hint">Coastal land less than 3 m above today's mean sea level, from the 30 m DeltaDTM terrain model (buildings and trees removed).
+              Compare with the projected <a class="term" href="#g-slr">sea-level rise</a>: land below it would sit below the future mean sea level
+              unless protected (<a class="term" href="#g-bathtub">how to read this</a>).</p>
+            <div class="ctl"><div class="row"><label for="opLowland">Opacity</label><output id="opLowlandOut">90%</output></div>
+              <input type="range" class="op" id="opLowland" data-layer="lowland" min="5" max="100" step="5" value="90"></div>
+          </div>
+        </li>
         <li class="lyr off" data-layer="pop" id="lyrPop">
           <div class="lyr-head">
             <span class="thumb t-pop"></span>
@@ -482,6 +497,8 @@ a.term:hover { color: var(--accent); }
         <div class="ge" id="g-classes"><dt>Flood-prone land (High+)</dt><dd>Land in GFSM's High or Very High classes, the top two of five (Very Low, Low, Moderate, High, Very High).</dd></div>
         <div class="ge" id="g-rp"><dt>1-in-100-year flood (return period)</dt><dd>A flood with a 1% chance of happening in any given year. It is not "once a century": over 30 years the chance of at least one is about 26%. A larger return period means a rarer, bigger flood.</dd></div>
         <div class="ge" id="g-floodzone"><dt>Flood zone</dt><dd>Land that WRI Aqueduct Floods models as under water in a 1-in-100-year river or coastal flood, at about 1 km, with no flood defences. A cell counts if any depth is modelled. Future coastal maps include median sea-level rise and land subsidence.</dd></div>
+        <div class="ge" id="g-slr"><dt>Sea-level rise</dt><dd>The projected rise of mean sea level relative to the land, against 1995–2014, from the IPCC's Sixth Assessment (AR6). The atlas uses the nearest point on AR6's 1° grid; local land sinking measured at tide gauges is left out because the estimates disagree sharply, so delta areas may see more.</dd></div>
+        <div class="ge" id="g-bathtub"><dt>Land below sea level</dt><dd>Land whose ground height (30 m DeltaDTM model) is below today's or the projected mean sea level. A simple "bathtub" estimate: it ignores whether the land connects to the sea, and much of it is already behind embankments, as in the Sundarbans and Kuttanad. Read it as land that depends on protection and drainage, not land that will flood. Tides and storm surges come on top; see Flood zone.</dd></div>
         <div class="ge" id="g-subsidence"><dt>Land subsidence</dt><dd>Sinking ground, from groundwater pumping and the settling of delta sediments. The coastal flood-zone maps include it, which is part of why low-lying delta areas such as greater Kolkata show large future increases.</dd></div>
         <div class="ge" id="g-depth"><dt>Flood depth</dt><dd>Modelled water depth above ground during the flood, in metres. Over 1 m is generally dangerous to people and buildings.</dd></div>
         <div class="ge" id="g-defences"><dt>Flood defences</dt><dd>Embankments, levees, sea walls and dams. The flood-zone maps leave them out, so in protected areas they show the hazard if defences fail or are overtopped, an upper bound.</dd></div>
@@ -523,6 +540,7 @@ a.term:hover { color: var(--accent); }
         <span>Climate: <a href="https://climateknowledgeportal.worldbank.org/" target="_blank" rel="noopener">World Bank CCKP</a> CMIP6 0.25° multi-model ensemble, CC BY 4.0.</span>
         <span>Flood zones: <a href="https://www.wri.org/data/aqueduct-floods-hazard-maps" target="_blank" rel="noopener">WRI Aqueduct Floods</a> v2 hazard maps (Ward et al. 2020), 1-in-100-year river (5 CMIP5 models) and coastal (median sea-level rise, with subsidence) inundation, no flood defences.</span>
         <span>Projected population: Wang, Meng &amp; Long (2022), <a href="https://doi.org/10.6084/m9.figshare.19608594" target="_blank" rel="noopener">1 km SSP population 2020–2100</a>, Scientific Data, CC BY 4.0. Used as growth rates on the 2020 counts.</span>
+        <span>Sea level: <a href="https://doi.org/10.5281/zenodo.6382554" target="_blank" rel="noopener">IPCC AR6 sea-level projections</a> (Fox-Kemper et al. 2021; Garner et al. 2021), CC BY 4.0. Elevation: <a href="https://doi.org/10.4121/21997565" target="_blank" rel="noopener">DeltaDTM</a> (Pronk et al. 2024), CC BY 4.0, built from Copernicus GLO-30 © DLR e.V.</span>
         <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
         <span>Satellite imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, 2018 onwards CC BY-NC-SA 4.0.</span>
         <span>Basemap labels: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
@@ -560,6 +578,10 @@ a.term:hover { color: var(--accent); }
           <div class="gleg"><span><i style="background:#bfe6f0"></i>up to 0.5 m</span><span><i style="background:#7cc4dc"></i>0.5–1 m</span>
           <span><i style="background:#3a9ac2"></i>1–2 m</span><span><i style="background:#1c6aa0"></i>2–4 m</span><span><i style="background:#0b3d6e"></i>over 4 m</span></div>
           <p>No flood defences. WRI Aqueduct Floods.</p></div>
+        <div class="lg" id="lgLowland" hidden><h3>Height above today's sea level</h3>
+          <div class="gleg"><span><i style="background:#6a1b6a"></i>below 0 m</span><span><i style="background:#a8327f"></i>0–0.5 m</span>
+          <span><i style="background:#d6619a"></i>0.5–1 m</span><span><i style="background:#eea2bf"></i>1–2 m</span><span><i style="background:#f8d8e4"></i>2–3 m</span></div>
+          <p id="lgLowlandNote">DeltaDTM, 30 m. No check for embankments or connection to the sea.</p></div>
         <div class="lg" id="lgPop" hidden><h3 id="lgPopT">People per km²</h3>
           <div class="gleg"><span><i style="background:var(--d1)"></i>1–10</span><span><i style="background:var(--d2)"></i>10–50</span>
           <span><i style="background:var(--d3)"></i>50–250</span><span><i style="background:var(--d4)"></i>250–1k</span>
@@ -596,14 +618,15 @@ const METRICS = {
   x:  { label: "People in High+",    opt: "People on High+ land", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true },
   xp: { label: "% people in High+",  opt: "Share of people on High+ land", fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1, pop: true },
   c5: { label: "Δ 5-day max rain",   opt: "Change in wettest 5-day rain", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [0, 5, 10, 15, 20, 30], step: 1, max: 60, clim: true },
-  fz0: { label: "People in 100-yr flood zone, today", opt: "People in 1-in-100-year flood zone, today", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true },
-  fz:  { label: "People in 100-yr flood zone, future", opt: "People in 1-in-100-year flood zone, future (projected population)", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true },
-  fzd: { label: "Change in people in flood zone", opt: "Change in people in flood zone vs today", fmt: v => (v > 0 ? "+" : v < 0 ? "−" : "") + fmtPeople(Math.abs(v)), tick: v => (v < 0 ? "−" : "") + fmtShort(Math.abs(v)), fixed: [0, 500, 2000, 5000, 20000, 50000], step: 500, max: 100000, pop: true, flood: true },
+  fz0: { label: "People in 100-yr flood zone, today", opt: "People in 1-in-100-year flood zone, today", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true, zero: true },
+  fz:  { label: "People in 100-yr flood zone, future", opt: "People in 1-in-100-year flood zone, future (projected population)", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true, zero: true },
+  fzd: { label: "Change in people in flood zone", opt: "Change in people in flood zone vs today", fmt: v => (v > 0 ? "+" : v < 0 ? "−" : "") + fmtPeople(Math.abs(v)), tick: v => (v < 0 ? "−" : "") + fmtShort(Math.abs(v)), fixed: [0, 500, 2000, 5000, 20000, 50000], step: 500, max: 100000, pop: true, flood: true, zero: true },
+  sl:  { label: "People below future sea level", opt: "People on land below the future mean sea level", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [100, 1000, 5000, 2e4, 5e4, 1e5], step: 100, max: 200000, pop: true, slr: true, zero: true },
   pg:  { label: "Population change", opt: "Projected population change since 2020", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [-10, 0, 10, 20, 40, 60], step: 1, max: 100, flood: true, ssp: true },
   cf: { label: "Flood pressure",     opt: "Flood pressure (climate-adjusted)", fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
 const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People", ["x", "xp", "pg"]],
-  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["Rainfall outlook", ["c5", "cf"]]];
+  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
 const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
   gpw: { label: "GPW v4.11", hint: "GPW spreads each census sub-district's count evenly over its area, so it cannot tell whether settlements sit on the floodplain or above it." },
@@ -613,7 +636,7 @@ const CLASS_NAMES = ["Very Low", "Low", "Moderate", "High", "Very High"];
 const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], src: "gpw", popKind: "high", srcs: [],
   // map layers, each with its own switch and opacity (places and OSM context are handled by their own sections)
   L: { choro: { on: true, op: 0.9 }, gfsm: { on: false, op: 0.85 }, pop: { on: false, op: 0.9 }, clim: { on: false, op: 0.85 }, bounds: { on: true },
-       flood: { on: false, op: 0.9, when: "future" },
+       flood: { on: false, op: 0.9, when: "future" }, lowland: { on: false, op: 0.9 },
        sat: { on: false, op: 1, year: "2024" } } };
 // Sentinel-2 cloudless mosaics by EOX (https://s2maps.eu); the 2016 layer has no year in its name
 const SAT_YEARS = { 2024: { layer: "s2cloudless-2024_3857", lic: "CC BY-NC-SA 4.0" }, 2016: { layer: "s2cloudless_3857", lic: "CC BY 4.0" } };
@@ -653,7 +676,7 @@ function bboxOf(g) {
 }
 const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
 const inScope = p => !S.state || p.s === S.state;
-const isData = m => METRICS[m].clim || METRICS[m].flood;  // values arrive with lazily loaded projections
+const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr;  // values arrive with lazily loaded projections
 const valid = p => p.q === 0 && (!isData(S.metric) || Number.isFinite(p[S.metric]));
 
 /* population per source: {src}T people, {src}X people in High + Very High (scripts/06_population_exposure.py) */
@@ -676,7 +699,7 @@ function computeBreaks() {
   if (S.mode === "fixed") b = METRICS[m].fixed.slice();
   else {
     // flood-zone counts are zero in most sub-districts: rank only the non-zero ones so the classes stay distinct
-    const vals = P.filter(p => valid(p) && inScope(p) && (!METRICS[m].flood || METRICS[m].ssp || p[m] !== 0)).map(p => p[m]).sort((a, c) => a - c);
+    const vals = P.filter(p => valid(p) && inScope(p) && (!METRICS[m].zero || p[m] !== 0)).map(p => p[m]).sort((a, c) => a - c);
     b = [1, 2, 3, 4, 5, 6].map(k => vals[Math.min(vals.length - 1, Math.floor(k * vals.length / 7))] ?? 0);
   }
   for (let i = 1; i < b.length; i++) if (b[i] <= b[i - 1]) b[i] = b[i - 1] + 1e-6; // step needs strictly ascending
@@ -720,6 +743,8 @@ function applyRaster() {
     map.setPaintProperty("clim", "raster-opacity", L.clim.op);
   }
   map.setLayoutProperty("adm3-edges", "visibility", vis(L.bounds.on));
+  map.setLayoutProperty("lowland", "visibility", vis(L.lowland.on));
+  map.setPaintProperty("lowland", "raster-opacity", L.lowland.op);
   const fk = floodKey();
   for (const k of FLOOD_KEYS) {
     map.setLayoutProperty("flood_" + k, "visibility", vis(L.flood.on && k === fk));
@@ -737,7 +762,7 @@ const layerOn = k => k === "places" ? PL.on : k === "ctx" ? $("ctx").checked : S
 // one-line state under each layer name, and dimmed rows for layers that are off
 function renderLayerMeta() {
   const m = METRICS[S.metric];
-  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.ssp ? ` · ${sspPopLabel()}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())} map, ${sspNum()} population` : "");
+  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.ssp || m.slr ? ` · ${sspPopLabel()}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())} map, ${sspNum()} population` : "");
   if (S.srcs.length) $("metaPop").textContent = `${POP_SOURCES[S.src].label} · ${S.popKind === "high" ? "people on High+ land" : "everyone"}`;
   $("metaClim").textContent = scenLabel();
   $("metaFlood").textContent = floodLabel();
@@ -749,11 +774,11 @@ function renderLayerMeta() {
 function renderLegendBox() {
   const L = S.L, m = METRICS[S.metric];
   $("lgChoro").hidden = !L.choro.on; $("lgGfsm").hidden = !L.gfsm.on; $("lgPop").hidden = !L.pop.on;
-  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on; $("lgFlood").hidden = !L.flood.on;
-  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on;
+  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on; $("lgFlood").hidden = !L.flood.on; $("lgLowland").hidden = !L.lowland.on;
+  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on || L.lowland.on;
   $("lgFloodT").textContent = `Flood depth, 1-in-100-year, ${floodLabel()}`;
   $("satCredit").textContent = `Sentinel-2 cloudless ${L.sat.year} by EOX IT Services GmbH, contains modified Copernicus Sentinel data, ${SAT_YEARS[L.sat.year].lic}.`;
-  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.ssp ? ", " + sspPopLabel() : S.metric === "fz0" ? "" : m.flood ? `, ${aqLabel(aqKey())} map, ${sspNum()} population` : "")
+  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.ssp || m.slr ? ", " + sspPopLabel() : S.metric === "fz0" ? "" : m.flood ? `, ${aqLabel(aqKey())} map, ${sspNum()} population` : "")
     + (m.pop ? ", " + POP_SOURCES[S.src].label : "");
   if (S.srcs.length) $("lgPopT").textContent = `People per km², ${POP_SOURCES[S.src].label}${S.popKind === "high" ? ", on High+ land only" : ""}`;
   $("lgClimT").textContent = `Change in wettest 5-day rain, ${scenLabel()}`;
@@ -766,7 +791,8 @@ function buildMetricSelects() {
 }
 async function setMetric(k) {
   if (METRICS[k].clim) await loadClimate();
-  if (METRICS[k].flood) await loadFlood();
+  if (METRICS[k].flood || METRICS[k].slr) await loadFlood();
+  if (METRICS[k].slr) await loadSlr();
   S.metric = k; S.thr = 0;
   document.querySelectorAll(".metricSel").forEach(s => s.value = k);
   computeRanks(); renderThreshold(); refresh(); renderLayerMeta(); renderLegendBox();
@@ -775,14 +801,14 @@ function setSource(k) {
   S.src = k;
   document.querySelectorAll(".srcSel").forEach(s => s.value = k);
   document.querySelectorAll(".srcHint").forEach(e => e.textContent = POP_SOURCES[k].hint);
-  deriveSource(); deriveFlood(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
+  deriveSource(); deriveFlood(); deriveSlr(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
 }
 function showTab(id) {
   document.querySelectorAll('[role="tab"]').forEach(x => {
     if (!x.closest(".tabs")) return;
     x.setAttribute("aria-selected", x.id === id); $(x.getAttribute("aria-controls")).hidden = x.id !== id;
   });
-  if (id === "tabS") { loadClimate(); loadFlood(); loadPlaces(); }
+  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadPlaces(); }
 }
 function filterGlossary() {
   const q = $("glossQ").value.trim().toLowerCase();
@@ -880,7 +906,7 @@ function renderCard() {
       <div><dt>Rank in ${esc(p.s)}</dt><dd>${fmtNum(p._rs)} <small>of ${fmtNum(S.perState[p.s])}</small></dd></div>` : ""}
     </dl>
     <div class="where">Ranks by ${m.opt.toLowerCase()}${m.pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`;
-  const future = !CL.data || !FL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + climBlock(p);
+  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + slrBlock(p) + climBlock(p);
   card.innerHTML = `
     <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
       <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
@@ -890,7 +916,7 @@ function renderCard() {
   $("cardX").onclick = () => select(null);
   card.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { CARD_TAB = b.dataset.ct; renderCard(); });
   if (!FL.data) loadFlood();
-  if (CARD_TAB === "future") loadClimate();
+  if (CARD_TAB === "future") { loadClimate(); loadSlr(); }
 }
 function refresh({ breaks = true } = {}) {
   if (breaks) computeBreaks();
@@ -1110,7 +1136,7 @@ function climImage() {
 }
 function updateClimImage() { if (map.getSource("clim")) map.getSource("clim").updateImage({ url: climImage() }); }
 function renderFuture() {
-  if (!CL.data || !FL.data) { $("kfFuture").innerHTML = `<p class="hint">Loading projections…</p>`; return; }
+  if (!CL.data || !FL.data || !SL.data) { $("kfFuture").innerHTML = `<p class="hint">Loading projections…</p>`; return; }
   const d = CL.data.data[climKey()], sc = P.filter(p => p.q === 0 && inScope(p) && d.d5[p.i] != null), where = esc(S.state || "India");
   const wavg = f => { let s = 0, w = 0; sc.forEach(p => { const v = d[f][p.i]; if (v != null) { s += v * p.va; w += p.va; } }); return w ? s / w : NaN; };
   const rows = [[signed(wavg("d5")), `change in the ${term("rx5day", "wettest 5-day rainfall")} of the year, ${where} average.`,
@@ -1124,12 +1150,24 @@ function renderFuture() {
     rows.push([signed(100 * (pop1 / pop0 - 1)), `${term("ssppop", "projected population")} change by ${G_YEAR[CL.per]} (${sspNum()}), to ${fmtPeople(pop1)}.`]);
     rows.push([fmtPeople(fut), `people would live in the ${term("floodzone", "1-in-100-year flood zone")} by ${AQ_YEAR[CL.per]}, ${more(fut - now)} than today.`,
       `Climate change: ${more(clim - now)} (${aqLabel(k)} flood map). Population change: ${more(fut - clim)}. ${term("defences", "No flood defences")}.`]);
+    if (SL.data) {
+      const y = G_YEAR[CL.per], D = SL.data.data[CL.ssp], cs = all.map(p => SL.k.get(p.i)).filter(k => k != null);
+      if (cs.length) {
+        const med = a => { const v = cs.map(k => a[k]).sort((x, z) => x - z); return v[v.length >> 1]; };
+        const now0 = cs.reduce((t, k) => t + SL.data[S.src + "0"][k], 0);
+        const fut0 = all.reduce((t, p) => { const k = SL.k.get(p.i); return k == null ? t : t + D[S.src + y][k] * growth(p.i); }, 0);
+        rows.push([metres(med(D["med" + y])), `${term("slr", "sea-level rise")} along the coast by ${y} (${sspNum()}, median of ${fmtNum(cs.length)} coastal sub-districts).`,
+          `${term("range", "Likely")} ${metres(med(D["lo" + y]))} to ${metres(med(D["hi" + y]))}; ${metres(med(D.med2100))} by 2100.`]);
+        rows.push([fmtPeople(fut0), `people would live on land ${term("bathtub", "below the future mean sea level")}, against ${fmtPeople(now0)} below it today.`,
+          `Most of this land is already protected by embankments; it depends on them more as the sea rises.`]);
+      }
+    }
     const x = sumOf(sc, p => p.x), xRob = sumOf(sc.filter(p => d.lo[p.i] > 0), p => p.x);
     rows.push([fmtPeople(xRob), `people live on flood-prone land where ${term("agree", "models agree")} extreme rain will increase${x ? `, ${(100 * xRob / x).toFixed(0)}% of all on such land` : ""}.`]);
   }
   $("kfFuture").innerHTML = rows.map(kfRow).join("") +
     `<p class="hint">Rainfall: median of about 30 CMIP6 models against 1995–2014. Flood zone: WRI Aqueduct, median of 5 models,
-      with SSP population from Wang et al. (2022).
+      with SSP population from Wang et al. (2022). Sea level: IPCC AR6, with DeltaDTM elevation.
       ${term("screening", "Screening figures, not forecasts.")}</p>`;
 }
 function climBlock(p) {
@@ -1148,7 +1186,7 @@ function setClimate(ssp = CL.ssp, per = CL.per) {
   CL.ssp = ssp; CL.per = per;
   [...$("sspSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.s === ssp));
   [...$("perSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.p === per));
-  deriveClimate(); deriveFlood();
+  deriveClimate(); deriveFlood(); deriveSlr();
   if (isData(S.metric)) computeRanks();
   if (S.L.clim.on && CL.data) updateClimImage();
   refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
@@ -1201,8 +1239,34 @@ function deriveFlood() {
 }
 const loadFlood = () => once("flood", async () => {
   [FL.data, FL.pop] = await Promise.all([fetchOk("data/flood.json", "json"), fetchOk("data/popssp.json", "json")]);
-  deriveFlood(); dataLoaded();
+  deriveFlood(); deriveSlr(); dataLoaded();
 });
+/* ---------- sea-level rise (scripts/12_sea_level.py): IPCC AR6 relative sea level, DeltaDTM elevation ---------- */
+const SL = { data: null, k: new Map() };
+const loadSlr = () => once("slr", async () => {
+  SL.data = await fetchOk("data/slr.json", "json");
+  SL.data.idx.forEach((i, k) => SL.k.set(i, k));
+  deriveSlr(); dataLoaded();
+});
+// people below the future mean sea level, scaled by the sub-district's projected population growth
+function deriveSlr() {
+  if (!SL.data || !FL.pop || !S.srcs.length) return;
+  const d = SL.data.data[CL.ssp][S.src + G_YEAR[CL.per]];
+  P.forEach(p => { const k = SL.k.get(p.i); p.sl = k == null ? 0 : d[k] * growth(p.i); });
+  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i }, { sl: p.sl }));
+}
+const metres = cm => (cm / 100).toFixed(2) + " m";
+function slrBlock(p) {
+  const k = SL.data ? SL.k.get(p.i) : null;
+  if (k == null || !S.srcs.length) return "";
+  const D = SL.data.data, y = G_YEAR[CL.per], s = S.src, g = growth(p.i);
+  const cell = (ssp, yy) => `<td class="${ssp === CL.ssp && yy === y ? "on" : ""}">${metres(D[ssp]["med" + yy][k])} <small>${(D[ssp]["lo" + yy][k] / 100).toFixed(2)}–${metres(D[ssp]["hi" + yy][k])}</small></td>`;
+  const rows = Object.keys(SSP_INFO).map(ssp => `<tr><td>${SSP_INFO[ssp][0]}</td>${cell(ssp, y)}${cell(ssp, 2100)}</tr>`).join("");
+  return `<div><h3>${term("slr", "Sea-level rise")}</h3>
+    <table class="ctab"><tr><th>Scenario</th><th>By ${y} <small>(${term("range", "likely")})</small></th><th>By 2100</th></tr>${rows}</table>
+    <div class="where" style="margin-top:4px">${term("bathtub", "Land below today's sea level")}: ${fmtNum(SL.data.a0[k] / 10, 1)} km², ${fmtPeople(SL.data[s + "0"][k])} people.
+      Below the ${y} level (${sspNum()}): ${fmtNum(D[CL.ssp]["a" + y][k] / 10, 1)} km², ${fmtPeople(D[CL.ssp][s + y][k] * g)} people (projected population).</div></div>`;
+}
 function floodBlock(p) {
   if (!S.srcs.length) return "";
   const i = p.i, s = S.src, T = FL.data.data.today, cy = AQ_YEAR[CL.per];
@@ -1406,6 +1470,9 @@ function bindPlacesUI() {
       map.addLayer({ id: "flood_" + k, type: "raster", source: "flood_" + k, layout: { visibility: "none" },
         paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.L.flood.op } });
     }
+    map.addSource("lowland", { type: "raster", tiles: ["tiles://lowland/{z}/{x}/{y}"], tileSize: 256, minzoom: 4, maxzoom: 10, bounds: [68, 6.3, 97.6, 37.3] });
+    map.addLayer({ id: "lowland", type: "raster", source: "lowland", layout: { visibility: "none" },
+      paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.L.lowland.op } });
     map.addLayer({ id: "adm3-edges", type: "line", source: "adm3Edges", paint: { "line-color": css("--edge"), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.15, 7, 0.5, 10, 1] } });
     map.addLayer({ id: "state-edges", type: "line", source: "stateEdges", paint: { "line-color": css("--state-edge"), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.7, 8, 1.6] } });
     map.addLayer({ id: "coast", type: "line", source: "coast", paint: { "line-color": css("--state-edge"), "line-width": 0.8 } });

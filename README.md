@@ -132,6 +132,30 @@ Each place is put in one of ten categories and gets its sub-district, the GFSM c
 point (`gfsm_class`) and the share of High + Very High land within 250 m (`pct_high_250m`). Large sites
 (parks, forts) are represented by their centre point.
 
+### Sea-level rise
+
+`scripts/12_sea_level.py` → `data/processed/india_adm3_sealevel.csv`, `viewer/data/slr.json`, `viewer/data/lowland/`
+
+IPCC AR6 relative sea-level projections (Garner et al. 2021, CC BY 4.0; median and likely range, medium
+confidence, against 1995–2014) at the nearest 1° grid point, combined with the 30 m DeltaDTM coastal terrain
+model (Pronk et al. 2024, CC BY 4.0). Every 30 m pixel below 3 m is binned in 5 cm steps per 30″ cell, so each
+coastal sub-district (482 with at least 1 km² below 3 m) gets the land and the 2020 population below any water
+level. Tide-gauge points are left out because their land-motion terms disagree within a few km. Only the
+needed members are read out of the 9 GB AR6 and 17 GB DeltaDTM archives with HTTP range requests
+(`scripts/remote_zip.py`).
+
+| Median coastal sub-district | 2050 people below (GPW, lakh) | 2100 rise | 2100 people below (lakh) |
+|---|---|---|---|
+| SSP1-2.6 | 7.5 | 0.39 m | 10.6 |
+| SSP2-4.5 | 7.7 | 0.49 m | 12.7 |
+| SSP3-7.0 | 7.8 | 0.61 m | 15.3 |
+| SSP5-8.5 | 8.1 | 0.72 m | 18.4 |
+
+Today 5.5 lakh people (GPW) live on 708 km² below mean sea level, led by Kuttanad in Kerala. This is a
+bathtub estimate with 2020 population: no check that land connects to the sea, and most of it is behind
+embankments, so it shows land that depends on protection rather than land that will flood. Tides and surges
+are in the Aqueduct coastal flood zone. The viewer scales these counts by SSP growth.
+
 ## Reproduce
 
 ```bash
@@ -151,6 +175,8 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/python scripts/09_climate_projections.py         # CMIP6 rainfall extremes (downloads ~660 MB once)
 .venv/Scripts/python scripts/10_aqueduct_floods.py             # Aqueduct flood zones + depth tiles (streams ~3 GB, keeps India crops)
 .venv/Scripts/python scripts/11_ssp_population.py            # SSP population growth (streams ~3 GB of the figshare zips)
+.venv/Scripts/pip install h5py
+.venv/Scripts/python scripts/12_sea_level.py --workers 8     # AR6 sea level + DeltaDTM (~1.4 GB download, ~1 h)
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size
@@ -167,14 +193,14 @@ Serve the folder rather than opening the file directly: `python -m http.server -
 It can be hosted as-is on GitHub Pages or any static host.
 
 The sidebar has four tabs. **Layers** lists every map layer in drawing order (places, labels and rivers,
-boundaries, rainfall change, 1-in-100-year flood zone, population, GFSM 30 m, sub-district statistics, and a
+boundaries, rainfall change, 1-in-100-year flood zone, low-lying coastal land, population, GFSM 30 m, sub-district statistics, and a
 Sentinel-2 cloudless satellite basemap by EOX for 2024 or 2016), each with its own switch, opacity and settings.
 **Findings** gives headline numbers as plain sentences for India or the chosen state, today and under the chosen
 scenario, plus rankings. **Glossary** defines the terms; underlined terms anywhere in the viewer link to it.
 **About** holds the purpose, caveats and sources. Clicking a sub-district opens a profile with Today and Future tabs.
 
 For speed on GitHub Pages the first view loads only the boundaries (0.9 MB gzipped). Climate (0.9 MB),
-flood-zone (0.6 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
+flood-zone (0.6 MB), projected population (0.5 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
 raster layers fetch only the tile bundles in view.
 
 Tiles are selected by intersecting the GFSM tile index with India's boundary buffered by 0.1°,
