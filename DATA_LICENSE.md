@@ -7,6 +7,7 @@ third-party datasets and carry their licences:
 | --- | --- | --- |
 | `data/processed/*`, `viewer/data/india_adm3.topo.json` | geoBoundaries gbOpen IND ADM3 boundaries + GFSM v1 | **ODbL 1.0** (share-alike, from geoBoundaries); GFSM attribution required |
 | `viewer/data/gfsm/*` (raster tiles) | GFSM v1 | **CC BY 4.0** |
+| `data/processed/india_adm3_climate.csv`, `viewer/data/climate.json` | World Bank CCKP CMIP6 0.25° ensemble, with GFSM v1 | **CC BY 4.0** |
 | `data/processed/india_places.*`, `viewer/data/places.geojson` | OpenStreetMap + Wikidata, with GFSM v1 class | **ODbL 1.0** (from OpenStreetMap) |
 | `data/processed/*2020_india_pop*.tif`, `viewer/data/pop_*/*` | GPW v4.11 or GHS-POP R2023A, split by GFSM v1 | **CC BY 4.0** |
 
@@ -23,6 +24,8 @@ third-party datasets and carry their licences:
 - GHS-POP: Schiavina, M., Freire, S., Carioli, A., MacManus, K. (2023). GHS-POP R2023A, GHS population grid
   multitemporal (1975-2030). European Commission, Joint Research Centre (JRC).
   https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE. CC BY 4.0.
+- Climate: World Bank Group, Climate Change Knowledge Portal (CCKP), CMIP6 0.25° collection,
+  https://climateknowledgeportal.worldbank.org/. CC BY 4.0. Based on CMIP6 model output (WCRP).
 - Places to visit: © OpenStreetMap contributors (ODbL); prominence from Wikidata (CC0).
 - Viewer place names and rivers: © OpenStreetMap contributors (ODbL), served by OpenFreeMap using the OpenMapTiles schema.
 

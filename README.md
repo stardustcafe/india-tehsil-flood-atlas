@@ -14,6 +14,7 @@ socio-economic and demographic indicators to build an open flood vulnerability m
 | India boundary (India point-of-view) | Natural Earth 10m `admin_0_countries_ind` | `data/raw/boundaries/` |
 | Sub-district (ADM3), district, state boundaries | [geoBoundaries](https://www.geoboundaries.org) gbOpen IND (LGD-derived, ODbL 1.0) | `data/raw/boundaries/geoboundaries/` |
 | Population 2020, GPW v4.11 UN WPP-adjusted count, 30″ | [NASA SEDAC / CIESIN](https://doi.org/10.7927/H4PN93PB) (Earthdata login, CC BY 4.0) | `data/raw/population/gpw/` |
+| Climate projections, CMIP6 0.25° ensemble (Rx5day, Rx1day, precipitation) | [World Bank CCKP](https://climateknowledgeportal.worldbank.org/) (`wbg-cckp` S3 bucket, CC BY 4.0) | `data/raw/climate/cckp/` |
 | Places to visit (tourism, heritage, religious, nature) | OpenStreetMap via Overpass (ODbL) + Wikidata sitelinks (CC0) | `data/raw/places/` (API cache) |
 | Population 2020, GHS-POP R2023A, EPSG:4326 30″ | [EC JRC GHSL](https://ghsl.jrc.ec.europa.eu/download.php?ds=pop) (no login, CC BY 4.0) | `data/raw/population/ghs/` |
 
@@ -51,6 +52,31 @@ The two sources answer different questions. GPW spreads each Census 2011 sub-dis
 area, so its exposure is close to population × High+ area share. GHS-POP distributes people by built-up
 volume, so it follows where settlements actually are. Report both.
 
+### Climate projections
+
+`scripts/09_climate_projections.py` → `data/processed/india_adm3_climate.csv`, `viewer/data/climate.json`
+
+Four CMIP6 scenarios: SSP1-2.6, SSP2-4.5, SSP3-7.0 and SSP5-8.5, the successors of RCP2.6/4.5/7.0/8.5.
+Four periods: 2020–39, 2040–59, 2060–79 and 2080–99. Changes are against 1995–2014, from the World Bank
+CCKP multi-model ensemble (median and 10th/90th percentile across about 30 models). Per sub-district,
+area-weighted:
+
+- `d_rx5day_pct`: change in the wettest 5-day rainfall of the year, the main driver of river and widespread flooding.
+  The model range is in `_p10_pct` / `_p90_pct`, and `robust_rx5day_pct` is the % of area passing the
+  IPCC AR6 robustness test.
+- `d_rx1day_pct`: change in the wettest single day (flash and urban flooding).
+- `d_pr_pct`: change in mean precipitation.
+- `flood_pressure` = `pct_high_or_above` × (1 + `d_rx5day_pct`/100).
+
+**What this is and is not.** GFSM is a static susceptibility map. The flood-pressure index scales today's
+High+ share by the projected intensification of extreme rainfall, so it ranks where heavier rain meets
+flood-prone land. It is not a projection of flood probability or depth: runoff, river discharge, upstream
+rainfall, dams, embankments, land-use change and sea-level rise are not modelled. Models disagree widely
+over the Indian monsoon. "Models agree" in the viewer means at least 90% of models project an increase.
+
+By 2080–99 the median sub-district's wettest 5-day rainfall rises by about 10% (SSP1-2.6), 13% (SSP2-4.5),
+20% (SSP3-7.0) and 26% (SSP5-8.5).
+
 ### Places to visit
 
 `scripts/08_tourism_places.py` → `data/processed/india_places.{csv,geojson}`, `viewer/data/places.geojson`
@@ -79,6 +105,7 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/python scripts/07_build_pop_tiles.py             # 1 km population tiles z4-8 for the viewer
 .venv/Scripts/python scripts/03_build_viewer_data.py           # rerun to add population to the TopoJSON
 .venv/Scripts/python scripts/08_tourism_places.py              # places to visit from OSM + Wikidata
+.venv/Scripts/python scripts/09_climate_projections.py         # CMIP6 rainfall extremes (downloads ~660 MB once)
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size

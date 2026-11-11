@@ -98,6 +98,19 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 .top .val { font: 500 12.5px var(--mono); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 6px; }
 .top .val i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
 
+/* climate projections */
+.seg.four { grid-template-columns: repeat(4, 1fr); }
+.seg.ssp button { display: flex; flex-direction: column; gap: 1px; padding: 6px 4px; }
+.seg.ssp small { font-size: 10.5px; color: var(--muted); }
+.clim-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; padding: 8px 0 2px; }
+.clim-sum .v { font: 700 19px/1.1 var(--display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
+.clim-sum .k { color: var(--muted); font-size: 11.5px; }
+.ctab { width: 100%; border-collapse: collapse; font: 12px var(--body); }
+.ctab th { text-align: left; font-weight: 500; color: var(--muted); font-size: 11px; padding: 2px 4px 3px 0; }
+.ctab td { font: 500 12px var(--mono); padding: 3px 4px 3px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.ctab tr.on td { color: var(--accent); font-weight: 600; }
+.ctab td small { color: var(--muted); font-weight: 400; }
+
 /* places to visit */
 .cats { display: flex; flex-direction: column; }
 .cats label { display: grid; grid-template-columns: 18px 22px 1fr auto; gap: 6px; align-items: center; padding: 4px 2px; font-size: 12.5px; cursor: pointer; border-top: 1px solid var(--line); }
@@ -192,6 +205,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
         <button type="button" data-v="raster" aria-pressed="false">GFSM 30 m</button>
         <button type="button" data-v="overlay" aria-pressed="false">GFSM over summary</button>
         <button type="button" data-v="pop" aria-pressed="false">Population 1 km</button>
+        <button type="button" data-v="clim" aria-pressed="false" hidden>Rainfall change 0.25°</button>
       </div>
       <div class="raster-ctl" id="rasterCtl" hidden>
         <div class="seg" role="group" aria-label="Population shown" id="popKindSeg" hidden>
@@ -205,6 +219,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
           <span><i style="background:var(--d3)"></i>50–250</span><span><i style="background:var(--d4)"></i>250–1k</span>
           <span><i style="background:var(--d5)"></i>1k–5k</span><span><i style="background:var(--d6)"></i>5k+ people/km²</span>
         </div>
+        <div class="gleg" id="climLeg" aria-label="Change in 5-day maximum rainfall" hidden></div>
         <div class="gleg" id="gfsmLeg" aria-label="GFSM classes">
           <span><i style="background:var(--g1)"></i>Very Low</span><span><i style="background:var(--g2)"></i>Low</span>
           <span><i style="background:var(--g3)"></i>Moderate</span><span><i style="background:var(--g4)"></i>High</span>
@@ -214,6 +229,15 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
       </div>
       <label class="check" id="ctxRow" hidden><input type="checkbox" id="ctx" checked> Place names and rivers (OpenStreetMap)</label>
     </div>
+
+    <section class="field" id="climField" hidden>
+      <span class="eyebrow" id="climLbl">Climate projection · CMIP6 · extreme rainfall</span>
+      <div class="seg ssp" role="group" aria-label="Emissions scenario" id="sspSeg"></div>
+      <div class="seg four" role="group" aria-label="Period" id="perSeg"></div>
+      <div class="clim-sum" id="climSum" aria-live="polite"></div>
+      <p class="hint">Change in the wettest 5-day rainfall of the year against 1995–2014, median of about 30 models.
+        Flood pressure = today's % High+ land × (1 + that change). A screening index, not a flood forecast: GFSM is static, and river flow, dams and land use are not modelled.</p>
+    </section>
 
     <section class="field places" id="placesField" hidden>
       <div class="thr-row">
@@ -238,6 +262,8 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
         <button type="button" data-m="hk" aria-pressed="false">High-risk area km²</button>
         <button type="button" data-m="x" aria-pressed="false">People in High+</button>
         <button type="button" data-m="xp" aria-pressed="false">% people in High+</button>
+        <button type="button" data-m="c5" aria-pressed="false" hidden>Δ 5-day max rain</button>
+        <button type="button" data-m="cf" aria-pressed="false" hidden>Flood pressure (climate)</button>
       </div>
     </div>
 
@@ -285,6 +311,7 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
       Population 2020: <a href="https://doi.org/10.7927/H4PN93PB" target="_blank" rel="noopener">GPW v4.11</a> (CIESIN, NASA SEDAC) and
       <a href="https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE" target="_blank" rel="noopener">GHS-POP R2023A</a> (EC JRC), CC BY 4.0.
       Each 1 km cell's people are split across the 30 m GFSM land area inside it.
+      Climate: <a href="https://climateknowledgeportal.worldbank.org/" target="_blank" rel="noopener">World Bank CCKP</a> CMIP6 0.25° multi-model ensemble, CC BY 4.0.
       Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).
       Areas are true ground areas, corrected for Mercator distortion. Raster tiles built with gdal2tiles.
       Susceptibility is a baseline, not a forecast.
@@ -315,7 +342,10 @@ const METRICS = {
   hk: { label: "High-risk area",     fmt: v => fmtNum(v, v < 10 ? 1 : 0) + " km²", tick: v => fmtNum(v), fixed: [5, 15, 40, 100, 250, 600], step: 5, max: 1000 },
   x:  { label: "People in High+",    fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true },
   xp: { label: "% people in High+",  fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1, pop: true },
+  c5: { label: "Δ 5-day max rain",   fmt: v => signed(v, 1), tick: v => signed(v), fixed: [0, 5, 10, 15, 20, 30], step: 1, max: 60, clim: true },
+  cf: { label: "Flood pressure",     fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
+const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
   gpw: { label: "GPW v4.11", hint: "GPW spreads each census sub-district's count evenly over its area, so it cannot tell whether settlements sit on the floodplain or above it." },
   ghs: { label: "GHS-POP", hint: "GHS-POP places people by built-up volume mapped from satellite imagery, so it follows where settlements actually are." },
@@ -358,7 +388,7 @@ function bboxOf(g) {
 }
 const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
 const inScope = p => !S.state || p.s === S.state;
-const valid = p => p.q === 0;
+const valid = p => p.q === 0 && (!METRICS[S.metric].clim || Number.isFinite(p[S.metric]));
 
 /* population per source: {src}T people, {src}X people in High + Very High (scripts/06_population_exposure.py) */
 function deriveSource() {
@@ -367,6 +397,7 @@ function deriveSource() {
 }
 // map-side value of the current metric; the derived population fields are not in the GeoJSON source
 function metricExpr() {
+  if (METRICS[S.metric].clim) return ["coalesce", ["feature-state", S.metric], -999];  // set per scenario by deriveClimate
   if (S.metric === "x") return ["get", S.src + "X"];
   if (S.metric === "xp") return ["*", 100, ["/", ["get", S.src + "X"], ["max", 1, ["get", S.src + "T"]]]];
   return ["get", S.metric];
@@ -403,7 +434,7 @@ function applyPaint() {
   const conds = [];
   if (S.state) conds.push(["==", ["get", "s"], S.state]);
   if (S.thr > 0) conds.push([">=", metricExpr(), S.thr]);
-  const bare = S.view === "raster" || S.view === "pop", on = bare ? 0 : 0.95, off = bare ? 0 : 0.12;
+  const bare = S.view === "raster" || S.view === "pop" || S.view === "clim", on = bare ? 0 : 0.95, off = bare ? 0 : 0.12;
   map.setPaintProperty("adm3-fill", "fill-opacity", conds.length ? ["case", ["all", ...conds], on, off] : on);
   applyRaster();
 }
@@ -416,15 +447,21 @@ function applyRaster() {
     map.setLayoutProperty(id, "visibility", S.view === "pop" && id === popSet ? "visible" : "none");
     map.setPaintProperty(id, "raster-opacity", Math.max(S.rop, 0.05));
   }
+  if (map.getLayer("clim")) {
+    map.setLayoutProperty("clim", "visibility", S.view === "clim" ? "visible" : "none");
+    map.setPaintProperty("clim", "raster-opacity", Math.max(S.rop, 0.05));
+  }
 }
 function renderRasterCtl() {
-  const pop = S.view === "pop";
+  const pop = S.view === "pop", clim = S.view === "clim";
   $("rasterCtl").hidden = S.view === "summary";
   $("popKindSeg").hidden = $("popLeg").hidden = !pop;
-  $("gfsmLeg").hidden = pop;
-  $("ropLbl").textContent = pop ? "Population opacity" : "GFSM opacity";
+  $("climLeg").hidden = !clim;
+  $("gfsmLeg").hidden = pop || clim;
+  $("ropLbl").textContent = pop ? "Population opacity" : clim ? "Rainfall layer opacity" : "GFSM opacity";
   $("rasterHint").textContent = pop
     ? `${POP_SOURCES[S.src]?.label ?? S.src} people per km² of each 1 km cell${S.popKind === "high" ? ", counting only people on land rated High or Very High" : ""}.`
+    : clim ? `${SSP_INFO[CL.ssp][0]}, ${perLabel(CL.per)}: change in the wettest 5-day rainfall of the year against 1995–2014, in 0.25° cells (about 27 km). Faded cells: fewer than 90% of models project an increase.`
     : "Pixels are about 150 m at zoom 10 (most common 30 m class per pixel). Zooming further enlarges them.";
 }
 function applyTheme() {
@@ -504,6 +541,7 @@ function renderCard() {
       <div><dt>Rank in India</dt><dd>${fmtNum(p._rn)} / ${fmtNum(S.nValid)}</dd></div>
       <div><dt>Rank in state</dt><dd>${fmtNum(p._rs)} / ${fmtNum(S.perState[p.s])}</dd></div>
     </dl>
+    ${climBlock(p)}
     ${S.srcs.length > 1 ? `<div class="where">People in High+ by source: ${S.srcs.map(k => `${POP_SOURCES[k].label} ${fmtPeople(p[k + "X"] ?? 0)}`).join(" · ")}.</div>` : ""}
     <div class="where">Ranked by ${METRICS[S.metric].label.toLowerCase()}${METRICS[S.metric].pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`}`;
   card.hidden = false;
@@ -537,7 +575,8 @@ function bindUI() {
     const b = e.target.closest("button"); if (!b) return;
     S.view = b.dataset.v;
     [...$("layerSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
-    if ((S.view === "raster" || S.view === "pop") && S.rop < 0.5) { S.rop = 1; $("rop").value = 100; $("ropOut").textContent = "100%"; }
+    if (S.view === "clim") updateClimImage();
+    if ((S.view === "raster" || S.view === "pop" || S.view === "clim") && S.rop < 0.5) { S.rop = 1; $("rop").value = 100; $("ropOut").textContent = "100%"; }
     renderRasterCtl(); applyPaint();
   });
   $("popKindSeg").addEventListener("click", e => {
@@ -551,7 +590,7 @@ function bindUI() {
     S.src = b.dataset.s;
     [...$("srcSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
     $("srcHint").textContent = POP_SOURCES[S.src].hint;
-    deriveSource(); computeRanks(); renderRasterCtl(); refresh();
+    deriveSource(); computeRanks(); renderRasterCtl(); refresh(); renderClimate();
   });
   $("ctx").addEventListener("change", e => CONTEXT_LAYERS.forEach(id => map.getLayer(id) && map.setLayoutProperty(id, "visibility", e.target.checked ? "visible" : "none")));
   $("rop").addEventListener("input", e => { S.rop = e.target.value / 100; $("ropOut").textContent = e.target.value + "%"; applyRaster(); });
@@ -564,7 +603,7 @@ function bindUI() {
   $("st").addEventListener("change", e => {
     S.state = e.target.value;
     if (S.sel != null && S.state && P[S.sel].s !== S.state) select(null);
-    refresh(); applyPlaces(); renderPlaces(); fitScope();
+    refresh(); applyPlaces(); renderPlaces(); renderClimate(); fitScope();
   });
   $("thr").addEventListener("input", e => { S.thr = +e.target.value; renderThreshold(); applyPaint(); });
   $("topList").addEventListener("click", e => { const b = e.target.closest("button"); if (b) select(+b.dataset.i, true); });
@@ -640,6 +679,99 @@ async function addContext() {
     paint: labelPaint() });
   $("attrib").hidden = false;
   $("ctxRow").hidden = false;
+}
+
+/* ---------- climate projections (scripts/09_climate_projections.py): World Bank CCKP CMIP6 0.25° ensemble ---------- */
+const SSP_INFO = { ssp126: ["SSP1-2.6", "low · RCP2.6"], ssp245: ["SSP2-4.5", "middle · RCP4.5"], ssp370: ["SSP3-7.0", "high · RCP7.0"], ssp585: ["SSP5-8.5", "very high · RCP8.5"] };
+const CL = { data: null, ssp: "ssp245", per: "2080", img: new Map() };
+const CLIM_BINS = [-10, 0, 10, 20, 30, 50];
+const CLIM_COLORS = ["#a6611a", "#dfc27d", "#e4ecee", "#a6cee3", "#5b9bd5", "#2166ac", "#0b3a75"];
+const CLIM_LABELS = ["below −10%", "−10–0%", "0–10%", "10–20%", "20–30%", "30–50%", "50%+"];
+const perLabel = per => `${per}–${String(+per + 19).slice(2)}`;
+const climKey = () => `${CL.ssp}_${CL.per}`;
+const b64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+function deriveClimate() {
+  if (!CL.data) return;
+  const d5 = CL.data.data[climKey()].d5;
+  P.forEach(p => { const v = d5[p.i]; p.c5 = v ?? NaN; p.cf = v == null || p.q ? NaN : p.h * (1 + v / 100); });
+  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i },
+    { c5: Number.isFinite(p.c5) ? p.c5 : null, cf: Number.isFinite(p.cf) ? p.cf : null }));
+}
+// 0.25° lat/lon grid -> canvas in Web Mercator rows (an image source is stretched linearly in Mercator)
+function climImage() {
+  const k = climKey();
+  if (CL.img.has(k)) return CL.img.get(k);
+  const g = CL.data.grid, v = new Int8Array(b64(CL.data.data[k].grid).buffer), ag = b64(CL.data.data[k].gagree);
+  const H = 640, cv = document.createElement("canvas"); cv.width = g.cols; cv.height = H;
+  const ctx = cv.getContext("2d"), im = ctx.createImageData(g.cols, H);
+  const my = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)), south = g.north - g.rows * g.res;
+  const y0 = my(g.north), y1 = my(south);
+  const rgb = CLIM_COLORS.map(h => [1, 3, 5].map(o => parseInt(h.slice(o, o + 2), 16)));
+  for (let y = 0; y < H; y++) {
+    const lat = (2 * Math.atan(Math.exp(y0 + (y + 0.5) / H * (y1 - y0))) - Math.PI / 2) * 180 / Math.PI;
+    const r = Math.min(g.rows - 1, Math.floor((g.north - lat) / g.res));
+    for (let x = 0; x < g.cols; x++) {
+      const idx = r * g.cols + x, val = v[idx], o = 4 * (y * g.cols + x);
+      if (val === -128) continue;
+      let b = 0; while (b < CLIM_BINS.length && val >= CLIM_BINS[b]) b++;
+      im.data.set(rgb[b], o);
+      im.data[o + 3] = (ag[idx >> 3] >> (7 - (idx & 7))) & 1 ? 235 : 90;  // np.packbits bit order
+    }
+  }
+  ctx.putImageData(im, 0, 0);
+  const url = cv.toDataURL();
+  CL.img.set(k, url);
+  return url;
+}
+function updateClimImage() { if (map.getSource("clim")) map.getSource("clim").updateImage({ url: climImage() }); }
+function renderClimate() {
+  if (!CL.data) return;
+  const d = CL.data.data[climKey()], sc = P.filter(p => p.q === 0 && inScope(p) && d.d5[p.i] != null);
+  const wavg = f => { let s = 0, w = 0; sc.forEach(p => { const v = d[f][p.i]; if (v != null) { s += v * p.va; w += p.va; } }); return w ? s / w : NaN; };
+  const x = sc.reduce((s, p) => s + p.x, 0);
+  const xRob = sc.filter(p => d.lo[p.i] > 0).reduce((s, p) => s + p.x, 0);
+  const x20 = sc.filter(p => d.d5[p.i] >= 20).reduce((s, p) => s + p.x, 0);
+  const pct = v => x ? ` (${(100 * v / x).toFixed(0)}%)` : "";
+  $("climSum").innerHTML = `
+    <div><div class="v">${signed(wavg("d5"), 1)}</div><div class="k">wettest 5-day rain, ${esc(S.state || "India")} average (model range ${signed(wavg("lo"))} to ${signed(wavg("hi"))})</div></div>
+    <div><div class="v">${signed(wavg("d1"), 1)}</div><div class="k">wettest single day; annual rain ${signed(wavg("dp"), 1)}</div></div>
+    ${S.srcs.length ? `<div><div class="v">${fmtPeople(xRob)}</div><div class="k">people on High+ land where 90% of models project an increase${pct(xRob)}</div></div>
+    <div><div class="v">${fmtPeople(x20)}</div><div class="k">people on High+ land where it rises 20% or more${pct(x20)}</div></div>` : ""}`;
+}
+function climBlock(p) {
+  if (!CL.data || CL.data.base5[p.i] == null) return "";
+  const i = p.i, rows = Object.keys(SSP_INFO).map(s => {
+    const d = CL.data.data[`${s}_${CL.per}`], v = d.d5[i];
+    return `<tr class="${s === CL.ssp ? "on" : ""}"><td>${SSP_INFO[s][0]}</td><td>${v == null ? "–" : signed(v)} <small>${d.lo[i] == null ? "" : signed(d.lo[i]) + " to " + signed(d.hi[i])}</small></td>
+      <td>${d.d1[i] == null ? "–" : signed(d.d1[i])}</td><td>${d.lo[i] > 0 ? "yes" : "no"}</td></tr>`;
+  }).join("");
+  return `<div><div class="where" style="margin:0 0 4px">Wettest 5-day rain 1995–2014: ${fmtNum(CL.data.base5[i])} mm. Change by ${perLabel(CL.per)}:</div>
+    <table class="ctab"><tr><th>Scenario</th><th>5-day max <small>(10–90% of models)</small></th><th>1-day</th><th>Models agree</th></tr>${rows}</table>
+    ${Number.isFinite(p.cf) ? `<div class="where" style="margin-top:4px">Flood pressure ${p.cf.toFixed(1)} against ${p.h.toFixed(1)} today (${SSP_INFO[CL.ssp][0]}).</div>` : ""}</div>`;
+}
+function setClimate(ssp = CL.ssp, per = CL.per) {
+  CL.ssp = ssp; CL.per = per;
+  [...$("sspSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.s === ssp));
+  [...$("perSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.p === per));
+  deriveClimate();
+  if (METRICS[S.metric].clim) computeRanks();
+  if (S.view === "clim") updateClimImage();
+  renderRasterCtl(); refresh(); renderClimate();
+}
+async function addClimate() {
+  try { CL.data = await fetchOk("data/climate.json", "json"); } catch { return; }
+  $("sspSeg").innerHTML = Object.entries(SSP_INFO).map(([k, [a, b]]) => `<button type="button" data-s="${k}" aria-pressed="${k === CL.ssp}">${a}<small>${b}</small></button>`).join("");
+  $("perSeg").innerHTML = CL.data.periods.map(p => p.slice(0, 4)).map(p => `<button type="button" data-p="${p}" aria-pressed="${p === CL.per}">${perLabel(p)}</button>`).join("");
+  $("sspSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setClimate(b.dataset.s); });
+  $("perSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setClimate(undefined, b.dataset.p); });
+  $("climLeg").innerHTML = CLIM_COLORS.map((c, i) => `<span><i style="background:${c}"></i>${CLIM_LABELS[i]}</span>`).join("");
+  const g = CL.data.grid, east = g.west + g.cols * g.res, south = g.north - g.rows * g.res;
+  map.addSource("clim", { type: "image", url: climImage(), coordinates: [[g.west, g.north], [east, g.north], [east, south], [g.west, south]] });
+  map.addLayer({ id: "clim", type: "raster", source: "clim", layout: { visibility: "none" },
+    paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": 0.85 } }, "adm3-edges");
+  document.querySelectorAll('[data-m="c5"], [data-m="cf"], [data-v="clim"]').forEach(b => b.hidden = false);
+  $("climField").hidden = false;
+  deriveClimate(); renderClimate(); renderCard();
 }
 
 /* ---------- places to visit (scripts/08_tourism_places.py): OSM features with Wikidata links ---------- */
@@ -823,7 +955,7 @@ function bindPlacesUI() {
     map.addLayer({ id: "hl", type: "line", source: "adm3", paint: {
       "line-color": css("--ink"),
       "line-width": ["case", ["boolean", ["feature-state", "sel"], false], 2.6, ["boolean", ["feature-state", "hover"], false], 1.4, 0] } });
-    bindMap(); bindPlacesUI(); refresh(); addContext().then(addPlaces);
+    bindMap(); bindPlacesUI(); refresh(); addClimate(); addContext().then(addPlaces);
     $("loading").hidden = true;
   });
 })();
