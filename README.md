@@ -223,6 +223,30 @@ Today 777 sub-districts lie within 250 km downstream of such lakes: 283 within 5
 at 150–250 km. This is a screening link at about 50 km resolution, not a flood model. It shows which places lie
 down-valley from dangerous lakes, not flood depth or timing.
 
+### Runoff and soil wetness
+
+`scripts/15_runoff_soil.py` → `data/processed/india_adm3_runoff.csv`, `viewer/data/runoff.json`
+
+ISIMIP3b monthly total runoff (15 runs: CWatM, WaterGAP2-2e, MIROC-INTEG-LAND × 5 CMIP6 models) and soil moisture
+(10 runs: CWatM with its layers summed, WaterGAP2-2e), cut to India on the ISIMIP server as in scripts/13. Two
+indicators are compared with 1985–2014:
+- **Wettest-month runoff:** the year's largest monthly runoff, averaged over the period. It is the water feeding
+  streams at the monsoon peak, including small rivers that the river-frequency analysis leaves out.
+- **Monsoon soil wetness:** mean June–September soil moisture. Wetter soils turn more of the next storm into runoff.
+
+Changes are taken per run on area-weighted sub-district means, then the median, likely range and share of runs
+with an increase are reported. SSP2-4.5 is the mean of SSP1-2.6 and SSP3-7.0.
+
+| Median sub-district, wettest-month runoff | 2020–39 | 2040–59 | 2060–79 | 2080–99 |
+|---|---|---|---|---|
+| SSP1-2.6 | +4% | +15% | +17% | +12% |
+| SSP2-4.5 (estimated) | +7% | +10% | +18% | +14% |
+| SSP3-7.0 | +10% | +5% | +17% | +18% |
+| SSP5-8.5 | +9% | +10% | +16% | +35% |
+
+Monsoon soils get 2–5% wetter in the median sub-district. In dry regions the runoff percentages run high
+because they start from small baselines.
+
 ## Reproduce
 
 ```bash
@@ -245,7 +269,8 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/pip install h5py
 .venv/Scripts/python scripts/12_sea_level.py --workers 8     # AR6 sea level + DeltaDTM (~1.4 GB download, ~1 h)
 .venv/Scripts/python scripts/13_return_period.py --workers 8 # ISIMIP river flow, 465 India cut-outs (~10 GB, ~2 h)
-.venv/Scripts/python scripts/14_cyclone_wind.py             # STORM cyclone wind return periods (~5 MB of GeoTIFFs)
+.venv/Scripts/python .venv/Scripts/python scripts/15_runoff_soil.py --workers 6  # ISIMIP monthly runoff + soil moisture (100 India cut-outs, ~1 h)
+scripts/14_cyclone_wind.py             # STORM cyclone wind return periods (~5 MB of GeoTIFFs)
 .venv/Scripts/python scripts/16_glof.py                     # glacial lake outburst hazard (7 MB from Zenodo)
 ```
 
@@ -270,7 +295,7 @@ scenario, plus rankings. **Glossary** defines the terms; underlined terms anywhe
 **About** holds the purpose, caveats and sources. Clicking a sub-district opens a profile with Today and Future tabs.
 
 For speed on GitHub Pages the first view loads only the boundaries (0.9 MB gzipped). Climate (0.9 MB),
-flood-zone (0.6 MB), projected population (0.5 MB), river flood frequency (0.4 MB), cyclone wind (0.05 MB), glacial lakes (0.1 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
+flood-zone (0.6 MB), projected population (0.5 MB), river flood frequency (0.4 MB), runoff and soil wetness (0.6 MB), cyclone wind (0.05 MB), glacial lakes (0.1 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
 raster layers fetch only the tile bundles in view.
 
 Tiles are selected by intersecting the GFSM tile index with India's boundary buffered by 0.1°,

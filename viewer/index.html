@@ -553,6 +553,8 @@ a.term:hover { color: var(--accent); }
         <div class="ge" id="g-classes"><dt>Flood-prone land (High+)</dt><dd>Land in GFSM's High or Very High classes, the top two of five (Very Low, Low, Moderate, High, Very High).</dd></div>
         <div class="ge" id="g-rp"><dt>1-in-100-year flood (return period)</dt><dd>A flood with a 1% chance of happening in any given year. It is not "once a century": over 30 years the chance of at least one is about 26%. A larger return period means a rarer, bigger flood.</dd></div>
         <div class="ge" id="g-rpshift"><dt>River flood frequency (return-period shift)</dt><dd>How often today's 1-in-100-year river flood would come in future. "Every 25 years" means four times as often as today; "every 200 years" means half as often. Computed from daily river flow on the larger rivers (about 50 km cells), comparing each model run's future with its own 1985–2014 past, so model biases largely cancel. Each sub-district takes the largest river crossing it; places without one have no value. It shows the change in river flow only, not in who lives on the floodplain.</dd></div>
+        <div class="ge" id="g-runoff"><dt>Wettest-month runoff</dt><dd>The rain and snowmelt that does not soak in or evaporate and flows off the land, in the wettest month of each year, averaged over the period and compared with 1985–2014. It is the water that feeds streams and rivers at the monsoon peak, so a rise points to bigger floods from local catchments, including small rivers the river-frequency layer does not cover. In drier regions such as western Rajasthan and north Karnataka the percentages run high because they start from little runoff. Median of 15 hydrological model runs (ISIMIP); SSP2-4.5 is estimated as the mean of SSP1-2.6 and SSP3-7.0.</dd></div>
+        <div class="ge" id="g-soil"><dt>Monsoon soil wetness</dt><dd>Average soil moisture from June to September compared with 1985–2014. Soils that are already wet cannot absorb more rain, so the next heavy storm turns into runoff and floods more quickly. Median of 10 model runs (CWatM and WaterGAP2).</dd></div>
         <div class="ge" id="g-floodzone"><dt>Flood zone</dt><dd>Land that WRI Aqueduct Floods models as under water in a 1-in-100-year river or coastal flood, at about 1 km, with no flood defences. A cell counts if any depth is modelled. Future coastal maps include median sea-level rise and land subsidence.</dd></div>
         <div class="ge" id="g-slr"><dt>Sea-level rise</dt><dd>The projected rise of mean sea level relative to the land, against 1995–2014, from the IPCC's Sixth Assessment (AR6). The atlas uses the nearest point on AR6's 1° grid; local land sinking measured at tide gauges is left out because the estimates disagree sharply, so delta areas may see more.</dd></div>
         <div class="ge" id="g-bathtub"><dt>Land below sea level</dt><dd>Land whose ground height (30 m DeltaDTM model) is below today's or the projected mean sea level. A simple "bathtub" estimate: it ignores whether the land connects to the sea, and much of it is already behind embankments, as in the Sundarbans and Kuttanad. Read it as land that depends on protection and drainage, not land that will flood. Tides and storm surges come on top; see Flood zone.</dd></div>
@@ -602,7 +604,7 @@ a.term:hover { color: var(--accent); }
         <span>Flood zones: <a href="https://www.wri.org/data/aqueduct-floods-hazard-maps" target="_blank" rel="noopener">WRI Aqueduct Floods</a> v2 hazard maps (Ward et al. 2020), 1-in-100-year river (5 CMIP5 models) and coastal (median sea-level rise, with subsidence) inundation, no flood defences.</span>
         <span>Projected population: Wang, Meng &amp; Long (2022), <a href="https://doi.org/10.6084/m9.figshare.19608594" target="_blank" rel="noopener">1 km SSP population 2020–2100</a>, Scientific Data, CC BY 4.0. Used as growth rates on the 2020 counts.</span>
         <span>Sea level: <a href="https://doi.org/10.5281/zenodo.6382554" target="_blank" rel="noopener">IPCC AR6 sea-level projections</a> (Fox-Kemper et al. 2021; Garner et al. 2021), CC BY 4.0. Elevation: <a href="https://doi.org/10.4121/21997565" target="_blank" rel="noopener">DeltaDTM</a> (Pronk et al. 2024), CC BY 4.0, built from Copernicus GLO-30 © DLR e.V.</span>
-        <span>River flow: <a href="https://www.isimip.org" target="_blank" rel="noopener">ISIMIP3b</a> daily discharge, CWatM, WaterGAP2-2e and MIROC-INTEG-LAND with five CMIP6 models, CC BY 4.0. Return periods after Hirabayashi et al. (2013).</span>
+        <span>River flow, runoff and soil moisture: <a href="https://www.isimip.org" target="_blank" rel="noopener">ISIMIP3b</a> daily discharge and monthly runoff and soil moisture, CWatM, WaterGAP2-2e and MIROC-INTEG-LAND with five CMIP6 models, CC BY 4.0. Return periods after Hirabayashi et al. (2013).</span>
         <span>Cyclone wind: <a href="https://doi.org/10.4121/12705164" target="_blank" rel="noopener">STORM</a> 10 km wind-speed return periods, present and <a href="https://doi.org/10.4121/14510817" target="_blank" rel="noopener">2015–2050</a> (Bloemendaal et al. 2020, 2022), CC0.</span>
         <span>Glacial lakes: <a href="https://doi.org/10.5281/zenodo.4477945" target="_blank" rel="noopener">Zheng et al. (2021)</a> GLOF hazard for present and projected Third Pole lakes, CC BY 4.0.</span>
         <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
@@ -701,12 +703,14 @@ const METRICS = {
   cwd: { label: "Change in cyclone wind", opt: "Change in 1-in-100-year cyclone wind by 2015–2050", fmt: v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v * 3.6).toFixed(0) + " km/h", tick: v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v * 3.6).toFixed(0), fixed: [-4, -2, -1, 0, 1, 2], step: 0.5, cyc: true },
   gl0: { label: "Dangerous glacial lakes, today", opt: "Dangerous glacial lakes upstream, today", fmt: v => fmtNum(v), tick: v => fmtNum(v), fixed: [1, 2, 5, 10, 20, 50], step: 1, max: 100, glof: true },
   gl:  { label: "Dangerous glacial lakes, future", opt: "Dangerous glacial lakes upstream, future", fmt: v => fmtNum(v), tick: v => fmtNum(v), fixed: [1, 2, 5, 10, 20, 50], step: 1, max: 100, glof: true },
+  ro:  { label: "Δ wettest-month runoff", opt: "Change in wettest-month runoff", fmt: v => signed(v), tick: v => signed(v), fixed: [-10, 0, 10, 20, 35, 50], step: 1, max: 100, ro: true },
+  sm:  { label: "Δ monsoon soil wetness", opt: "Change in monsoon soil wetness", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [-5, -2, 0, 2, 5, 10], step: 0.5, max: 20, ro: true },
   rf:  { label: "River flood frequency", opt: "How much more often today's 100-year river flood comes", fmt: v => "×" + v.toFixed(v < 10 ? 1 : 0), tick: v => "×" + (v < 10 ? +v.toFixed(1) : v.toFixed(0)), fixed: [0.8, 1, 1.25, 2, 4, 10], step: 0.1, max: 10, rp: true },
   pg:  { label: "Population change", opt: "Projected population change since 2020", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [-10, 0, 10, 20, 40, 60], step: 1, max: 100, flood: true, ssp: true },
   cf: { label: "Flood pressure",     opt: "Flood pressure (climate-adjusted)", fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
 const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People", ["x", "xp", "pg"]],
-  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["River flood frequency", ["rf"]], ["Cyclone wind", ["cw", "cwd"]], ["Glacial lake outburst floods", ["gl0", "gl"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
+  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["River flood frequency", ["rf"]], ["Runoff and soil wetness", ["ro", "sm"]], ["Cyclone wind", ["cw", "cwd"]], ["Glacial lake outburst floods", ["gl0", "gl"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
 const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
   gpw: { label: "GPW v4.11", hint: "GPW spreads each census sub-district's count evenly over its area, so it cannot tell whether settlements sit on the floodplain or above it." },
@@ -756,7 +760,7 @@ function bboxOf(g) {
 }
 const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
 const inScope = p => !S.state || p.s === S.state;
-const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr || METRICS[m].rp || METRICS[m].cyc || METRICS[m].glof;  // values arrive with lazily loaded projections
+const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr || METRICS[m].rp || METRICS[m].cyc || METRICS[m].glof || METRICS[m].ro;  // values arrive with lazily loaded projections
 const valid = p => p.q === 0 && (!isData(S.metric) || Number.isFinite(p[S.metric]));
 
 /* population per source: {src}T people, {src}X people in High + Very High (scripts/06_population_exposure.py) */
@@ -860,7 +864,7 @@ const layerOn = k => k === "places" ? PL.on : k === "ctx" ? $("ctx").checked : S
 // one-line state under each layer name, and dimmed rows for layers that are off
 function renderLayerMeta() {
   const m = METRICS[S.metric];
-  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.ssp || m.slr ? ` · ${sspPopLabel()}` : m.rp ? ` · ${rpLabel()}` : S.metric === "gl" ? ` · ${glofLabel(glofKey())}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())} map, ${sspNum()} population` : "");
+  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.ssp || m.slr ? ` · ${sspPopLabel()}` : m.rp || m.ro ? ` · ${rpLabel()}` : S.metric === "gl" ? ` · ${glofLabel(glofKey())}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())} map, ${sspNum()} population` : "");
   if (S.srcs.length) $("metaPop").textContent = `${POP_SOURCES[S.src].label} · ${S.popKind === "high" ? "people on High+ land" : "everyone"}`;
   $("metaClim").textContent = scenLabel();
   $("metaFlood").textContent = floodLabel();
@@ -882,7 +886,7 @@ function renderLegendBox() {
   $("lgRiversT").textContent = `Today's 100-year river flood comes, ${rpLabel()}`;
   $("lgFloodT").textContent = `Flood depth, 1-in-100-year, ${floodLabel()}`;
   $("satCredit").textContent = `Sentinel-2 cloudless ${L.sat.year} by EOX IT Services GmbH, contains modified Copernicus Sentinel data, ${SAT_YEARS[L.sat.year].lic}.`;
-  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.ssp || m.slr ? ", " + sspPopLabel() : m.rp ? ", " + rpLabel() : S.metric === "gl" ? ", " + glofLabel(glofKey()) : S.metric === "fz0" ? "" : m.flood ? `, ${aqLabel(aqKey())} map, ${sspNum()} population` : "")
+  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.ssp || m.slr ? ", " + sspPopLabel() : m.rp || m.ro ? ", " + rpLabel() : S.metric === "gl" ? ", " + glofLabel(glofKey()) : S.metric === "fz0" ? "" : m.flood ? `, ${aqLabel(aqKey())} map, ${sspNum()} population` : "")
     + (m.pop ? ", " + POP_SOURCES[S.src].label : "");
   if (S.srcs.length) $("lgPopT").textContent = `People per km², ${POP_SOURCES[S.src].label}${S.popKind === "high" ? ", on High+ land only" : ""}`;
   $("lgClimT").textContent = `Change in wettest 5-day rain, ${scenLabel()}`;
@@ -900,6 +904,7 @@ async function setMetric(k) {
   if (METRICS[k].rp) await loadRp();
   if (METRICS[k].cyc) await loadCyclone();
   if (METRICS[k].glof) await loadGlof();
+  if (METRICS[k].ro) await loadRunoff();
   S.metric = k; S.thr = 0;
   document.querySelectorAll(".metricSel").forEach(s => s.value = k);
   computeRanks(); renderThreshold(); refresh(); renderLayerMeta(); renderLegendBox();
@@ -908,14 +913,14 @@ function setSource(k) {
   S.src = k;
   document.querySelectorAll(".srcSel").forEach(s => s.value = k);
   document.querySelectorAll(".srcHint").forEach(e => e.textContent = POP_SOURCES[k].hint);
-  deriveSource(); deriveFlood(); deriveSlr(); deriveRp(); deriveCyclone(); deriveGlof(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
+  deriveSource(); deriveFlood(); deriveSlr(); deriveRp(); deriveRunoff(); deriveCyclone(); deriveGlof(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
 }
 function showTab(id) {
   document.querySelectorAll('[role="tab"]').forEach(x => {
     if (!x.closest(".tabs")) return;
     x.setAttribute("aria-selected", x.id === id); $(x.getAttribute("aria-controls")).hidden = x.id !== id;
   });
-  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadRp(); loadCyclone(); loadGlof(); loadPlaces(); }
+  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadRp(); loadRunoff(); loadCyclone(); loadGlof(); loadPlaces(); }
 }
 function filterGlossary() {
   const q = $("glossQ").value.trim().toLowerCase();
@@ -1023,7 +1028,7 @@ function renderCard() {
       <div><dt>Rank in ${esc(p.s)}</dt><dd>${fmtNum(p._rs)} <small>of ${fmtNum(S.perState[p.s])}</small></dd></div>` : ""}
     </dl>
     <div class="where">Ranks by ${m.opt.toLowerCase()}${m.pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`;
-  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + rpBlock(p) + glofBlock(p) + slrBlock(p) + windBlock(p) + climBlock(p);
+  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + rpBlock(p) + roBlock(p) + glofBlock(p) + slrBlock(p) + windBlock(p) + climBlock(p);
   card.innerHTML = `
     <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
       <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
@@ -1033,7 +1038,7 @@ function renderCard() {
   $("cardX").onclick = () => select(null);
   card.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { CARD_TAB = b.dataset.ct; renderCard(); });
   if (!FL.data) loadFlood();
-  if (CARD_TAB === "future") { loadClimate(); loadSlr(); loadRp(); loadCyclone(); loadGlof(); }
+  if (CARD_TAB === "future") { loadClimate(); loadSlr(); loadRp(); loadRunoff(); loadCyclone(); loadGlof(); }
 }
 function refresh({ breaks = true } = {}) {
   if (breaks) computeBreaks();
@@ -1289,6 +1294,15 @@ function renderFuture() {
           `Median: every ${years(med)}. ${fmtPeople(sumOf(twice, p => p.fz0))} people live in their river and coastal flood zones today.`]);
       }
     }
+    if (RO.data) {
+      const D = RO.data.data[CL.ssp], k = CL.per, sc2 = all.filter(p => Number.isFinite(p.ro));
+      if (sc2.length) {
+        const wmed = f => { const v = sc2.map(p => D[f + k][p.i]).filter(x => x != null).sort((a, b) => a - b); return v[v.length >> 1]; };
+        const up = sc2.filter(p => p.ro > 0 && D["roA" + k][p.i] >= 67).length;
+        rows.push([signed(wmed("ro")), `change in ${term("runoff", "wettest-month runoff")}, median sub-district, ${perLabel(CL.per)} (${rpSsp()}).`,
+          `It rises in ${Math.round(100 * up / sc2.length)}% of sub-districts with at least two-thirds of 15 model runs agreeing. ${term("soil", "Monsoon soils")}: ${signed(wmed("sm") / 10, 1)}.`]);
+      }
+    }
     if (GL.data) {
       const g = glofKey();
       rows.push([fmtNum(GL.data.lakes[g]), `${term("glof", "dangerous glacial lakes")} would drain into India by ${g.slice(-4)} (${glofLabel(g).split(" · ")[0]}), against ${fmtNum(GL.data.lakes.now)} today, as retreating glaciers leave new lakes.`,
@@ -1317,7 +1331,7 @@ function renderFuture() {
   }
   $("kfFuture").innerHTML = rows.map(kfRow).join("") +
     `<p class="hint">Rainfall: median of about 30 CMIP6 models against 1995–2014. Flood zone: WRI Aqueduct, median of 5 models,
-      with SSP population from Wang et al. (2022). River flood frequency: ISIMIP, 15 hydrological model runs. Cyclone wind: STORM. Glacial lakes: Zheng et al. (2021). Sea level: IPCC AR6, with DeltaDTM elevation.
+      with SSP population from Wang et al. (2022). River flood frequency and runoff: ISIMIP, 15 hydrological model runs. Cyclone wind: STORM. Glacial lakes: Zheng et al. (2021). Sea level: IPCC AR6, with DeltaDTM elevation.
       ${term("screening", "Screening figures, not forecasts.")}</p>`;
 }
 function climBlock(p) {
@@ -1336,7 +1350,7 @@ function setClimate(ssp = CL.ssp, per = CL.per) {
   CL.ssp = ssp; CL.per = per;
   [...$("sspSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.s === ssp));
   [...$("perSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.p === per));
-  deriveClimate(); deriveFlood(); deriveSlr(); deriveRp(); deriveGlof();
+  deriveClimate(); deriveFlood(); deriveSlr(); deriveRp(); deriveRunoff(); deriveGlof();
   if (isData(S.metric)) computeRanks();
   if (S.L.clim.on && CL.data) updateClimImage();
   refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
@@ -1435,6 +1449,31 @@ function rpBlock(p) {
     <table class="ctab"><tr><th>Scenario</th>${per.map(y => `<th>${perLabel(y)}</th>`).join("")}</tr>${rows}</table>
     <div class="where" style="margin-top:4px">${rpSsp()}, ${perLabel(k)}: every ${years(d["med" + k][i] / 10)} (${term("range", "likely")} ${years(d["lo" + k][i] / 10)} to ${years(d["hi" + k][i] / 10)});
       ${d["agree" + k][i]}% of 15 ${term("ghm", "model runs")} show it coming more often. *SSP2-4.5 estimated from SSP1-2.6 and SSP3-7.0.</div></div>`;
+}
+/* ---------- runoff and soil wetness (scripts/15_runoff_soil.py): ISIMIP3b monthly qtot and soilmoist ---------- */
+const RO = { data: null };
+const loadRunoff = () => once("runoff", async () => {
+  RO.data = await fetchOk("data/runoff.json", "json");
+  deriveRunoff(); dataLoaded();
+});
+function deriveRunoff() {
+  if (!RO.data) return;
+  const D = RO.data.data[CL.ssp], k = CL.per;
+  P.forEach(p => { const a = D["ro" + k][p.i], b = D["sm" + k][p.i]; p.ro = a == null ? NaN : a; p.sm = b == null ? NaN : b / 10; });
+  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i },
+    { ro: Number.isFinite(p.ro) ? p.ro : null, sm: Number.isFinite(p.sm) ? p.sm : null }));
+}
+function roBlock(p) {
+  if (!RO.data || RO.data.data.ssp126["ro" + CL.per][p.i] == null) return "";
+  const i = p.i, k = CL.per;
+  const rows = Object.keys(SSP_INFO).map(s => {
+    const D = RO.data.data[s];
+    return `<tr class="${s === CL.ssp ? "on" : ""}"><td>${SSP_INFO[s][0]}${s === "ssp245" ? "*" : ""}</td><td>${signed(D["ro" + k][i])} <small>${signed(D["roLo" + k][i])} to ${signed(D["roHi" + k][i])}</small></td>
+      <td>${D["roA" + k][i]}%</td><td>${D["sm" + k][i] == null ? "–" : signed(D["sm" + k][i] / 10, 1)}</td></tr>`;
+  }).join("");
+  return `<div><h3>${term("runoff", "Runoff")} and ${term("soil", "soil wetness")}, ${perLabel(k)} vs 1985–2014</h3>
+    <table class="ctab"><tr><th>Scenario</th><th>Wettest month <small>(${term("range", "likely")})</small></th><th>Runs up</th><th>Monsoon soil</th></tr>${rows}</table>
+    <div class="where" style="margin-top:4px">*SSP2-4.5 estimated from SSP1-2.6 and SSP3-7.0. 50 km model cells.</div></div>`;
 }
 /* ---------- glacial lake outburst floods (scripts/16_glof.py): Zheng et al. 2021, present and projected lakes ---------- */
 const GL = { data: null, k: new Map() };

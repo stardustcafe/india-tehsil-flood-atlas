@@ -13,6 +13,7 @@ third-party datasets and carry their licences:
 | `data/processed/india_adm3_returnperiod.csv`, `viewer/data/rp.json`, `viewer/data/rivers.geojson` | ISIMIP3b daily discharge (3 hydrological × 5 climate models), DDM30 river network | **CC BY 4.0** |
 | `data/processed/india_adm3_cyclone.csv`, `viewer/data/cyclone.json`, `viewer/data/wind_*/*` | STORM tropical cyclone wind return periods, with GPW / GHS-POP | **CC BY 4.0** (STORM itself is CC0) |
 | `data/processed/india_adm3_glof.csv`, `viewer/data/glof.json`, `viewer/data/glof_lakes.geojson` | Zheng et al. (2021) GLOF hazard, DDM30 river network | **CC BY 4.0** |
+| `data/processed/india_adm3_runoff.csv`, `viewer/data/runoff.json` | ISIMIP3b monthly runoff and soil moisture | **CC BY 4.0** |
 | `data/processed/india_adm3_sealevel.csv`, `viewer/data/slr.json`, `viewer/data/lowland/*` | IPCC AR6 sea-level projections + DeltaDTM v1.1, with GPW / GHS-POP | **CC BY 4.0** |
 
 ## Required attribution
@@ -35,7 +36,7 @@ third-party datasets and carry their licences:
   Aqueduct Floods Methodology, Technical Note, World Resources Institute. www.wri.org/publication/aqueduct-floods-methodology
 - Projected population: Wang, X., Meng, X., Long, Y. (2022), Projecting 1 km-grid population distributions from 2020
   to 2100 globally under shared socioeconomic pathways, Scientific Data 9, 563. https://doi.org/10.6084/m9.figshare.19608594, CC BY 4.0.
-- River flow: ISIMIP3b water_global output (CWatM, WaterGAP2-2e, MIROC-INTEG-LAND), daily discharge, CC BY 4.0, https://data.isimip.org (Inter-Sectoral Impact Model Intercomparison Project, www.isimip.org).
+- River flow, runoff and soil moisture: ISIMIP3b water_global output (CWatM, WaterGAP2-2e, MIROC-INTEG-LAND), daily discharge and monthly qtot / soilmoist, CC BY 4.0, https://data.isimip.org (Inter-Sectoral Impact Model Intercomparison Project, www.isimip.org).
   River network: DDM30 (Döll, P. & Lehner, B. 2002, J. Hydrol. 258, 214–231), as distributed by ISIMIP.
   Method after Hirabayashi, Y., et al. (2013), Global flood risk under climate change, Nature Climate Change 3, 816–821.
 - Cyclone wind: Bloemendaal, N., et al. (2020), Generation of a global synthetic tropical cyclone hazard dataset using STORM,
