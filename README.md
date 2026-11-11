@@ -99,6 +99,27 @@ and SSP5-8.5 → RCP8.5) and period (2020–39 → 2030, 2040–59 → 2050, 206
 which map is shown. Without defences the figures are an upper bound where embankments hold; the 1 km cells
 also count everyone in a cell that is only partly flooded.
 
+### Projected population (SSPs)
+
+`scripts/11_ssp_population.py` → `data/processed/india_adm3_ssp_pop.csv`, `viewer/data/popssp.json`
+
+1 km population grids for SSP1, SSP2, SSP3 and SSP5 (Wang, Meng & Long 2022, Scientific Data, CC BY 4.0),
+read year by year out of the 2.5 GB figshare zips with HTTP range requests. Our 2020 counts (GPW / GHS-POP)
+stay the anchor and the SSP grids supply growth: each sub-district's population growth since 2020, and
+separately the growth of people inside the future flood zone (cells flooded by at least 3 of 5 river models,
+or by the coastal map), so that growth concentrated on floodplains counts. SSPs are paired with the flood
+maps by nearest RCP (SSP1/2 → RCP4.5, SSP3/5 → RCP8.5).
+
+| People in the flood zone, GPW (crore) | 2030 | 2050 | 2080 |
+|---|---|---|---|
+| SSP1-2.6 | 20.4 | 22.6 | 22.0 |
+| SSP2-4.5 | 20.9 | 24.9 | 27.4 |
+| SSP3-7.0 | 22.0 | 29.7 | 40.1 |
+| SSP5-8.5 | 20.7 | 24.1 | 23.8 |
+
+Today: 18.2 crore. Under SSP2-4.5 by 2080 the increase of 9.2 crore splits into 2.6 crore from the larger
+flood zone (climate) and 6.6 crore from population growth. The viewer shows this split for any scenario.
+
 ### Places to visit
 
 `scripts/08_tourism_places.py` → `data/processed/india_places.{csv,geojson}`, `viewer/data/places.geojson`
@@ -129,6 +150,7 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/python scripts/08_tourism_places.py              # places to visit from OSM + Wikidata
 .venv/Scripts/python scripts/09_climate_projections.py         # CMIP6 rainfall extremes (downloads ~660 MB once)
 .venv/Scripts/python scripts/10_aqueduct_floods.py             # Aqueduct flood zones + depth tiles (streams ~3 GB, keeps India crops)
+.venv/Scripts/python scripts/11_ssp_population.py            # SSP population growth (streams ~3 GB of the figshare zips)
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size

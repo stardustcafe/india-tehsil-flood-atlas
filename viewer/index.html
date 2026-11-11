@@ -472,6 +472,7 @@ a.term:hover { color: var(--accent); }
         <div class="ge" id="g-subdistrict"><dt>Sub-district (tehsil, taluka, mandal)</dt><dd>The administrative level below the district. The atlas uses 6,820 sub-districts from geoBoundaries (Local Government Directory, 2018), so names and borders may differ from later notifications.</dd></div>
         <div class="ge" id="g-exposure"><dt>People exposed</dt><dd>Residents in 2020 whose home grid cell lies in the hazard area. Exposure is not damage: it does not reflect housing quality, income, warning systems or local defences.</dd></div>
         <div class="ge" id="g-popsrc"><dt>GPW and GHS-POP</dt><dd>Two 2020 population grids at about 1 km. GPW spreads each census unit's count evenly over its area. GHS-POP places people where satellites see buildings, so it follows settlements and is usually the better guide on floodplains. Choose between them in the Findings tab.</dd></div>
+        <div class="ge" id="g-ssppop"><dt>Projected population (SSP)</dt><dd>Population by 2030–2090 following each SSP's storyline of births, deaths, migration and urbanisation, mapped at 1 km by Wang et al. (2022). The atlas applies each sub-district's projected growth to its 2020 count, and for flood zones the growth of people inside the zone, so growth on floodplains counts. Future flood-zone figures use it unless they say "2020 population".</dd></div>
         <div class="ge" id="g-crore"><dt>Lakh and crore</dt><dd>1 lakh = 100,000. 1 crore = 10 million (100 lakh).</dd></div>
       </dl>
       <h3>Flood hazard today</h3>
@@ -489,7 +490,7 @@ a.term:hover { color: var(--accent); }
       </dl>
       <h3>Climate projections</h3>
       <dl>
-        <div class="ge" id="g-scenario"><dt>Emissions scenario (SSP, RCP)</dt><dd>A storyline of future greenhouse-gas emissions. The current SSPs (CMIP6) replaced the older RCPs (CMIP5); SSP2-4.5 is roughly RCP4.5. Here SSP1-2.6 is low, SSP2-4.5 middle, SSP3-7.0 high and SSP5-8.5 very high. Flood-zone maps exist only for RCP4.5 and RCP8.5, so the atlas shows RCP4.5 for SSP1-2.6 and SSP2-4.5, and RCP8.5 for SSP3-7.0 and SSP5-8.5.</dd></div>
+        <div class="ge" id="g-scenario"><dt>Emissions scenario (SSP, RCP)</dt><dd>A storyline of future greenhouse-gas emissions. The current SSPs (CMIP6) replaced the older RCPs (CMIP5); SSP2-4.5 is roughly RCP4.5. Here SSP1-2.6 is low, SSP2-4.5 middle, SSP3-7.0 high and SSP5-8.5 very high. Each SSP also has its own population path (see Projected population). Flood-zone maps exist only for RCP4.5 and RCP8.5, so the atlas shows RCP4.5 for SSP1-2.6 and SSP2-4.5, and RCP8.5 for SSP3-7.0 and SSP5-8.5.</dd></div>
         <div class="ge" id="g-period"><dt>Period and baseline</dt><dd>Rainfall changes are 20-year averages (2020–39 to 2080–99) compared with 1995–2014. Flood-zone maps are centred on 2030, 2050 and 2080 and compared with a 1960–1999 baseline; 2060–79 and 2080–99 both use the 2080 map.</dd></div>
         <div class="ge" id="g-model"><dt>Climate model</dt><dd>A computer simulation of the global climate. Rainfall projections use about 30 CMIP6 models; flood-zone maps use 5 CMIP5 models. Models differ, so the atlas shows the middle value (median) and a range.</dd></div>
         <div class="ge" id="g-range"><dt>Model range</dt><dd>For rainfall, the 10th to 90th percentile across models: 8 in 10 models fall inside it. For flood zones, the lowest to highest of the 5 models.</dd></div>
@@ -521,6 +522,7 @@ a.term:hover { color: var(--accent); }
           Each 1 km cell's people are split across the 30 m GFSM land area inside it.</span>
         <span>Climate: <a href="https://climateknowledgeportal.worldbank.org/" target="_blank" rel="noopener">World Bank CCKP</a> CMIP6 0.25° multi-model ensemble, CC BY 4.0.</span>
         <span>Flood zones: <a href="https://www.wri.org/data/aqueduct-floods-hazard-maps" target="_blank" rel="noopener">WRI Aqueduct Floods</a> v2 hazard maps (Ward et al. 2020), 1-in-100-year river (5 CMIP5 models) and coastal (median sea-level rise, with subsidence) inundation, no flood defences.</span>
+        <span>Projected population: Wang, Meng &amp; Long (2022), <a href="https://doi.org/10.6084/m9.figshare.19608594" target="_blank" rel="noopener">1 km SSP population 2020–2100</a>, Scientific Data, CC BY 4.0. Used as growth rates on the 2020 counts.</span>
         <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
         <span>Satellite imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, 2018 onwards CC BY-NC-SA 4.0.</span>
         <span>Basemap labels: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
@@ -595,11 +597,12 @@ const METRICS = {
   xp: { label: "% people in High+",  opt: "Share of people on High+ land", fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1, pop: true },
   c5: { label: "Δ 5-day max rain",   opt: "Change in wettest 5-day rain", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [0, 5, 10, 15, 20, 30], step: 1, max: 60, clim: true },
   fz0: { label: "People in 100-yr flood zone, today", opt: "People in 1-in-100-year flood zone, today", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true },
-  fz:  { label: "People in 100-yr flood zone, future", opt: "People in 1-in-100-year flood zone, future", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true },
+  fz:  { label: "People in 100-yr flood zone, future", opt: "People in 1-in-100-year flood zone, future (projected population)", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true },
   fzd: { label: "Change in people in flood zone", opt: "Change in people in flood zone vs today", fmt: v => (v > 0 ? "+" : v < 0 ? "−" : "") + fmtPeople(Math.abs(v)), tick: v => (v < 0 ? "−" : "") + fmtShort(Math.abs(v)), fixed: [0, 500, 2000, 5000, 20000, 50000], step: 500, max: 100000, pop: true, flood: true },
+  pg:  { label: "Population change", opt: "Projected population change since 2020", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [-10, 0, 10, 20, 40, 60], step: 1, max: 100, flood: true, ssp: true },
   cf: { label: "Flood pressure",     opt: "Flood pressure (climate-adjusted)", fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
-const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People on flood-prone land", ["x", "xp"]],
+const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People", ["x", "xp", "pg"]],
   ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["Rainfall outlook", ["c5", "cf"]]];
 const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
@@ -673,7 +676,7 @@ function computeBreaks() {
   if (S.mode === "fixed") b = METRICS[m].fixed.slice();
   else {
     // flood-zone counts are zero in most sub-districts: rank only the non-zero ones so the classes stay distinct
-    const vals = P.filter(p => valid(p) && inScope(p) && (!METRICS[m].flood || p[m] !== 0)).map(p => p[m]).sort((a, c) => a - c);
+    const vals = P.filter(p => valid(p) && inScope(p) && (!METRICS[m].flood || METRICS[m].ssp || p[m] !== 0)).map(p => p[m]).sort((a, c) => a - c);
     b = [1, 2, 3, 4, 5, 6].map(k => vals[Math.min(vals.length - 1, Math.floor(k * vals.length / 7))] ?? 0);
   }
   for (let i = 1; i < b.length; i++) if (b[i] <= b[i - 1]) b[i] = b[i - 1] + 1e-6; // step needs strictly ascending
@@ -734,7 +737,7 @@ const layerOn = k => k === "places" ? PL.on : k === "ctx" ? $("ctx").checked : S
 // one-line state under each layer name, and dimmed rows for layers that are off
 function renderLayerMeta() {
   const m = METRICS[S.metric];
-  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())}` : "");
+  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.ssp ? ` · ${sspPopLabel()}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())} map, ${sspNum()} population` : "");
   if (S.srcs.length) $("metaPop").textContent = `${POP_SOURCES[S.src].label} · ${S.popKind === "high" ? "people on High+ land" : "everyone"}`;
   $("metaClim").textContent = scenLabel();
   $("metaFlood").textContent = floodLabel();
@@ -750,7 +753,7 @@ function renderLegendBox() {
   $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on;
   $("lgFloodT").textContent = `Flood depth, 1-in-100-year, ${floodLabel()}`;
   $("satCredit").textContent = `Sentinel-2 cloudless ${L.sat.year} by EOX IT Services GmbH, contains modified Copernicus Sentinel data, ${SAT_YEARS[L.sat.year].lic}.`;
-  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : S.metric === "fz0" ? "" : m.flood ? ", " + aqLabel(aqKey()) : "")
+  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.ssp ? ", " + sspPopLabel() : S.metric === "fz0" ? "" : m.flood ? `, ${aqLabel(aqKey())} map, ${sspNum()} population` : "")
     + (m.pop ? ", " + POP_SOURCES[S.src].label : "");
   if (S.srcs.length) $("lgPopT").textContent = `People per km², ${POP_SOURCES[S.src].label}${S.popKind === "high" ? ", on High+ land only" : ""}`;
   $("lgClimT").textContent = `Change in wettest 5-day rain, ${scenLabel()}`;
@@ -1114,15 +1117,19 @@ function renderFuture() {
     `${term("range", "Models range")} ${signed(wavg("lo"))} to ${signed(wavg("hi"))}. Drives river floods.`],
     [signed(wavg("d1")), `change in the ${term("rx1day", "wettest day")}, which drives flash and urban floods.`]];
   if (S.srcs.length) {
-    const all = P.filter(p => inScope(p)), k = aqKey(), f = FL.data.data[k], t = FL.data.data.today;
-    const now = sumOf(all, p => t[S.src][p.i]), fut = sumOf(all, p => f[S.src][p.i]), chg = fut - now;
-    rows.push([fmtPeople(fut), `people would live in the ${term("floodzone", "1-in-100-year flood zone")} (${aqLabel(k)}),
-      ${chg >= 0 ? fmtPeople(chg) + " more" : fmtPeople(-chg) + " fewer"} than today.`, `2020 population held constant; ${term("defences", "no flood defences")}.`]);
+    const all = P.filter(p => inScope(p)), k = aqKey();
+    const now = sumOf(all, p => p.fz0), clim = sumOf(all, p => p.fzc), fut = sumOf(all, p => p.fz);
+    const pop0 = sumOf(all, p => p.pt), pop1 = sumOf(all, p => p.pt * growth(p.i));
+    const more = v => v >= 0 ? fmtPeople(v) + " more" : fmtPeople(-v) + " fewer";
+    rows.push([signed(100 * (pop1 / pop0 - 1)), `${term("ssppop", "projected population")} change by ${G_YEAR[CL.per]} (${sspNum()}), to ${fmtPeople(pop1)}.`]);
+    rows.push([fmtPeople(fut), `people would live in the ${term("floodzone", "1-in-100-year flood zone")} by ${AQ_YEAR[CL.per]}, ${more(fut - now)} than today.`,
+      `Climate change: ${more(clim - now)} (${aqLabel(k)} flood map). Population change: ${more(fut - clim)}. ${term("defences", "No flood defences")}.`]);
     const x = sumOf(sc, p => p.x), xRob = sumOf(sc.filter(p => d.lo[p.i] > 0), p => p.x);
     rows.push([fmtPeople(xRob), `people live on flood-prone land where ${term("agree", "models agree")} extreme rain will increase${x ? `, ${(100 * xRob / x).toFixed(0)}% of all on such land` : ""}.`]);
   }
   $("kfFuture").innerHTML = rows.map(kfRow).join("") +
-    `<p class="hint">Rainfall: median of about 30 CMIP6 models against 1995–2014. Flood zone: WRI Aqueduct, median of 5 models.
+    `<p class="hint">Rainfall: median of about 30 CMIP6 models against 1995–2014. Flood zone: WRI Aqueduct, median of 5 models,
+      with SSP population from Wang et al. (2022).
       ${term("screening", "Screening figures, not forecasts.")}</p>`;
 }
 function climBlock(p) {
@@ -1171,7 +1178,12 @@ const loadClimate = () => once("climate", async () => {
 });
 
 /* ---------- 1-in-100-year flood zones (scripts/10_aqueduct_floods.py): WRI Aqueduct Floods v2 ---------- */
-const FL = { data: null };
+const FL = { data: null, pop: null };
+// SSP population (scripts/11_ssp_population.py): growth to the period midpoint, flood-zone people in the flood-map year
+const G_YEAR = { 2020: 2030, 2040: 2050, 2060: 2070, 2080: 2090 };
+const sspNum = () => SSP_INFO[CL.ssp][0].slice(0, 4);
+const sspPopLabel = () => `${sspNum()} population, ${G_YEAR[CL.per]}`;
+const growth = i => FL.pop.data[CL.ssp]["g" + G_YEAR[CL.per]][i] / 1000;
 const FLOOD_KEYS = ["today", "rcp4p5_2030", "rcp4p5_2050", "rcp4p5_2080", "rcp8p5_2030", "rcp8p5_2050", "rcp8p5_2080"];
 // Aqueduct has RCP4.5 and RCP8.5 only, centred on 2030 / 2050 / 2080: nearest match to the chosen SSP and period
 const AQ_RCP = { ssp126: "rcp4p5", ssp245: "rcp4p5", ssp370: "rcp8p5", ssp585: "rcp8p5" };
@@ -1182,23 +1194,28 @@ const floodKey = () => S.L.flood.when === "today" ? "today" : aqKey();
 const floodLabel = () => S.L.flood.when === "today" ? "Today (1960–99 climate)" : `${aqLabel(aqKey())} · nearest to ${SSP_INFO[CL.ssp][0]}`;
 function deriveFlood() {
   if (!FL.data || !S.srcs.length) return;
-  const t = FL.data.data.today[S.src], f = FL.data.data[aqKey()][S.src];
-  P.forEach(p => { p.fz0 = t[p.i]; p.fz = f[p.i]; p.fzd = f[p.i] - t[p.i]; });
-  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i }, { fz0: p.fz0, fz: p.fz, fzd: p.fzd }));
+  const t = FL.data.data.today[S.src], c = FL.data.data[aqKey()][S.src], f = FL.pop.data[CL.ssp][`${S.src}_f${AQ_YEAR[CL.per]}`];
+  // fz: future flood zone with projected population; fzc: same zone with 2020 population (climate effect only)
+  P.forEach(p => { p.fz0 = t[p.i]; p.fzc = c[p.i]; p.fz = f[p.i]; p.fzd = f[p.i] - t[p.i]; p.pg = 100 * (growth(p.i) - 1); });
+  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i }, { fz0: p.fz0, fz: p.fz, fzd: p.fzd, pg: p.pg }));
 }
 const loadFlood = () => once("flood", async () => {
-  FL.data = await fetchOk("data/flood.json", "json");
+  [FL.data, FL.pop] = await Promise.all([fetchOk("data/flood.json", "json"), fetchOk("data/popssp.json", "json")]);
   deriveFlood(); dataLoaded();
 });
 function floodBlock(p) {
   if (!S.srcs.length) return "";
-  const i = p.i, D = FL.data.data, s = S.src, cur = aqKey();
-  const cell = k => { const d = D[k]; return `<td class="${k === cur ? "on" : ""}">${fmtShort(d[s][i])} <small>${fmtShort(d[s + "Lo"][i])}–${fmtShort(d[s + "Hi"][i])}</small></td>`; };
-  const rows = FLOOD_KEYS.slice(1, 4).map(k => k.slice(-4)).map(y => `<tr><td>${y}</td>${cell("rcp4p5_" + y)}${cell("rcp8p5_" + y)}</tr>`).join("");
+  const i = p.i, s = S.src, T = FL.data.data.today, cy = AQ_YEAR[CL.per];
+  const ssps = Object.keys(SSP_INFO);
+  const rows = FLOOD_KEYS.slice(1, 4).map(k => +k.slice(-4)).map(y => `<tr><td>${y}</td>${ssps.map(k =>
+    `<td class="${k === CL.ssp && y === +cy ? "on" : ""}">${fmtShort(FL.pop.data[k][`${s}_f${y}`][i])}</td>`).join("")}</tr>`).join("");
+  const c = FL.data.data[aqKey()];
   return `<div><h3>People in the ${term("floodzone", "1-in-100-year flood zone")}</h3>
-    <div class="where" style="margin:0 0 4px">Today ${fmtPeople(D.today[s][i])} (river ${fmtPeople(D.today[s + "R"][i])}, coast ${fmtPeople(D.today[s + "C"][i])}; the two can overlap).</div>
-    <table class="ctab"><tr><th>Year</th><th>RCP4.5 <small>(${term("range", "range")})</small></th><th>RCP8.5</th></tr>${rows}</table>
-    <div class="where" style="margin-top:4px">${POP_SOURCES[s].label} 2020 population, ${term("defences", "no flood defences")}. Highlighted: nearest to ${SSP_INFO[CL.ssp][0]}, ${perLabel(CL.per)}.</div></div>`;
+    <div class="where" style="margin:0 0 4px">Today ${fmtPeople(T[s][i])} (river ${fmtPeople(T[s + "R"][i])}, coast ${fmtPeople(T[s + "C"][i])}; the two can overlap).
+      With ${term("ssppop", "projected population")}:</div>
+    <table class="ctab"><tr><th>Year</th>${ssps.map(k => `<th>${SSP_INFO[k][0]}</th>`).join("")}</tr>${rows}</table>
+    <div class="where" style="margin-top:4px">With 2020 population, ${aqLabel(aqKey())}: ${fmtPeople(c[s][i])} (${term("range", "models")} ${fmtShort(c[s + "Lo"][i])}–${fmtShort(c[s + "Hi"][i])}).
+      Population ${fmtPeople(p.pt)} in 2020, ${fmtPeople(p.pt * growth(i))} by ${G_YEAR[CL.per]} (${sspNum()}). ${POP_SOURCES[s].label}, ${term("defences", "no flood defences")}.</div></div>`;
 }
 
 /* ---------- places to visit (scripts/08_tourism_places.py): OSM features with Wikidata links ---------- */

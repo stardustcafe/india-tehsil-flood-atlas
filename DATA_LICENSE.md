@@ -29,6 +29,8 @@ third-party datasets and carry their licences:
 - Places to visit: © OpenStreetMap contributors (ODbL); prominence from Wikidata (CC0).
 - Flood zones: WRI Aqueduct Floods v2 hazard maps, CC BY 4.0. Ward, P.J., Winsemius, H.C., Kuzma, S., et al. (2020),
   Aqueduct Floods Methodology, Technical Note, World Resources Institute. www.wri.org/publication/aqueduct-floods-methodology
+- Projected population: Wang, X., Meng, X., Long, Y. (2022), Projecting 1 km-grid population distributions from 2020
+  to 2100 globally under shared socioeconomic pathways, Scientific Data 9, 563. https://doi.org/10.6084/m9.figshare.19608594, CC BY 4.0.
 - Viewer place names and rivers: © OpenStreetMap contributors (ODbL), served by OpenFreeMap using the OpenMapTiles schema.
 - Viewer satellite imagery (streamed, not redistributed): Sentinel-2 cloudless (https://s2maps.eu) by EOX IT Services GmbH,
   contains modified Copernicus Sentinel data. The 2016 mosaic is CC BY 4.0; the 2018 onwards mosaics (the viewer uses 2024) are CC BY-NC-SA 4.0, non-commercial use only.
