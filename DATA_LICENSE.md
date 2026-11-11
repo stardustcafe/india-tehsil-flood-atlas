@@ -27,6 +27,8 @@ third-party datasets and carry their licences:
 - Climate: World Bank Group, Climate Change Knowledge Portal (CCKP), CMIP6 0.25° collection,
   https://climateknowledgeportal.worldbank.org/. CC BY 4.0. Based on CMIP6 model output (WCRP).
 - Places to visit: © OpenStreetMap contributors (ODbL); prominence from Wikidata (CC0).
+- Flood zones: WRI Aqueduct Floods v2 hazard maps, CC BY 4.0. Ward, P.J., Winsemius, H.C., Kuzma, S., et al. (2020),
+  Aqueduct Floods Methodology, Technical Note, World Resources Institute. www.wri.org/publication/aqueduct-floods-methodology
 - Viewer place names and rivers: © OpenStreetMap contributors (ODbL), served by OpenFreeMap using the OpenMapTiles schema.
 - Viewer satellite imagery (streamed, not redistributed): Sentinel-2 cloudless (https://s2maps.eu) by EOX IT Services GmbH,
   contains modified Copernicus Sentinel data. The 2016 mosaic is CC BY 4.0; the 2018 onwards mosaics (the viewer uses 2024) are CC BY-NC-SA 4.0, non-commercial use only.

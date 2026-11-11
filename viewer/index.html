@@ -65,7 +65,7 @@ button { font: inherit; color: inherit; }
 .search { position: relative; }
 .search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
 select, input[type="search"] { font: 13.5px var(--sans); color: var(--ink); background: var(--sunk); border: 1px solid var(--line-strong); border-radius: 4px; padding: 7px 9px; width: 100%; }
-input[type="search"] { padding-left: 32px; }
+.search input[type="search"] { padding-left: 32px; }
 select:hover, input[type="search"]:hover { border-color: var(--muted); }
 .results { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); background: var(--panel); border: 1px solid var(--line-strong); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden; }
 .results button { display: block; width: 100%; text-align: left; border: 0; background: transparent; color: var(--ink); padding: 8px 10px; font-size: 13px; cursor: pointer; }
@@ -120,6 +120,7 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 .t-gfsm { background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3), var(--g4), var(--g5)); }
 .t-pop { background: linear-gradient(90deg, var(--d1), var(--d3), var(--d6)); }
 .t-clim { background: linear-gradient(90deg, #a6611a, #e4ecee, #5b9bd5, #0b3a75); }
+.t-flood { background: linear-gradient(90deg, #bfe6f0, #3a9ac2, #0b3d6e); }
 .t-sat { background: linear-gradient(135deg, #3d5a2a, #7d7348 40%, #a89a72 55%, #2e4f63); }
 .lyr-body { padding: 4px 12px 14px 50px; display: flex; flex-direction: column; gap: 10px; background: var(--sunk); }
 .switch { position: relative; display: inline-block; width: 34px; height: 20px; flex: none; cursor: pointer; }
@@ -138,14 +139,6 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 .cats .ct { font: 11px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
 
 /* statistics */
-.summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
-.summary .big { grid-column: 1 / -1; }
-.summary .src { grid-column: 1 / -1; color: var(--muted); font-size: 11.5px; }
-.summary .v, .clim-sum .v { font: 600 22px/1.1 var(--cond); font-variant-numeric: tabular-nums; }
-.summary .big .v { font-size: 32px; color: var(--accent); }
-.summary .k, .clim-sum .k { color: var(--muted); font-size: 12px; }
-.clim-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
-.clim-sum .v { font-size: 20px; }
 .top ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .top li button { display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: center; width: 100%; text-align: left; background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--ink); padding: 7px 2px; cursor: pointer; font-size: 13px; }
 .top li:first-child button { border-top: 0; }
@@ -238,6 +231,31 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 .ctab tr.on td { color: var(--accent); font-weight: 600; }
 .ctab td small { color: var(--muted); font-weight: 400; }
 .ctab td:first-child { white-space: nowrap; }
+.ctab td.on { color: var(--accent); font-weight: 600; }
+.card h3 { margin: 0 0 4px; font-size: 12.5px; font-weight: 600; }
+.ctabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); margin-top: -2px; }
+.ctabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 4px 0 6px; margin-bottom: -1px; color: var(--muted); font-size: 12.5px; font-weight: 500; cursor: pointer; }
+.ctabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+
+/* findings: one number + one plain sentence per row */
+.kfs { display: flex; flex-direction: column; }
+.kf { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); }
+.kf:first-child { border-top: 0; padding-top: 2px; }
+.kf b { font: 600 19px/1.1 var(--cond); font-variant-numeric: tabular-nums; color: var(--accent); }
+.kf span { font-size: 13px; }
+.kf small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+.scope { color: var(--muted); font-weight: 400; font-size: 12.5px; }
+a.term { color: inherit; text-decoration: underline dotted var(--muted); text-underline-offset: 3px; cursor: help; }
+a.term:hover { color: var(--accent); }
+
+/* glossary */
+.gloss h3 { margin: 6px 0 0; font-size: 11.5px; font-weight: 600; color: var(--muted); letter-spacing: .02em; }
+.gloss dl { margin: 0; }
+.ge { padding: 8px 0; border-top: 1px solid var(--line); scroll-margin-top: 48px; }
+.ge dt { font-weight: 600; font-size: 13px; }
+.ge dd { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+.ge.flash { animation: flash 1.6s ease-out; }
+@keyframes flash { from { background: var(--accent-soft); } to { background: transparent; } }
 
 .attrib { position: absolute; z-index: 2; right: max(8px, env(safe-area-inset-right, 0px)); bottom: calc(6px + env(safe-area-inset-bottom, 0px)); font-size: 10.5px; color: var(--muted); background: var(--panel); opacity: .85; padding: 2px 6px; border-radius: 3px; }
 .attrib a { color: inherit; }
@@ -280,7 +298,8 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 
     <nav class="tabs" role="tablist" aria-label="Sidebar">
       <button type="button" role="tab" id="tabL" aria-selected="true" aria-controls="tab-layers">Layers</button>
-      <button type="button" role="tab" id="tabS" aria-selected="false" aria-controls="tab-stats">Statistics</button>
+      <button type="button" role="tab" id="tabS" aria-selected="false" aria-controls="tab-stats">Findings</button>
+      <button type="button" role="tab" id="tabG" aria-selected="false" aria-controls="tab-gloss">Glossary</button>
       <button type="button" role="tab" id="tabA" aria-selected="false" aria-controls="tab-about">About</button>
     </nav>
 
@@ -288,7 +307,7 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
     <div class="tabpanel" id="tab-layers" role="tabpanel" aria-labelledby="tabL">
       <p class="note">Layers higher in the list draw on top. Click a layer name for its settings.</p>
       <ol class="stack">
-        <li class="lyr off" data-layer="places" id="lyrPlaces" hidden>
+        <li class="lyr off" data-layer="places" id="lyrPlaces">
           <div class="lyr-head">
             <span class="thumb"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.2 7 12 7 12s7-6.8 7-12a7 7 0 0 0-7-7zm0 9.6a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2z" fill="currentColor"/></svg></span>
             <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrPlacesBody"><b>Places to visit</b><small id="metaPlaces">Notable sites from OpenStreetMap</small></button>
@@ -314,7 +333,7 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
             <label class="switch"><input type="checkbox" class="lyr-on" data-layer="bounds" checked aria-label="Show sub-district boundaries"><span></span></label>
           </div>
         </li>
-        <li class="lyr off" data-layer="clim" id="lyrClim" hidden>
+        <li class="lyr off" data-layer="clim" id="lyrClim">
           <div class="lyr-head">
             <span class="thumb t-clim"></span>
             <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrClimBody"><b>Rainfall change</b><small id="metaClim"></small></button>
@@ -326,6 +345,26 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
             <button type="button" class="linkbtn scen-open">Change scenario or period</button>
             <div class="ctl"><div class="row"><label for="opClim">Opacity</label><output id="opClimOut">85%</output></div>
               <input type="range" class="op" id="opClim" data-layer="clim" min="5" max="100" step="5" value="85"></div>
+          </div>
+        </li>
+        <li class="lyr off" data-layer="flood" id="lyrFlood">
+          <div class="lyr-head">
+            <span class="thumb t-flood"></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrFloodBody"><b>Flood zone, 1-in-100-year</b><small id="metaFlood"></small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="flood" aria-label="Show 1-in-100-year flood zone"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrFloodBody" hidden>
+            <div class="ctl"><span class="lbl" id="floodWhenLbl">Show</span>
+              <div class="seg" role="group" aria-labelledby="floodWhenLbl" id="floodWhenSeg">
+                <button type="button" data-w="today" aria-pressed="false">Today</button>
+                <button type="button" data-w="future" aria-pressed="true">Future scenario</button>
+              </div></div>
+            <p class="hint">Modelled depth of a <a class="term" href="#g-rp">1-in-100-year</a> river or coastal flood, about 1 km cells,
+              <a class="term" href="#g-defences">without flood defences</a>. Future maps use the RCP nearest the chosen scenario
+              (<a class="term" href="#g-scenario">why</a>). Source: WRI Aqueduct Floods.</p>
+            <button type="button" class="linkbtn scen-open">Change scenario or period</button>
+            <div class="ctl"><div class="row"><label for="opFlood">Opacity</label><output id="opFloodOut">90%</output></div>
+              <input type="range" class="op" id="opFlood" data-layer="flood" min="5" max="100" step="5" value="90"></div>
           </div>
         </li>
         <li class="lyr off" data-layer="pop" id="lyrPop">
@@ -400,24 +439,16 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
     </div>
 
     <div class="tabpanel" id="tab-stats" role="tabpanel" aria-labelledby="tabS" hidden>
-      <section class="block" aria-live="polite">
-        <div class="summary">
-          <div class="big"><div class="v" id="sumPct">–</div><div class="k" id="sumPctK">of land rated High or Very High</div></div>
-          <div id="sumXBox"><div class="v" id="sumX">–</div><div class="k">people in High or Very High areas</div></div>
-          <div id="sumXpBox"><div class="v" id="sumXp">–</div><div class="k">of the population</div></div>
-          <div><div class="v" id="sumKm">–</div><div class="k">km² High or Very High</div></div>
-          <div><div class="v" id="sumN">–</div><div class="k" id="sumNK">sub-districts over half High+</div></div>
-          <div class="src" id="sumSrc"></div>
-        </div>
-        <div class="ctl" id="srcRow"><label for="srcSelStats">Population data (2020)</label><select class="srcSel" id="srcSelStats"></select>
+      <section class="block">
+        <h2>Today <span class="scope" id="scopeToday">India</span></h2>
+        <div class="kfs" id="kfToday" aria-live="polite"></div>
+        <div class="ctl" id="srcRow"><label for="srcSelStats">Population estimate (2020)</label><select class="srcSel" id="srcSelStats"></select>
           <p class="hint srcHint"></p></div>
       </section>
 
-      <section class="block" id="climField" hidden>
-        <h2>Climate outlook <button type="button" class="linkbtn scen-open scenTxt"></button></h2>
-        <div class="clim-sum" id="climSum" aria-live="polite"></div>
-        <p class="hint">Change in the wettest 5-day rainfall of the year against 1995–2014, median of about 30 models.
-          Flood pressure = today's % High+ land × (1 + that change). A screening index, not a flood forecast: GFSM is static, and river flow, dams and land use are not modelled.</p>
+      <section class="block" id="climField">
+        <h2>Future <button type="button" class="linkbtn scen-open scenTxt"></button></h2>
+        <div class="kfs" id="kfFuture" aria-live="polite"><p class="hint">Loading projections…</p></div>
       </section>
 
       <section class="block top">
@@ -427,14 +458,60 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
       </section>
 
       <section class="block top" id="plTopBlock" hidden>
-        <h2 id="plTopLbl">Best-known sites on High+ land</h2>
+        <h2 id="plTopLbl">Best-known sites on flood-prone land</h2>
         <ol id="plTop"></ol>
       </section>
     </div>
 
+    <!-- Glossary: plain-language definitions; links with class="term" elsewhere jump here -->
+    <div class="tabpanel gloss" id="tab-gloss" role="tabpanel" aria-labelledby="tabG" hidden>
+      <input type="search" id="glossQ" placeholder="Filter terms" aria-label="Filter glossary terms" autocomplete="off">
+      <p class="hint" id="glossNone" hidden>No term matches.</p>
+      <h3>Places and people</h3>
+      <dl>
+        <div class="ge" id="g-subdistrict"><dt>Sub-district (tehsil, taluka, mandal)</dt><dd>The administrative level below the district. The atlas uses 6,820 sub-districts from geoBoundaries (Local Government Directory, 2018), so names and borders may differ from later notifications.</dd></div>
+        <div class="ge" id="g-exposure"><dt>People exposed</dt><dd>Residents in 2020 whose home grid cell lies in the hazard area. Exposure is not damage: it does not reflect housing quality, income, warning systems or local defences.</dd></div>
+        <div class="ge" id="g-popsrc"><dt>GPW and GHS-POP</dt><dd>Two 2020 population grids at about 1 km. GPW spreads each census unit's count evenly over its area. GHS-POP places people where satellites see buildings, so it follows settlements and is usually the better guide on floodplains. Choose between them in the Findings tab.</dd></div>
+        <div class="ge" id="g-crore"><dt>Lakh and crore</dt><dd>1 lakh = 100,000. 1 crore = 10 million (100 lakh).</dd></div>
+      </dl>
+      <h3>Flood hazard today</h3>
+      <dl>
+        <div class="ge" id="g-susceptibility"><dt>Flood susceptibility</dt><dd>How prone land is to flooding given its terrain, nearness to rivers, soils, land cover and rainfall climate. It shows where floods tend to occur, not when, how deep or how often.</dd></div>
+        <div class="ge" id="g-gfsm"><dt>GFSM</dt><dd>Global Flood Susceptibility Map v1 (Waleed et al., 2026): a 30 m map built from satellite and geospatial data that rates land in five classes. It is the basis of today's figures in this atlas.</dd></div>
+        <div class="ge" id="g-classes"><dt>Flood-prone land (High+)</dt><dd>Land in GFSM's High or Very High classes, the top two of five (Very Low, Low, Moderate, High, Very High).</dd></div>
+        <div class="ge" id="g-rp"><dt>1-in-100-year flood (return period)</dt><dd>A flood with a 1% chance of happening in any given year. It is not "once a century": over 30 years the chance of at least one is about 26%. A larger return period means a rarer, bigger flood.</dd></div>
+        <div class="ge" id="g-floodzone"><dt>Flood zone</dt><dd>Land that WRI Aqueduct Floods models as under water in a 1-in-100-year river or coastal flood, at about 1 km, with no flood defences. A cell counts if any depth is modelled. Future coastal maps include median sea-level rise and land subsidence.</dd></div>
+        <div class="ge" id="g-subsidence"><dt>Land subsidence</dt><dd>Sinking ground, from groundwater pumping and the settling of delta sediments. The coastal flood-zone maps include it, which is part of why low-lying delta areas such as greater Kolkata show large future increases.</dd></div>
+        <div class="ge" id="g-depth"><dt>Flood depth</dt><dd>Modelled water depth above ground during the flood, in metres. Over 1 m is generally dangerous to people and buildings.</dd></div>
+        <div class="ge" id="g-defences"><dt>Flood defences</dt><dd>Embankments, levees, sea walls and dams. The flood-zone maps leave them out, so in protected areas they show the hazard if defences fail or are overtopped, an upper bound.</dd></div>
+        <div class="ge" id="g-riverine"><dt>River and coastal flooding</dt><dd>River (fluvial) floods come from rivers overtopping their banks after heavy or prolonged rain upstream. Coastal floods come from storm surges and high tides, made worse by sea-level rise.</dd></div>
+        <div class="ge" id="g-pluvial"><dt>Flash and urban flooding</dt><dd>Intense local rain that overwhelms drains and small streams. The flood-zone maps do not cover it; the wettest-day rainfall indicator is the closest guide here.</dd></div>
+      </dl>
+      <h3>Climate projections</h3>
+      <dl>
+        <div class="ge" id="g-scenario"><dt>Emissions scenario (SSP, RCP)</dt><dd>A storyline of future greenhouse-gas emissions. The current SSPs (CMIP6) replaced the older RCPs (CMIP5); SSP2-4.5 is roughly RCP4.5. Here SSP1-2.6 is low, SSP2-4.5 middle, SSP3-7.0 high and SSP5-8.5 very high. Flood-zone maps exist only for RCP4.5 and RCP8.5, so the atlas shows RCP4.5 for SSP1-2.6 and SSP2-4.5, and RCP8.5 for SSP3-7.0 and SSP5-8.5.</dd></div>
+        <div class="ge" id="g-period"><dt>Period and baseline</dt><dd>Rainfall changes are 20-year averages (2020–39 to 2080–99) compared with 1995–2014. Flood-zone maps are centred on 2030, 2050 and 2080 and compared with a 1960–1999 baseline; 2060–79 and 2080–99 both use the 2080 map.</dd></div>
+        <div class="ge" id="g-model"><dt>Climate model</dt><dd>A computer simulation of the global climate. Rainfall projections use about 30 CMIP6 models; flood-zone maps use 5 CMIP5 models. Models differ, so the atlas shows the middle value (median) and a range.</dd></div>
+        <div class="ge" id="g-range"><dt>Model range</dt><dd>For rainfall, the 10th to 90th percentile across models: 8 in 10 models fall inside it. For flood zones, the lowest to highest of the 5 models.</dd></div>
+        <div class="ge" id="g-agree"><dt>Models agree</dt><dd>At least 90% of models project an increase. Where they don't, the direction of change is uncertain.</dd></div>
+        <div class="ge" id="g-rx5day"><dt>Wettest 5-day rainfall (Rx5day)</dt><dd>The year's largest rainfall total over 5 consecutive days, averaged over the period. Linked to river flooding.</dd></div>
+        <div class="ge" id="g-rx1day"><dt>Wettest day (Rx1day)</dt><dd>The year's largest single-day rainfall, averaged over the period. Linked to flash and urban flooding.</dd></div>
+        <div class="ge" id="g-pressure"><dt>Flood pressure index</dt><dd>Share of flood-prone land × (1 + change in wettest 5-day rainfall). It ranks where heavier rain meets flood-prone land. It is a screening index, not a probability.</dd></div>
+      </dl>
+      <h3>Reading the map</h3>
+      <dl>
+        <div class="ge" id="g-breaks"><dt>Relative and absolute classes</dt><dd>Relative (quantile) classes put the same number of sub-districts in each colour, good for ranking. Absolute (fixed) classes use the same thresholds everywhere, good for comparing states.</dd></div>
+        <div class="ge" id="g-screening"><dt>Screening, not forecasting</dt><dd>The atlas is for comparing places and setting priorities for closer study. It is not suited to decisions about individual sites, which need local flood studies.</dd></div>
+      </dl>
+    </div>
+
     <div class="tabpanel about" id="tab-about" role="tabpanel" aria-labelledby="tabA" hidden>
       <p>Flood susceptibility, and the people living with it, for 6,820 tehsils, talukas and mandals, summarised from the 30 m Global Flood Susceptibility Map (GFSM v1).</p>
-      <p>Susceptibility shows where flooding is likely given terrain, rivers and climate today. It is a baseline, not a forecast. The climate outlook scales today's susceptibility by projected changes in extreme rainfall. It is a screening index, not a flood probability.</p>
+      <p>It answers three questions for each sub-district: how much land is <a class="term" href="#g-classes">flood-prone</a> today,
+        how many people live there or in the <a class="term" href="#g-floodzone">1-in-100-year flood zone</a>, and how
+        <a class="term" href="#g-rx5day">extreme rainfall</a> and flood zones may change under each <a class="term" href="#g-scenario">emissions scenario</a>.</p>
+      <p>Start with the Findings tab for headline numbers, click any sub-district for its profile, and use the Glossary for terms.
+        All figures are for <a class="term" href="#g-screening">screening and comparison</a>, not forecasts for individual sites.</p>
       <h2>Sources</h2>
       <div class="credits">
         <span>Susceptibility: GFSM v1, Waleed et al. (2026), <a href="https://doi.org/10.1038/s41597-026-08338-1" target="_blank" rel="noopener">Scientific Data</a>, CC BY 4.0.</span>
@@ -443,9 +520,10 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
           <a href="https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE" target="_blank" rel="noopener">GHS-POP R2023A</a> (EC JRC), CC BY 4.0.
           Each 1 km cell's people are split across the 30 m GFSM land area inside it.</span>
         <span>Climate: <a href="https://climateknowledgeportal.worldbank.org/" target="_blank" rel="noopener">World Bank CCKP</a> CMIP6 0.25° multi-model ensemble, CC BY 4.0.</span>
+        <span>Flood zones: <a href="https://www.wri.org/data/aqueduct-floods-hazard-maps" target="_blank" rel="noopener">WRI Aqueduct Floods</a> v2 hazard maps (Ward et al. 2020), 1-in-100-year river (5 CMIP5 models) and coastal (median sea-level rise, with subsidence) inundation, no flood defences.</span>
         <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
         <span>Satellite imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, 2018 onwards CC BY-NC-SA 4.0.</span>
-        <span>Basemap labels:<a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
+        <span>Basemap labels: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
         <span>Areas are true ground areas, corrected for Mercator distortion. Raster tiles built with gdal2tiles.</span>
         <span><a href="https://github.com/stardustcafe/india-tehsil-flood-atlas" target="_blank" rel="noopener">Code and data on GitHub</a></span>
       </div>
@@ -460,7 +538,7 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
       <button type="button" id="zfit" aria-label="Fit to selection" style="font-size:13px">⤢</button>
     </div>
 
-    <div class="scen float" id="scen" hidden>
+    <div class="scen float" id="scen">
       <button type="button" class="scen-btn" id="scenBtn" aria-expanded="false" aria-controls="scenPop">
         <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M5.5 12.5a3.5 3.5 0 0 1 .4-7 4.5 4.5 0 0 1 8.6 1.2 3 3 0 0 1-.5 5.8z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 14.5l-1 2.5M10.5 14.5l-1 2.5M14 14.5l-1 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         <span><span class="k">Climate scenario</span><b class="scenTxt"></b></span></button>
@@ -476,6 +554,10 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
       <div class="lg-body" id="lgBody">
         <div class="lg" id="lgPlaces" hidden><h3>Places to visit</h3><div class="gleg" id="plLeg"></div><p>Gold ring: UNESCO World Heritage.</p></div>
         <div class="lg" id="lgClim" hidden><h3 id="lgClimT">Change in wettest 5-day rain</h3><div class="gleg" id="climLeg"></div><p>Faded cells: fewer than 90% of models project an increase.</p></div>
+        <div class="lg" id="lgFlood" hidden><h3 id="lgFloodT">Flood depth, 1-in-100-year</h3>
+          <div class="gleg"><span><i style="background:#bfe6f0"></i>up to 0.5 m</span><span><i style="background:#7cc4dc"></i>0.5–1 m</span>
+          <span><i style="background:#3a9ac2"></i>1–2 m</span><span><i style="background:#1c6aa0"></i>2–4 m</span><span><i style="background:#0b3d6e"></i>over 4 m</span></div>
+          <p>No flood defences. WRI Aqueduct Floods.</p></div>
         <div class="lg" id="lgPop" hidden><h3 id="lgPopT">People per km²</h3>
           <div class="gleg"><span><i style="background:var(--d1)"></i>1–10</span><span><i style="background:var(--d2)"></i>10–50</span>
           <span><i style="background:var(--d3)"></i>50–250</span><span><i style="background:var(--d4)"></i>250–1k</span>
@@ -512,9 +594,13 @@ const METRICS = {
   x:  { label: "People in High+",    opt: "People on High+ land", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true },
   xp: { label: "% people in High+",  opt: "Share of people on High+ land", fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1, pop: true },
   c5: { label: "Δ 5-day max rain",   opt: "Change in wettest 5-day rain", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [0, 5, 10, 15, 20, 30], step: 1, max: 60, clim: true },
+  fz0: { label: "People in 100-yr flood zone, today", opt: "People in 1-in-100-year flood zone, today", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true },
+  fz:  { label: "People in 100-yr flood zone, future", opt: "People in 1-in-100-year flood zone, future", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true },
+  fzd: { label: "Change in people in flood zone", opt: "Change in people in flood zone vs today", fmt: v => (v > 0 ? "+" : v < 0 ? "−" : "") + fmtPeople(Math.abs(v)), tick: v => (v < 0 ? "−" : "") + fmtShort(Math.abs(v)), fixed: [0, 500, 2000, 5000, 20000, 50000], step: 500, max: 100000, pop: true, flood: true },
   cf: { label: "Flood pressure",     opt: "Flood pressure (climate-adjusted)", fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
-const METRIC_GROUPS = [["Flood susceptibility", ["h", "p5", "m", "hk"]], ["People exposed", ["x", "xp"]], ["Climate outlook", ["c5", "cf"]]];
+const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People on flood-prone land", ["x", "xp"]],
+  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["Rainfall outlook", ["c5", "cf"]]];
 const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
   gpw: { label: "GPW v4.11", hint: "GPW spreads each census sub-district's count evenly over its area, so it cannot tell whether settlements sit on the floodplain or above it." },
@@ -524,6 +610,7 @@ const CLASS_NAMES = ["Very Low", "Low", "Moderate", "High", "Very High"];
 const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], src: "gpw", popKind: "high", srcs: [],
   // map layers, each with its own switch and opacity (places and OSM context are handled by their own sections)
   L: { choro: { on: true, op: 0.9 }, gfsm: { on: false, op: 0.85 }, pop: { on: false, op: 0.9 }, clim: { on: false, op: 0.85 }, bounds: { on: true },
+       flood: { on: false, op: 0.9, when: "future" },
        sat: { on: false, op: 1, year: "2024" } } };
 // Sentinel-2 cloudless mosaics by EOX (https://s2maps.eu); the 2016 layer has no year in its name
 const SAT_YEARS = { 2024: { layer: "s2cloudless-2024_3857", lic: "CC BY-NC-SA 4.0" }, 2016: { layer: "s2cloudless_3857", lic: "CC BY 4.0" } };
@@ -563,7 +650,8 @@ function bboxOf(g) {
 }
 const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
 const inScope = p => !S.state || p.s === S.state;
-const valid = p => p.q === 0 && (!METRICS[S.metric].clim || Number.isFinite(p[S.metric]));
+const isData = m => METRICS[m].clim || METRICS[m].flood;  // values arrive with lazily loaded projections
+const valid = p => p.q === 0 && (!isData(S.metric) || Number.isFinite(p[S.metric]));
 
 /* population per source: {src}T people, {src}X people in High + Very High (scripts/06_population_exposure.py) */
 function deriveSource() {
@@ -572,7 +660,7 @@ function deriveSource() {
 }
 // map-side value of the current metric; the derived population fields are not in the GeoJSON source
 function metricExpr() {
-  if (METRICS[S.metric].clim) return ["coalesce", ["feature-state", S.metric], -999];  // set per scenario by deriveClimate
+  if (isData(S.metric)) return ["coalesce", ["feature-state", S.metric], -1e9];  // set per scenario by deriveClimate / deriveFlood
   if (S.metric === "x") return ["get", S.src + "X"];
   if (S.metric === "xp") return ["*", 100, ["/", ["get", S.src + "X"], ["max", 1, ["get", S.src + "T"]]]];
   return ["get", S.metric];
@@ -584,7 +672,8 @@ function computeBreaks() {
   let b;
   if (S.mode === "fixed") b = METRICS[m].fixed.slice();
   else {
-    const vals = P.filter(p => valid(p) && inScope(p)).map(p => p[m]).sort((a, c) => a - c);
+    // flood-zone counts are zero in most sub-districts: rank only the non-zero ones so the classes stay distinct
+    const vals = P.filter(p => valid(p) && inScope(p) && (!METRICS[m].flood || p[m] !== 0)).map(p => p[m]).sort((a, c) => a - c);
     b = [1, 2, 3, 4, 5, 6].map(k => vals[Math.min(vals.length - 1, Math.floor(k * vals.length / 7))] ?? 0);
   }
   for (let i = 1; i < b.length; i++) if (b[i] <= b[i - 1]) b[i] = b[i - 1] + 1e-6; // step needs strictly ascending
@@ -628,6 +717,11 @@ function applyRaster() {
     map.setPaintProperty("clim", "raster-opacity", L.clim.op);
   }
   map.setLayoutProperty("adm3-edges", "visibility", vis(L.bounds.on));
+  const fk = floodKey();
+  for (const k of FLOOD_KEYS) {
+    map.setLayoutProperty("flood_" + k, "visibility", vis(L.flood.on && k === fk));
+    map.setPaintProperty("flood_" + k, "raster-opacity", L.flood.op);
+  }
   for (const y in SAT_YEARS) {
     map.setLayoutProperty("sat" + y, "visibility", vis(L.sat.on && y === L.sat.year));
     map.setPaintProperty("sat" + y, "raster-opacity", L.sat.op);
@@ -640,9 +734,10 @@ const layerOn = k => k === "places" ? PL.on : k === "ctx" ? $("ctx").checked : S
 // one-line state under each layer name, and dimmed rows for layers that are off
 function renderLayerMeta() {
   const m = METRICS[S.metric];
-  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : "");
+  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())}` : "");
   if (S.srcs.length) $("metaPop").textContent = `${POP_SOURCES[S.src].label} · ${S.popKind === "high" ? "people on High+ land" : "everyone"}`;
   $("metaClim").textContent = scenLabel();
+  $("metaFlood").textContent = floodLabel();
   $("metaSat").textContent = `Sentinel-2 cloudless ${S.L.sat.year} · EOX`;
   document.querySelectorAll(".scenTxt").forEach(e => e.textContent = scenLabel());
   document.querySelectorAll(".lyr").forEach(li => li.classList.toggle("off", !layerOn(li.dataset.layer)));
@@ -651,20 +746,24 @@ function renderLayerMeta() {
 function renderLegendBox() {
   const L = S.L, m = METRICS[S.metric];
   $("lgChoro").hidden = !L.choro.on; $("lgGfsm").hidden = !L.gfsm.on; $("lgPop").hidden = !L.pop.on;
-  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on;
-  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on;
+  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on; $("lgFlood").hidden = !L.flood.on;
+  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on;
+  $("lgFloodT").textContent = `Flood depth, 1-in-100-year, ${floodLabel()}`;
   $("satCredit").textContent = `Sentinel-2 cloudless ${L.sat.year} by EOX IT Services GmbH, contains modified Copernicus Sentinel data, ${SAT_YEARS[L.sat.year].lic}.`;
-  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.pop ? ", " + POP_SOURCES[S.src].label : "");
+  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : S.metric === "fz0" ? "" : m.flood ? ", " + aqLabel(aqKey()) : "")
+    + (m.pop ? ", " + POP_SOURCES[S.src].label : "");
   if (S.srcs.length) $("lgPopT").textContent = `People per km², ${POP_SOURCES[S.src].label}${S.popKind === "high" ? ", on High+ land only" : ""}`;
   $("lgClimT").textContent = `Change in wettest 5-day rain, ${scenLabel()}`;
 }
 function buildMetricSelects() {
-  const have = k => (!METRICS[k].pop || S.srcs.length) && (!METRICS[k].clim || CL.data);
+  const have = k => !METRICS[k].pop || S.srcs.length;
   const html = METRIC_GROUPS.map(([g, ks]) => ks.filter(have)).map((ks, i) => ks.length
     ? `<optgroup label="${METRIC_GROUPS[i][0]}">${ks.map(k => `<option value="${k}">${METRICS[k].opt}</option>`).join("")}</optgroup>` : "").join("");
   document.querySelectorAll(".metricSel").forEach(s => { s.innerHTML = html; s.value = S.metric; });
 }
-function setMetric(k) {
+async function setMetric(k) {
+  if (METRICS[k].clim) await loadClimate();
+  if (METRICS[k].flood) await loadFlood();
   S.metric = k; S.thr = 0;
   document.querySelectorAll(".metricSel").forEach(s => s.value = k);
   computeRanks(); renderThreshold(); refresh(); renderLayerMeta(); renderLegendBox();
@@ -673,7 +772,21 @@ function setSource(k) {
   S.src = k;
   document.querySelectorAll(".srcSel").forEach(s => s.value = k);
   document.querySelectorAll(".srcHint").forEach(e => e.textContent = POP_SOURCES[k].hint);
-  deriveSource(); computeRanks(); refresh(); renderClimate(); renderLayerMeta(); renderLegendBox();
+  deriveSource(); deriveFlood(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
+}
+function showTab(id) {
+  document.querySelectorAll('[role="tab"]').forEach(x => {
+    if (!x.closest(".tabs")) return;
+    x.setAttribute("aria-selected", x.id === id); $(x.getAttribute("aria-controls")).hidden = x.id !== id;
+  });
+  if (id === "tabS") { loadClimate(); loadFlood(); loadPlaces(); }
+}
+function filterGlossary() {
+  const q = $("glossQ").value.trim().toLowerCase();
+  let any = false;
+  document.querySelectorAll(".ge").forEach(g => { const on = !q || g.textContent.toLowerCase().includes(q); g.hidden = !on; any ||= on; });
+  document.querySelectorAll(".gloss dl").forEach(dl => { const h = dl.previousElementSibling; h.hidden = ![...dl.children].some(g => !g.hidden); });
+  $("glossNone").hidden = any;
 }
 function toggleScen(open) {
   const o = open ?? $("scenPop").hidden;
@@ -701,19 +814,24 @@ function applyTheme() {
 }
 
 /* ---------- panel rendering ---------- */
-function renderSummary() {
-  const sc = P.filter(p => valid(p) && inScope(p));
-  const va = sc.reduce((s, p) => s + p.va, 0), hk = sc.reduce((s, p) => s + p.hk, 0);
-  const pt = sc.reduce((s, p) => s + p.pt, 0), x = sc.reduce((s, p) => s + p.x, 0);
-  if (S.srcs.length) {
-    $("sumX").textContent = fmtPeople(x);
-    $("sumXp").textContent = pt ? (100 * x / pt).toFixed(1) + "%" : "–";
-    $("sumSrc").textContent = `Population: ${POP_SOURCES[S.src].label}, 2020, ${fmtPeople(pt)} people in ${S.state || "India"}.`;
+// one headline number and one plain sentence per row; terms link to the glossary
+const term = (id, text) => `<a class="term" href="#g-${id}">${text}</a>`;
+const kfRow = ([v, text, note]) => `<div class="kf"><b>${v}</b><span>${text}${note ? `<small>${note}</small>` : ""}</span></div>`;
+const sumOf = (list, f) => list.reduce((s, p) => s + (f(p) || 0), 0);
+function renderToday() {
+  const sc = P.filter(p => p.q === 0 && inScope(p)), where = S.state || "India";
+  const va = sumOf(sc, p => p.va), hk = sumOf(sc, p => p.hk), pt = sumOf(sc, p => p.pt), x = sumOf(sc, p => p.x);
+  const rows = [[va ? (100 * hk / va).toFixed(1) + "%" : "–", `of ${esc(where)}'s land is ${term("classes", "flood-prone")} (High or Very High ${term("susceptibility", "flood susceptibility")}).`]];
+  if (S.srcs.length) rows.push([fmtPeople(x), `people live on flood-prone land, ${pt ? (100 * x / pt).toFixed(1) : 0}% of the population.`]);
+  if (FL.data && S.srcs.length) {
+    const d = FL.data.data.today, fz = sumOf(sc, p => d[S.src][p.i]);
+    rows.push([fmtPeople(fz), `people live in the ${term("floodzone", "1-in-100-year flood zone")} of rivers and the coast.`,
+      `River ${fmtPeople(sumOf(sc, p => d[S.src + "R"][p.i]))}, coast ${fmtPeople(sumOf(sc, p => d[S.src + "C"][p.i]))} (overlapping). No flood defences assumed.`]);
   }
-  $("sumPct").textContent = va ? (100 * hk / va).toFixed(1) + "%" : "–";
-  $("sumPctK").textContent = `of ${S.state || "India"}'s land rated High or Very High`;
-  $("sumKm").textContent = fmtNum(hk);
-  $("sumN").textContent = fmtNum(sc.filter(p => p.h >= 50).length) + " / " + fmtNum(sc.length);
+  rows.push([fmtNum(sc.filter(p => p.h >= 50).length), `of ${fmtNum(sc.length)} ${term("subdistrict", "sub-districts")} have more than half their land flood-prone.`]);
+  $("scopeToday").textContent = where;
+  $("kfToday").innerHTML = rows.map(kfRow).join("") +
+    (S.srcs.length ? `<p class="hint">Population: ${POP_SOURCES[S.src].label}, 2020, ${fmtPeople(pt)} people in ${esc(where)}.</p>` : "");
 }
 function renderLegend() {
   const counts = new Array(7).fill(0);
@@ -741,36 +859,39 @@ function renderThreshold() {
   r.value = S.thr;
   $("thrOut").textContent = S.thr > 0 ? "≥ " + METRICS[m].fmt(+S.thr) : "off";
 }
+let CARD_TAB = "today";
 function renderCard() {
   const card = $("card"), p = S.sel == null ? null : P[S.sel];
   if (!p) { if (PL.sel != null) renderPlaceCard(); else card.hidden = true; return; }
-  const comp = [p.p1, p.p2, p.p3, p.p4, p.p5];
-  card.innerHTML = `
-    <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
-      <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
-    ${p.q ? `<div class="flag">GFSM has no data for this sub-district (small islands are outside its coverage).</div>` : `
+  const comp = [p.p1, p.p2, p.p3, p.p4, p.p5], m = METRICS[S.metric];
+  const fz = FL.data && S.srcs.length ? FL.data.data.today[S.src][p.i] : null;
+  const today = p.q ? `<div class="flag">GFSM has no data for this sub-district (small islands are outside its coverage).</div>` : `
     <div class="comp" role="img" aria-label="Share of area by susceptibility class">${comp.map((v, i) => `<span style="width:${v}%;background:var(--g${i + 1})"></span>`).join("")}</div>
     <div class="cls">${comp.map((v, i) => `<div><i style="background:var(--g${i + 1})"></i><b>${v.toFixed(1)}%</b>${CLASS_NAMES[i]}</div>`).join("")}</div>
     <dl class="facts">
-      <div><dt>High + Very High</dt><dd>${p.h.toFixed(1)}%</dd></div>
-      <div><dt>Mean class</dt><dd>${p.m.toFixed(2)} / 5</dd></div>
-      <div><dt>High-risk area</dt><dd>${fmtNum(p.hk, 1)} km²</dd></div>
-      <div><dt>Total area</dt><dd>${fmtNum(p.a, 1)} km²</dd></div>
-      ${S.srcs.length ? `<div><dt>People in High+</dt><dd>${fmtPeople(p.x)}</dd></div>
-      <div><dt>Share of people in High+</dt><dd>${p.xp.toFixed(1)}%</dd></div>
-      <div><dt>Population</dt><dd>${fmtPeople(p.pt)}</dd></div>` : ""}
-      <div><dt>Rank in India</dt><dd>${fmtNum(p._rn)} / ${fmtNum(S.nValid)}</dd></div>
-      <div><dt>Rank in state</dt><dd>${fmtNum(p._rs)} / ${fmtNum(S.perState[p.s])}</dd></div>
+      <div><dt>${term("classes", "Flood-prone land")}</dt><dd>${p.h.toFixed(1)}% <small>${fmtNum(p.hk, p.hk < 10 ? 1 : 0)} km²</small></dd></div>
+      ${S.srcs.length ? `<div><dt>Population 2020</dt><dd>${fmtPeople(p.pt)}</dd></div>
+      <div><dt>People on flood-prone land</dt><dd>${fmtPeople(p.x)} <small>${p.xp.toFixed(0)}%</small></dd></div>
+      <div><dt>${term("floodzone", "In 100-year flood zone")}</dt><dd>${fz == null ? "…" : fmtPeople(fz)}</dd></div>` : ""}
+      ${valid(p) ? `<div><dt>Rank in India</dt><dd>${fmtNum(p._rn)} <small>of ${fmtNum(S.nValid)}</small></dd></div>
+      <div><dt>Rank in ${esc(p.s)}</dt><dd>${fmtNum(p._rs)} <small>of ${fmtNum(S.perState[p.s])}</small></dd></div>` : ""}
     </dl>
-    ${climBlock(p)}
-    ${S.srcs.length > 1 ? `<div class="where">People in High+ by source: ${S.srcs.map(k => `${POP_SOURCES[k].label} ${fmtPeople(p[k + "X"] ?? 0)}`).join(" · ")}.</div>` : ""}
-    <div class="where">Ranked by ${METRICS[S.metric].label.toLowerCase()}${METRICS[S.metric].pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`}`;
+    <div class="where">Ranks by ${m.opt.toLowerCase()}${m.pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`;
+  const future = !CL.data || !FL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + climBlock(p);
+  card.innerHTML = `
+    <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
+      <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
+    <div class="ctabs" role="tablist">${["today", "future"].map(t => `<button type="button" role="tab" data-ct="${t}" aria-selected="${t === CARD_TAB}">${t === "today" ? "Today" : "Future"}</button>`).join("")}</div>
+    ${CARD_TAB === "today" ? today : future}`;
   card.hidden = false;
   $("cardX").onclick = () => select(null);
+  card.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { CARD_TAB = b.dataset.ct; renderCard(); });
+  if (!FL.data) loadFlood();
+  if (CARD_TAB === "future") loadClimate();
 }
 function refresh({ breaks = true } = {}) {
   if (breaks) computeBreaks();
-  applyPaint(); renderLegend(); renderTop(); renderSummary(); renderCard();
+  applyPaint(); renderLegend(); renderTop(); renderToday(); renderCard();
 }
 
 /* ---------- interaction ---------- */
@@ -791,7 +912,7 @@ function bindUI() {
   // layer stack: switches, opacity sliders, expandable settings
   document.querySelectorAll(".lyr-on").forEach(inp => inp.addEventListener("change", () => {
     const k = inp.dataset.layer; S.L[k].on = inp.checked;
-    if (k === "clim" && inp.checked) updateClimImage();
+    if (k === "clim" && inp.checked) loadClimate().then(() => { updateClimImage(); applyRaster(); });
     if (k === "sat" && inp.checked && S.L.choro.on && S.L.choro.op > 0.5) {  // let the imagery show through the fill
       S.L.choro.op = 0.5; $("opChoro").value = 50; $("opChoroOut").textContent = "50%";
     }
@@ -823,9 +944,25 @@ function bindUI() {
   });
   // sidebar tabs
   const tabs = [...document.querySelectorAll('[role="tab"]')];
-  tabs.forEach(t => t.addEventListener("click", () => tabs.forEach(x => {
-    x.setAttribute("aria-selected", x === t); $(x.getAttribute("aria-controls")).hidden = x !== t;
-  })));
+  tabs.forEach(t => t.addEventListener("click", () => showTab(t.id)));
+  // glossary links anywhere in the page open the Glossary tab at that term
+  document.addEventListener("click", e => {
+    const a = e.target.closest("a.term"); if (!a) return;
+    e.preventDefault();
+    const el = $(a.getAttribute("href").slice(1)); if (!el) return;
+    $("glossQ").value = ""; filterGlossary();
+    showTab("tabG");
+    el.scrollIntoView({ block: "start", behavior: "smooth" });
+    el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+    if (matchMedia("(max-width: 760px)").matches) $("tab-gloss").scrollIntoView({ block: "start" });
+  });
+  $("glossQ").addEventListener("input", filterGlossary);
+  $("floodWhenSeg").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    S.L.flood.when = b.dataset.w;
+    [...$("floodWhenSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+    applyRaster(); renderLayerMeta(); renderLegendBox();
+  });
   // climate scenario popover on the map; "change scenario" links elsewhere open it
   $("scenBtn").addEventListener("click", () => toggleScen());
   document.addEventListener("click", e => {
@@ -848,7 +985,7 @@ function bindUI() {
   $("st").addEventListener("change", e => {
     S.state = e.target.value;
     if (S.sel != null && S.state && P[S.sel].s !== S.state) select(null);
-    refresh(); applyPlaces(); renderPlaces(); renderClimate(); fitScope();
+    refresh(); applyPlaces(); renderPlaces(); renderFuture(); fitScope();
   });
   $("thr").addEventListener("input", e => { S.thr = +e.target.value; renderThreshold(); applyPaint(); });
   $("topList").addEventListener("click", e => { const b = e.target.closest("button"); if (b) select(+b.dataset.i, true); });
@@ -888,7 +1025,7 @@ function bindMap() {
     const f = e.features[0]; if (!f) return;
     if (S.hover !== f.id) { setFS(S.hover, "hover", false); S.hover = f.id; setFS(f.id, "hover", true); }
     const p = P[f.id], m = S.metric;
-    tip.innerHTML = `<b>${esc(p.n)}</b><small>${esc(p.d)}, ${esc(p.s)}</small><div class="tv">${p.q ? "No GFSM data" : METRICS[m].label + ": " + METRICS[m].fmt(p[m])}</div>`;
+    tip.innerHTML = `<b>${esc(p.n)}</b><small>${esc(p.d)}, ${esc(p.s)}</small><div class="tv">${p.q ? "No GFSM data" : !Number.isFinite(p[m]) ? "No data" : METRICS[m].label + ": " + METRICS[m].fmt(p[m])}</div>`;
     const W = map.getContainer().clientWidth, x = e.point.x + 14, y = e.point.y + 14;
     tip.style.left = (x + 240 > W ? e.point.x - 250 : x) + "px"; tip.style.top = y + "px"; tip.hidden = false;
   });
@@ -969,19 +1106,24 @@ function climImage() {
   return url;
 }
 function updateClimImage() { if (map.getSource("clim")) map.getSource("clim").updateImage({ url: climImage() }); }
-function renderClimate() {
-  if (!CL.data) return;
-  const d = CL.data.data[climKey()], sc = P.filter(p => p.q === 0 && inScope(p) && d.d5[p.i] != null);
+function renderFuture() {
+  if (!CL.data || !FL.data) { $("kfFuture").innerHTML = `<p class="hint">Loading projections…</p>`; return; }
+  const d = CL.data.data[climKey()], sc = P.filter(p => p.q === 0 && inScope(p) && d.d5[p.i] != null), where = esc(S.state || "India");
   const wavg = f => { let s = 0, w = 0; sc.forEach(p => { const v = d[f][p.i]; if (v != null) { s += v * p.va; w += p.va; } }); return w ? s / w : NaN; };
-  const x = sc.reduce((s, p) => s + p.x, 0);
-  const xRob = sc.filter(p => d.lo[p.i] > 0).reduce((s, p) => s + p.x, 0);
-  const x20 = sc.filter(p => d.d5[p.i] >= 20).reduce((s, p) => s + p.x, 0);
-  const pct = v => x ? ` (${(100 * v / x).toFixed(0)}%)` : "";
-  $("climSum").innerHTML = `
-    <div><div class="v">${signed(wavg("d5"), 1)}</div><div class="k">wettest 5-day rain, ${esc(S.state || "India")} average (model range ${signed(wavg("lo"))} to ${signed(wavg("hi"))})</div></div>
-    <div><div class="v">${signed(wavg("d1"), 1)}</div><div class="k">wettest single day; annual rain ${signed(wavg("dp"), 1)}</div></div>
-    ${S.srcs.length ? `<div><div class="v">${fmtPeople(xRob)}</div><div class="k">people on High+ land where 90% of models project an increase${pct(xRob)}</div></div>
-    <div><div class="v">${fmtPeople(x20)}</div><div class="k">people on High+ land where it rises 20% or more${pct(x20)}</div></div>` : ""}`;
+  const rows = [[signed(wavg("d5")), `change in the ${term("rx5day", "wettest 5-day rainfall")} of the year, ${where} average.`,
+    `${term("range", "Models range")} ${signed(wavg("lo"))} to ${signed(wavg("hi"))}. Drives river floods.`],
+    [signed(wavg("d1")), `change in the ${term("rx1day", "wettest day")}, which drives flash and urban floods.`]];
+  if (S.srcs.length) {
+    const all = P.filter(p => inScope(p)), k = aqKey(), f = FL.data.data[k], t = FL.data.data.today;
+    const now = sumOf(all, p => t[S.src][p.i]), fut = sumOf(all, p => f[S.src][p.i]), chg = fut - now;
+    rows.push([fmtPeople(fut), `people would live in the ${term("floodzone", "1-in-100-year flood zone")} (${aqLabel(k)}),
+      ${chg >= 0 ? fmtPeople(chg) + " more" : fmtPeople(-chg) + " fewer"} than today.`, `2020 population held constant; ${term("defences", "no flood defences")}.`]);
+    const x = sumOf(sc, p => p.x), xRob = sumOf(sc.filter(p => d.lo[p.i] > 0), p => p.x);
+    rows.push([fmtPeople(xRob), `people live on flood-prone land where ${term("agree", "models agree")} extreme rain will increase${x ? `, ${(100 * xRob / x).toFixed(0)}% of all on such land` : ""}.`]);
+  }
+  $("kfFuture").innerHTML = rows.map(kfRow).join("") +
+    `<p class="hint">Rainfall: median of about 30 CMIP6 models against 1995–2014. Flood zone: WRI Aqueduct, median of 5 models.
+      ${term("screening", "Screening figures, not forecasts.")}</p>`;
 }
 function climBlock(p) {
   if (!CL.data || CL.data.base5[p.i] == null) return "";
@@ -990,32 +1132,73 @@ function climBlock(p) {
     return `<tr class="${s === CL.ssp ? "on" : ""}"><td>${SSP_INFO[s][0]}</td><td>${v == null ? "–" : signed(v)} <small>${d.lo[i] == null ? "" : signed(d.lo[i]) + " to " + signed(d.hi[i])}</small></td>
       <td>${d.d1[i] == null ? "–" : signed(d.d1[i])}</td><td>${d.lo[i] > 0 ? "yes" : "no"}</td></tr>`;
   }).join("");
-  return `<div><div class="where" style="margin:0 0 4px">Wettest 5-day rain 1995–2014: ${fmtNum(CL.data.base5[i])} mm. Change by ${perLabel(CL.per)}:</div>
-    <table class="ctab"><tr><th>Scenario</th><th>5-day max <small>(10–90% of models)</small></th><th>1-day</th><th>Models agree</th></tr>${rows}</table>
+  return `<div><h3>Extreme rainfall, ${perLabel(CL.per)} vs 1995–2014</h3>
+    <table class="ctab"><tr><th>Scenario</th><th>${term("rx5day", "Wettest 5 days")} <small>(${term("range", "range")})</small></th><th>${term("rx1day", "Wettest day")}</th><th>${term("agree", "Agree")}</th></tr>${rows}</table>
+    <div class="where" style="margin-top:4px">Today's wettest 5 days: ${fmtNum(CL.data.base5[i])} mm.</div>
     ${Number.isFinite(p.cf) ? `<div class="where" style="margin-top:4px">Flood pressure ${p.cf.toFixed(1)} against ${p.h.toFixed(1)} today (${SSP_INFO[CL.ssp][0]}).</div>` : ""}</div>`;
 }
 function setClimate(ssp = CL.ssp, per = CL.per) {
   CL.ssp = ssp; CL.per = per;
   [...$("sspSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.s === ssp));
   [...$("perSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.p === per));
-  deriveClimate();
-  if (METRICS[S.metric].clim) computeRanks();
-  if (S.L.clim.on) updateClimImage();
-  refresh(); renderClimate(); renderLayerMeta(); renderLegendBox();
+  deriveClimate(); deriveFlood();
+  if (isData(S.metric)) computeRanks();
+  if (S.L.clim.on && CL.data) updateClimImage();
+  refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
 }
-async function addClimate() {
-  try { CL.data = await fetchOk("data/climate.json", "json"); } catch { return; }
+const PERIODS = ["2020", "2040", "2060", "2080"];
+function initClimateUI() {
   $("sspSeg").innerHTML = Object.entries(SSP_INFO).map(([k, [a, b]]) => `<button type="button" data-s="${k}" aria-pressed="${k === CL.ssp}">${a}<small>${b.replace(" · ", "<br>")}</small></button>`).join("");
-  $("perSeg").innerHTML = CL.data.periods.map(p => p.slice(0, 4)).map(p => `<button type="button" data-p="${p}" aria-pressed="${p === CL.per}">${perLabel(p)}</button>`).join("");
+  $("perSeg").innerHTML = PERIODS.map(p => `<button type="button" data-p="${p}" aria-pressed="${p === CL.per}">${perLabel(p)}</button>`).join("");
   $("sspSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setClimate(b.dataset.s); });
   $("perSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setClimate(undefined, b.dataset.p); });
   $("climLeg").innerHTML = CLIM_COLORS.map((c, i) => `<span><i style="background:${c}"></i>${CLIM_LABELS[i]}</span>`).join("");
+}
+// projections are fetched the first time something needs them, so the first map view loads only the boundaries
+const LOADS = {};
+const once = (key, load) => LOADS[key] ??= load().catch(e => { delete LOADS[key]; console.warn(key, e); });
+function dataLoaded() {
+  if (isData(S.metric)) computeRanks();
+  refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
+}
+const loadClimate = () => once("climate", async () => {
+  CL.data = await fetchOk("data/climate.json", "json");
   const g = CL.data.grid, east = g.west + g.cols * g.res, south = g.north - g.rows * g.res;
   map.addSource("clim", { type: "image", url: climImage(), coordinates: [[g.west, g.north], [east, g.north], [east, south], [g.west, south]] });
   map.addLayer({ id: "clim", type: "raster", source: "clim", layout: { visibility: "none" },
     paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": 0.85 } }, "adm3-edges");
-  $("lyrClim").hidden = $("climField").hidden = $("scen").hidden = false;
-  buildMetricSelects(); deriveClimate(); renderClimate(); renderCard(); renderLayerMeta(); renderLegendBox();
+  deriveClimate(); dataLoaded();
+});
+
+/* ---------- 1-in-100-year flood zones (scripts/10_aqueduct_floods.py): WRI Aqueduct Floods v2 ---------- */
+const FL = { data: null };
+const FLOOD_KEYS = ["today", "rcp4p5_2030", "rcp4p5_2050", "rcp4p5_2080", "rcp8p5_2030", "rcp8p5_2050", "rcp8p5_2080"];
+// Aqueduct has RCP4.5 and RCP8.5 only, centred on 2030 / 2050 / 2080: nearest match to the chosen SSP and period
+const AQ_RCP = { ssp126: "rcp4p5", ssp245: "rcp4p5", ssp370: "rcp8p5", ssp585: "rcp8p5" };
+const AQ_YEAR = { 2020: "2030", 2040: "2050", 2060: "2080", 2080: "2080" };
+const aqKey = () => `${AQ_RCP[CL.ssp]}_${AQ_YEAR[CL.per]}`;
+const aqLabel = k => k === "today" ? "today" : `${k.startsWith("rcp4p5") ? "RCP4.5" : "RCP8.5"}, ${k.slice(-4)}`;
+const floodKey = () => S.L.flood.when === "today" ? "today" : aqKey();
+const floodLabel = () => S.L.flood.when === "today" ? "Today (1960–99 climate)" : `${aqLabel(aqKey())} · nearest to ${SSP_INFO[CL.ssp][0]}`;
+function deriveFlood() {
+  if (!FL.data || !S.srcs.length) return;
+  const t = FL.data.data.today[S.src], f = FL.data.data[aqKey()][S.src];
+  P.forEach(p => { p.fz0 = t[p.i]; p.fz = f[p.i]; p.fzd = f[p.i] - t[p.i]; });
+  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i }, { fz0: p.fz0, fz: p.fz, fzd: p.fzd }));
+}
+const loadFlood = () => once("flood", async () => {
+  FL.data = await fetchOk("data/flood.json", "json");
+  deriveFlood(); dataLoaded();
+});
+function floodBlock(p) {
+  if (!S.srcs.length) return "";
+  const i = p.i, D = FL.data.data, s = S.src, cur = aqKey();
+  const cell = k => { const d = D[k]; return `<td class="${k === cur ? "on" : ""}">${fmtShort(d[s][i])} <small>${fmtShort(d[s + "Lo"][i])}–${fmtShort(d[s + "Hi"][i])}</small></td>`; };
+  const rows = FLOOD_KEYS.slice(1, 4).map(k => k.slice(-4)).map(y => `<tr><td>${y}</td>${cell("rcp4p5_" + y)}${cell("rcp8p5_" + y)}</tr>`).join("");
+  return `<div><h3>People in the ${term("floodzone", "1-in-100-year flood zone")}</h3>
+    <div class="where" style="margin:0 0 4px">Today ${fmtPeople(D.today[s][i])} (river ${fmtPeople(D.today[s + "R"][i])}, coast ${fmtPeople(D.today[s + "C"][i])}; the two can overlap).</div>
+    <table class="ctab"><tr><th>Year</th><th>RCP4.5 <small>(${term("range", "range")})</small></th><th>RCP8.5</th></tr>${rows}</table>
+    <div class="where" style="margin-top:4px">${POP_SOURCES[s].label} 2020 population, ${term("defences", "no flood defences")}. Highlighted: nearest to ${SSP_INFO[CL.ssp][0]}, ${perLabel(CL.per)}.</div></div>`;
 }
 
 /* ---------- places to visit (scripts/08_tourism_places.py): OSM features with Wikidata links ---------- */
@@ -1065,7 +1248,7 @@ function renderPlaces() {
   const tot = sc.length, hi = sc.filter(p => p.g >= 4).length;
   $("plHint").textContent = `${fmtNum(tot)} notable sites in ${S.state || "India"}; ${fmtNum(hi)} (${tot ? (100 * hi / tot).toFixed(1) : 0}%) stand on land rated High or Very High. Gold ring: UNESCO World Heritage. Better-known sites win where icons overlap.`;
   const top = sc.filter(p => p.g >= 4 && PL.cats.has(p.c)).slice(0, 8);  // data is sorted by prominence
-  $("plTopLbl").textContent = `Best-known sites on High+ land in ${S.state || "India"}`;
+  $("plTopLbl").textContent = `Best-known sites on flood-prone land in ${S.state || "India"}`;
   $("plTop").innerHTML = top.map((p, i) => `<li><button type="button" data-p="${p._i}">
     <span class="rk">${i + 1}</span><span class="nm">${esc(p.n)} <small>· ${esc(p.a)}${S.state ? "" : ", " + esc(p.s)}</small></span>
     <span class="val"><img src="${svgUrl(badgeSvg(PLACE_CATS[p.c], p.u))}" alt="" width="16" height="16"></span></button></li>`).join("");
@@ -1116,7 +1299,7 @@ async function addPlaces() {
       "text-field": ["step", ["zoom"], "", 8, ["get", "n"]], "text-font": ["Noto Sans Regular"], "text-size": 11,
       "text-offset": [0, 1.25], "text-anchor": "top", "text-optional": true, "text-max-width": 9, "text-padding": 3 },
     paint: { ...labelPaint(), "icon-opacity": ["case", ["boolean", ["feature-state", "sel"], false], 1, 0.96] } });
-  $("lyrPlaces").hidden = $("plTopBlock").hidden = false;
+  $("plTopBlock").hidden = false;
   $("metaPlaces").textContent = `${fmtNum(PL.data.length)} notable sites, 10 types`;
   $("plLeg").innerHTML = Object.values(PLACE_CATS).map(c => `<span><img src="${svgUrl(badgeSvg(c))}" alt="">${esc(c.label.split(",")[0])}</span>`).join("");
   renderPlaces();
@@ -1130,8 +1313,10 @@ async function addPlaces() {
   });
   map.on("mouseleave", "places-pt", () => { map.getCanvas().style.cursor = ""; $("tip").hidden = true; });
 }
+const loadPlaces = () => once("places", addPlaces);
 function bindPlacesUI() {
-  $("plOn").addEventListener("change", e => { PL.on = e.target.checked; applyPlaces(); renderLegendBox(); renderLayerMeta(); });
+  $("plOn").addEventListener("change", async e => { PL.on = e.target.checked; await loadPlaces(); applyPlaces(); renderLegendBox(); renderLayerMeta(); });
+  $("lyrPlaces").querySelector(".lyr-name").addEventListener("click", loadPlaces);
   $("plHigh").addEventListener("change", e => { PL.high = e.target.checked; applyPlaces(); });
   $("plCats").addEventListener("change", e => {
     const k = e.target.dataset.c; if (!k) return;
@@ -1199,13 +1384,18 @@ function bindPlacesUI() {
     POP_LAYERS.forEach(id => map.addLayer({ id, type: "raster", source: id, layout: { visibility: "none" },
       paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": 1 } }));
     tileIndex("gfsm").catch(() => {});  // warm the index so the first toggle is instant
+    for (const k of FLOOD_KEYS) {  // flood depth tiles, z4-8; a tileset's index loads only when it is first shown
+      map.addSource("flood_" + k, { type: "raster", tiles: [`tiles://flood_${k}/{z}/{x}/{y}`], tileSize: 256, minzoom: 4, maxzoom: 8, bounds: [68, 6.3, 97.6, 37.3] });
+      map.addLayer({ id: "flood_" + k, type: "raster", source: "flood_" + k, layout: { visibility: "none" },
+        paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.L.flood.op } });
+    }
     map.addLayer({ id: "adm3-edges", type: "line", source: "adm3Edges", paint: { "line-color": css("--edge"), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.15, 7, 0.5, 10, 1] } });
     map.addLayer({ id: "state-edges", type: "line", source: "stateEdges", paint: { "line-color": css("--state-edge"), "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.7, 8, 1.6] } });
     map.addLayer({ id: "coast", type: "line", source: "coast", paint: { "line-color": css("--state-edge"), "line-width": 0.8 } });
     map.addLayer({ id: "hl", type: "line", source: "adm3", paint: {
       "line-color": css("--ink"),
       "line-width": ["case", ["boolean", ["feature-state", "sel"], false], 2.6, ["boolean", ["feature-state", "hover"], false], 1.4, 0] } });
-    bindMap(); bindPlacesUI(); refresh(); addClimate(); addContext().then(addPlaces);
+    bindMap(); bindPlacesUI(); initClimateUI(); refresh(); renderFuture(); addContext();
     $("loading").hidden = true;
   });
 })();

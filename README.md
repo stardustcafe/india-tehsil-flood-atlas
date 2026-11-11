@@ -77,6 +77,28 @@ over the Indian monsoon. "Models agree" in the viewer means at least 90% of mode
 By 2080–99 the median sub-district's wettest 5-day rainfall rises by about 10% (SSP1-2.6), 13% (SSP2-4.5),
 20% (SSP3-7.0) and 26% (SSP5-8.5).
 
+### Flood zones (1-in-100-year)
+
+`scripts/10_aqueduct_floods.py` → `data/processed/india_adm3_floodzone.csv`, `viewer/data/flood.json`, `viewer/data/flood_*/`
+
+WRI Aqueduct Floods v2 inundation maps (Ward et al. 2020, CC BY 4.0), about 1 km, without flood defences, for the
+1-in-100-year flood: river (GLOFRIS; baseline 1960–99 climate, and 5 CMIP5 models under RCP4.5 and RCP8.5
+for 2030, 2050 and 2080) and coast (median sea-level rise, with land subsidence). A cell is in the flood
+zone when river or coastal depth is above zero. Its 2020 population is shared among the sub-districts it
+overlaps (10" rasterisation). River results are worked out per model; the CSV gives the median and the
+lowest/highest of the 5 models. Population is held at 2020.
+
+| People in the flood zone (crore) | GPW | GHS-POP |
+|---|---|---|
+| Today | 18.2 | 14.6 |
+| RCP4.5, 2050 / 2080 | 19.4 / 20.9 | 15.3 / 16.6 |
+| RCP8.5, 2050 / 2080 | 20.7 / 22.5 | 16.7 / 18.4 |
+
+The viewer matches these to the CMIP6 scenarios by nearest RCP (SSP1-2.6 and SSP2-4.5 → RCP4.5; SSP3-7.0
+and SSP5-8.5 → RCP8.5) and period (2020–39 → 2030, 2040–59 → 2050, 2060–79 and 2080–99 → 2080), and labels
+which map is shown. Without defences the figures are an upper bound where embankments hold; the 1 km cells
+also count everyone in a cell that is only partly flooded.
+
 ### Places to visit
 
 `scripts/08_tourism_places.py` → `data/processed/india_places.{csv,geojson}`, `viewer/data/places.geojson`
@@ -106,6 +128,7 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/python scripts/03_build_viewer_data.py           # rerun to add population to the TopoJSON
 .venv/Scripts/python scripts/08_tourism_places.py              # places to visit from OSM + Wikidata
 .venv/Scripts/python scripts/09_climate_projections.py         # CMIP6 rainfall extremes (downloads ~660 MB once)
+.venv/Scripts/python scripts/10_aqueduct_floods.py             # Aqueduct flood zones + depth tiles (streams ~3 GB, keeps India crops)
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size
@@ -121,12 +144,16 @@ Display tiles only: class shares shift by about ±1 percentage point from the 30
 Serve the folder rather than opening the file directly: `python -m http.server -d viewer 8000`.
 It can be hosted as-is on GitHub Pages or any static host.
 
-The sidebar has three tabs. **Layers** lists every map layer in drawing order (places, labels and rivers,
-boundaries, rainfall change, population, GFSM 30 m, sub-district statistics, and a Sentinel-2 cloudless satellite
-basemap by EOX for 2024 or 2016), each with its own switch, opacity
-and settings, so layers can be combined. **Statistics** holds the summary for India or the chosen state, the
-climate outlook and the rankings. **About** holds the method notes and sources. The map carries a legend for every
-visible layer and one climate-scenario control (SSP and period) that applies everywhere.
+The sidebar has four tabs. **Layers** lists every map layer in drawing order (places, labels and rivers,
+boundaries, rainfall change, 1-in-100-year flood zone, population, GFSM 30 m, sub-district statistics, and a
+Sentinel-2 cloudless satellite basemap by EOX for 2024 or 2016), each with its own switch, opacity and settings.
+**Findings** gives headline numbers as plain sentences for India or the chosen state, today and under the chosen
+scenario, plus rankings. **Glossary** defines the terms; underlined terms anywhere in the viewer link to it.
+**About** holds the purpose, caveats and sources. Clicking a sub-district opens a profile with Today and Future tabs.
+
+For speed on GitHub Pages the first view loads only the boundaries (0.9 MB gzipped). Climate (0.9 MB),
+flood-zone (0.6 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
+raster layers fetch only the tile bundles in view.
 
 Tiles are selected by intersecting the GFSM tile index with India's boundary buffered by 0.1°,
 then extracted from the four regional archives (N00E060, N00E080, N20E060, N20E080).
