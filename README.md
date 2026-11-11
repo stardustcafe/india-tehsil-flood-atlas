@@ -121,6 +121,12 @@ Display tiles only: class shares shift by about ±1 percentage point from the 30
 Serve the folder rather than opening the file directly: `python -m http.server -d viewer 8000`.
 It can be hosted as-is on GitHub Pages or any static host.
 
+The sidebar has three tabs. **Layers** lists every map layer in drawing order (places, labels and rivers,
+boundaries, rainfall change, population, GFSM 30 m, sub-district statistics), each with its own switch, opacity
+and settings, so layers can be combined. **Statistics** holds the summary for India or the chosen state, the
+climate outlook and the rankings. **About** holds the method notes and sources. The map carries a legend for every
+visible layer and one climate-scenario control (SSP and period) that applies everywhere.
+
 Tiles are selected by intersecting the GFSM tile index with India's boundary buffered by 0.1°,
 then extracted from the four regional archives (N00E060, N00E080, N20E060, N20E080).
 

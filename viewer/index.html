@@ -1,34 +1,41 @@
 <title>India Tehsil Flood Atlas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: full-height app — control panel on the left (stacks under the map on phones), WebGL map fills the rest. */
+/* Layout: app bar across the top; sidebar (search, tabs, layer stack) on the left; map with floating legend,
+   scenario control and detail card on the right. On phones the map sits above the sidebar. */
 :root {
-  --bg: #e9eeec; --panel: #f7f9f8; --ink: #13201d; --muted: #586864; --line: #cfd9d5;
-  --accent: #1d5d77; --accent-soft: #d7e7ee; --map-bg: #dbe3e0; --nodata: #b4bfbb;
-  --edge: rgba(19, 32, 29, .28); --state-edge: rgba(19, 32, 29, .7); --focus: #1d5d77; --river: #1f6fa8;
+  --bar: #0f1d33; --bar-ink: #f2f5fa; --bar-muted: #9fb0c8; --bar-line: #23324b;
+  --bg: #eef1f5; --panel: #ffffff; --sunk: #f3f5f8; --ink: #121a26; --muted: #5d6878; --line: #e1e6ed; --line-strong: #c9d1dc;
+  --accent: #1f62d0; --accent-ink: #ffffff; --accent-soft: #e8effb; --map-bg: #dde3ea; --nodata: #b9c1cc;
+  --edge: rgba(18, 26, 38, .28); --state-edge: rgba(18, 26, 38, .72); --focus: #1f62d0; --river: #2a6fb5;
+  --shadow: 0 1px 2px rgba(15, 29, 51, .08), 0 6px 20px rgba(15, 29, 51, .12);
   /* sequential risk ramp, low → high */
   --r0: #f7f1d6; --r1: #f4d68e; --r2: #eeab5d; --r3: #df753d; --r4: #c0423b; --r5: #8d2046; --r6: #4c1240;
   /* GFSM source class colours (Waleed et al. 2026) */
   --g1: #2c7bb6; --g2: #abd9e9; --g3: #ffffbf; --g4: #fdae61; --g5: #d7191c;
   /* population density classes (scripts/07_build_pop_tiles.py) */
   --d1: #e9e3f2; --d2: #c5b3dc; --d3: #9d84c4; --d4: #7652a8; --d5: #52307f; --d6: #2a1450;
-  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
-  --body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cond: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #0d1315; --panel: #131b1e; --ink: #e3ebe8; --muted: #93a39f; --line: #25343a;
-  --accent: #79bcd6; --accent-soft: #1b3440; --map-bg: #0a1012; --nodata: #3a464a;
-  --edge: rgba(227, 235, 232, .16); --state-edge: rgba(227, 235, 232, .55); --focus: #79bcd6; --river: #6ab4e6;
+  --bar: #070c14; --bar-ink: #e8edf5; --bar-muted: #7f8ea5; --bar-line: #1a2433;
+  --bg: #0b1018; --panel: #121924; --sunk: #0e141d; --ink: #e4e9f1; --muted: #8c98aa; --line: #212b39; --line-strong: #2f3b4c;
+  --accent: #5b9dff; --accent-ink: #06101f; --accent-soft: #16243a; --map-bg: #0a0f16; --nodata: #3a4554;
+  --edge: rgba(228, 233, 241, .16); --state-edge: rgba(228, 233, 241, .55); --focus: #5b9dff; --river: #5ea8e8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .45);
   --r0: #23343a; --r1: #4e5232; --r2: #93702a; --r3: #d08b26; --r4: #f0663a; --r5: #ff3f5f; --r6: #ffa3c6;
   color-scheme: dark;
 } }
 :root[data-theme="dark"] {
-  --bg: #0d1315; --panel: #131b1e; --ink: #e3ebe8; --muted: #93a39f; --line: #25343a;
-  --accent: #79bcd6; --accent-soft: #1b3440; --map-bg: #0a1012; --nodata: #3a464a;
-  --edge: rgba(227, 235, 232, .16); --state-edge: rgba(227, 235, 232, .55); --focus: #79bcd6; --river: #6ab4e6;
+  --bar: #070c14; --bar-ink: #e8edf5; --bar-muted: #7f8ea5; --bar-line: #1a2433;
+  --bg: #0b1018; --panel: #121924; --sunk: #0e141d; --ink: #e4e9f1; --muted: #8c98aa; --line: #212b39; --line-strong: #2f3b4c;
+  --accent: #5b9dff; --accent-ink: #06101f; --accent-soft: #16243a; --map-bg: #0a0f16; --nodata: #3a4554;
+  --edge: rgba(228, 233, 241, .16); --state-edge: rgba(228, 233, 241, .55); --focus: #5b9dff; --river: #5ea8e8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .45);
   --r0: #23343a; --r1: #4e5232; --r2: #93702a; --r3: #d08b26; --r4: #f0663a; --r5: #ff3f5f; --r6: #ffa3c6;
   color-scheme: dark;
 }
@@ -36,297 +43,436 @@
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { height: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--body); overflow: hidden; }
-.app { display: grid; grid-template-columns: minmax(320px, 370px) 1fr; height: 100%; }
-
-/* ---------- panel ---------- */
-.panel { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto;
-  display: flex; flex-direction: column; gap: 18px; padding-block: 18px 22px;
-  padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: 18px; min-width: 0; }
-.brand h1 { font: 760 26px/1.02 var(--display); font-stretch: 78%; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
-.brand p { margin: 6px 0 0; color: var(--muted); font-size: 13px; max-width: 34ch; }
-.eyebrow { font: 600 10.5px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
-
-.summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; padding: 12px 0; border-block: 1px solid var(--line); }
-.summary .big { grid-column: 1 / -1; }
-.summary .src { grid-column: 1 / -1; color: var(--muted); font-size: 11.5px; margin-top: -4px; }
-.summary .v { font: 700 22px/1.1 var(--display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
-.summary .big .v { font-size: 34px; }
-.summary .k { color: var(--muted); font-size: 12px; }
-
-.field { display: flex; flex-direction: column; gap: 6px; }
-.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--bg); padding: 4px; border-radius: 8px; }
-.seg button { font: 500 12.5px/1.2 var(--body); color: var(--muted); background: transparent; border: 0; border-radius: 6px; padding: 8px 6px; cursor: pointer; text-align: center; }
-.seg button[aria-pressed="true"] { background: var(--panel); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.12); }
-.seg.two { grid-template-columns: 1fr 1fr; }
-.raster-ctl { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
-.gleg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
-.gleg i { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; outline: 1px solid var(--line); }
-.hint { margin: 0; color: var(--muted); font-size: 11.5px; }
-.check { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; cursor: pointer; }
-.check input { accent-color: var(--accent); width: 16px; height: 16px; margin: 0; }
-select, input[type="search"] { font: 14px var(--body); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 7px; padding: 8px 10px; width: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 var(--sans); overflow: hidden; }
+.app { display: grid; grid-template-columns: minmax(330px, 360px) 1fr; grid-template-rows: auto 1fr; height: 100%; }
 :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+button { font: inherit; color: inherit; }
 
+/* ---------- app bar ---------- */
+.bar { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; background: var(--bar); color: var(--bar-ink);
+  padding: 9px max(16px, env(safe-area-inset-right, 0px)) 9px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--bar-line); }
+.bar svg { flex: none; display: block; }
+.bar .title { min-width: 0; display: flex; align-items: baseline; gap: 4px 14px; flex-wrap: wrap; }
+.bar h1 { font: 600 18px/1.15 var(--cond); margin: 0; letter-spacing: .005em; white-space: nowrap; }
+.bar .title span { color: var(--bar-muted); font-size: 12.5px; }
+.bar .theme { margin-left: auto; flex: none; display: flex; align-items: center; gap: 6px; background: transparent; color: var(--bar-muted);
+  border: 1px solid var(--bar-line); border-radius: 4px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
+.bar .theme:hover { color: var(--bar-ink); border-color: var(--bar-muted); }
+
+/* ---------- sidebar ---------- */
+.side { grid-row: 2; background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; min-width: 0; display: flex; flex-direction: column; }
+.finder { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 14px 16px 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); }
 .search { position: relative; }
-.results { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18); overflow: hidden; }
-.results button { display: block; width: 100%; text-align: left; border: 0; background: transparent; color: var(--ink); padding: 8px 10px; font: 13px var(--body); cursor: pointer; }
+.search svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+select, input[type="search"] { font: 13.5px var(--sans); color: var(--ink); background: var(--sunk); border: 1px solid var(--line-strong); border-radius: 4px; padding: 7px 9px; width: 100%; }
+input[type="search"] { padding-left: 32px; }
+select:hover, input[type="search"]:hover { border-color: var(--muted); }
+.results { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); background: var(--panel); border: 1px solid var(--line-strong); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden; }
+.results button { display: block; width: 100%; text-align: left; border: 0; background: transparent; color: var(--ink); padding: 8px 10px; font-size: 13px; cursor: pointer; }
 .results button:hover, .results button.on { background: var(--accent-soft); }
 .results small { color: var(--muted); }
 
-.thr-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.thr-row output { font: 500 13px var(--mono); }
-input[type="range"] { width: 100%; accent-color: var(--accent); }
+.tabs { position: sticky; top: 0; z-index: 4; display: flex; background: var(--panel); border-bottom: 1px solid var(--line); padding: 0 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); gap: 18px; }
+.tabs button { background: none; border: 0; border-bottom: 2px solid transparent; padding: 10px 0 9px; margin-bottom: -1px; color: var(--muted); font-weight: 500; font-size: 13.5px; cursor: pointer; }
+.tabs button:hover { color: var(--ink); }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tabpanel { padding: 14px 16px 22px; padding-left: max(16px, env(safe-area-inset-left, 0px)); display: flex; flex-direction: column; gap: 14px; }
+.tabpanel h2 { font: 600 13.5px/1.3 var(--sans); margin: 0; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.note, .hint { margin: 0; color: var(--muted); font-size: 12px; }
+.block { display: flex; flex-direction: column; gap: 8px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.block:last-child { border-bottom: 0; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--accent); font: 500 12.5px var(--sans); cursor: pointer; text-align: left; }
+.linkbtn:hover { text-decoration: underline; }
 
-/* legend + histogram */
-.hist { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; align-items: end; height: 58px; }
-.hist div { background: var(--line); border-radius: 2px 2px 0 0; min-height: 2px; position: relative; }
-.ramp { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; height: 12px; margin-top: 2px; }
-.ramp span { border-radius: 2px; }
-.ticks { display: grid; grid-template-columns: repeat(7, 1fr); font: 10.5px/1.2 var(--mono); color: var(--muted); margin-top: 4px; font-variant-numeric: tabular-nums; }
-.ticks span { transform: translateX(-50%); white-space: nowrap; }
-.ticks span:first-child { visibility: hidden; }
-.legend-note { display: flex; justify-content: space-between; color: var(--muted); font-size: 11.5px; margin-top: 6px; gap: 8px; }
-.legend-note i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--nodata); vertical-align: -1px; margin-right: 4px; }
+/* form rows */
+.row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ctl { display: flex; flex-direction: column; gap: 5px; }
+.ctl > label, .ctl > .lbl, .row > label, .row > .lbl { font-size: 12px; font-weight: 500; color: var(--muted); }
+.row output { font: 500 12px var(--mono); color: var(--muted); }
+input[type="range"] { width: 100%; accent-color: var(--accent); margin: 0; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--line-strong); border-radius: 4px; overflow: hidden; }
+.seg button { font-size: 12.5px; color: var(--muted); background: var(--panel); border: 0; border-left: 1px solid var(--line-strong); padding: 6px 6px; cursor: pointer; text-align: center; }
+.seg button:first-child { border-left: 0; }
+.seg button:hover { color: var(--ink); background: var(--sunk); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.seg.four { grid-template-columns: repeat(4, 1fr); }
+.seg.ssp { grid-template-columns: repeat(4, 1fr); }
+.seg.ssp button { display: flex; flex-direction: column; gap: 1px; padding: 6px 2px; font-weight: 500; }
+.seg.ssp small { font-size: 10.5px; font-weight: 400; opacity: .8; }
+.check { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+.check input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0; }
 
+/* ---------- layer stack ---------- */
+.stack { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.lyr + .lyr { border-top: 1px solid var(--line); }
+.lyr-head { display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 10px; padding: 9px 12px 9px 10px; }
+.lyr.open .lyr-head { background: var(--sunk); }
+.lyr-name { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; background: none; border: 0; padding: 0; text-align: left; cursor: default; }
+button.lyr-name { cursor: pointer; }
+.lyr-name b { font-weight: 500; font-size: 13.5px; display: flex; align-items: center; gap: 6px; }
+button.lyr-name b::after { content: ""; width: 6px; height: 6px; border: solid var(--muted); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg) translateY(-2px); transition: transform .15s; }
+button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) translate(-1px, -1px); }
+.lyr-name small { color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.lyr.off .lyr-name b { color: var(--muted); }
+.lyr.off .thumb { opacity: .45; filter: saturate(.4); }
+.thumb { width: 30px; height: 22px; border-radius: 3px; outline: 1px solid var(--line-strong); outline-offset: -1px; display: grid; place-items: center; color: var(--ink); background: var(--sunk); }
+.t-choro { background: linear-gradient(90deg, var(--r1), var(--r3), var(--r5)); }
+.t-gfsm { background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3), var(--g4), var(--g5)); }
+.t-pop { background: linear-gradient(90deg, var(--d1), var(--d3), var(--d6)); }
+.t-clim { background: linear-gradient(90deg, #a6611a, #e4ecee, #5b9bd5, #0b3a75); }
+.lyr-body { padding: 4px 12px 14px 50px; display: flex; flex-direction: column; gap: 10px; background: var(--sunk); }
+.switch { position: relative; display: inline-block; width: 34px; height: 20px; flex: none; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.switch span { position: absolute; inset: 0; border-radius: 10px; background: var(--line-strong); transition: background .15s; pointer-events: none; }
+.switch span::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.3); transition: transform .15s; }
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(14px); }
+.switch input:focus-visible + span { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* places categories */
+.cats { display: flex; flex-direction: column; }
+.cats label { display: grid; grid-template-columns: 16px 20px 1fr auto; gap: 7px; align-items: center; padding: 4px 0; font-size: 12.5px; cursor: pointer; }
+.cats input { accent-color: var(--accent); width: 14px; height: 14px; margin: 0; }
+.cats img { width: 20px; height: 20px; display: block; }
+.cats .ct { font: 11px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+
+/* statistics */
+.summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+.summary .big { grid-column: 1 / -1; }
+.summary .src { grid-column: 1 / -1; color: var(--muted); font-size: 11.5px; }
+.summary .v, .clim-sum .v { font: 600 22px/1.1 var(--cond); font-variant-numeric: tabular-nums; }
+.summary .big .v { font-size: 32px; color: var(--accent); }
+.summary .k, .clim-sum .k { color: var(--muted); font-size: 12px; }
+.clim-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+.clim-sum .v { font-size: 20px; }
 .top ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
-.top li button { display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: center; width: 100%; text-align: left; background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--ink); padding: 7px 2px; cursor: pointer; font: 13px var(--body); }
+.top li button { display: grid; grid-template-columns: 22px 1fr auto; gap: 8px; align-items: center; width: 100%; text-align: left; background: transparent; border: 0; border-top: 1px solid var(--line); color: var(--ink); padding: 7px 2px; cursor: pointer; font-size: 13px; }
+.top li:first-child button { border-top: 0; }
 .top li button:hover { background: var(--accent-soft); }
 .top .rk { font: 500 11px var(--mono); color: var(--muted); }
 .top .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .top .nm small { color: var(--muted); }
 .top .val { font: 500 12.5px var(--mono); font-variant-numeric: tabular-nums; display: flex; align-items: center; gap: 6px; }
 .top .val i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
-
-/* climate projections */
-.seg.four { grid-template-columns: repeat(4, 1fr); }
-.seg.ssp button { display: flex; flex-direction: column; gap: 1px; padding: 6px 4px; }
-.seg.ssp small { font-size: 10.5px; color: var(--muted); }
-.clim-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; padding: 8px 0 2px; }
-.clim-sum .v { font: 700 19px/1.1 var(--display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
-.clim-sum .k { color: var(--muted); font-size: 11.5px; }
-.ctab { width: 100%; border-collapse: collapse; font: 12px var(--body); }
-.ctab th { text-align: left; font-weight: 500; color: var(--muted); font-size: 11px; padding: 2px 4px 3px 0; }
-.ctab td { font: 500 12px var(--mono); padding: 3px 4px 3px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
-.ctab tr.on td { color: var(--accent); font-weight: 600; }
-.ctab td small { color: var(--muted); font-weight: 400; }
-
-/* places to visit */
-.cats { display: flex; flex-direction: column; }
-.cats label { display: grid; grid-template-columns: 18px 22px 1fr auto; gap: 6px; align-items: center; padding: 4px 2px; font-size: 12.5px; cursor: pointer; border-top: 1px solid var(--line); }
-.cats label:first-child { border-top: 0; }
-.cats input { accent-color: var(--accent); width: 15px; height: 15px; margin: 0; }
-.cats img { width: 20px; height: 20px; display: block; }
-.cats .ct { font: 500 11px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-.chip { display: inline-block; padding: 1px 7px; border-radius: 4px; font: 500 12px var(--mono); color: #13201d; }
-.card .links { display: flex; gap: 12px; font-size: 12.5px; }
-.card .links a { color: var(--accent); }
-.credits { color: var(--muted); font-size: 11.5px; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); }
-.credits a { color: var(--accent); }
+.about p { margin: 0; font-size: 13px; }
+.about h2 { margin-top: 4px; }
+.credits { color: var(--muted); font-size: 12px; display: flex; flex-direction: column; gap: 6px; }
+.credits a, .about a { color: var(--accent); }
 
 /* ---------- map ---------- */
-.stage { position: relative; min-width: 0; }
+.stage { grid-row: 2; position: relative; min-width: 0; }
 #map { position: absolute; inset: 0; background: var(--map-bg); }
 .maplibregl-map { overflow: hidden; position: relative; -webkit-tap-highlight-color: transparent; }
 .maplibregl-canvas { position: absolute; left: 0; top: 0; }
 .maplibregl-canvas-container.maplibregl-interactive { cursor: grab; }
 .maplibregl-canvas-container.maplibregl-interactive:active { cursor: grabbing; }
+.float { background: var(--panel); border: 1px solid var(--line-strong); border-radius: 6px; box-shadow: var(--shadow); }
 
-.zoom { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.zoom button { width: 36px; height: 34px; border: 0; background: transparent; color: var(--ink); font: 600 17px/1 var(--body); cursor: pointer; }
+.zoom { position: absolute; top: calc(12px + env(safe-area-inset-top, 0px)); right: max(12px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; overflow: hidden; }
+.zoom button { width: 34px; height: 32px; border: 0; background: transparent; color: var(--ink); font: 500 17px/1 var(--sans); cursor: pointer; }
 .zoom button + button { border-top: 1px solid var(--line); }
-.zoom button:hover { background: var(--accent-soft); }
+.zoom button:hover { background: var(--sunk); }
 
-.tip { position: absolute; pointer-events: none; z-index: 4; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 7px; padding: 7px 9px; font-size: 12.5px; box-shadow: 0 6px 18px rgba(0,0,0,.18); max-width: 260px; }
+/* climate scenario control */
+.scen { position: absolute; z-index: 3; top: 12px; left: max(12px, env(safe-area-inset-left, 0px)); width: min(340px, calc(100% - 70px)); }
+.scen-btn { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: 0; padding: 8px 12px; cursor: pointer; text-align: left; }
+.scen-btn svg { flex: none; color: var(--accent); }
+.scen-btn .k { display: block; font-size: 11px; color: var(--muted); }
+.scen-btn b { font-weight: 600; font-size: 13.5px; }
+.scen-btn::after { content: ""; margin-left: auto; width: 6px; height: 6px; border: solid var(--muted); border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); }
+.scen-btn[aria-expanded="true"]::after { transform: rotate(-135deg); }
+.scen-pop { border-top: 1px solid var(--line); padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 8px; }
+
+/* legend */
+.legend-box { position: absolute; z-index: 2; left: max(12px, env(safe-area-inset-left, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: 268px; max-height: calc(100% - 110px); display: flex; flex-direction: column; }
+.lg-toggle { display: flex; justify-content: space-between; align-items: center; background: none; border: 0; padding: 8px 12px; font-weight: 600; font-size: 12.5px; cursor: pointer; }
+.lg-toggle::after { content: ""; width: 6px; height: 6px; border: solid var(--muted); border-width: 0 1.5px 1.5px 0; transform: rotate(-135deg); }
+.lg-toggle[aria-expanded="false"]::after { transform: rotate(45deg); }
+.lg-body { overflow-y: auto; padding: 0 12px 10px; display: flex; flex-direction: column; }
+.lg { padding: 8px 0; border-top: 1px solid var(--line); }
+.lg h3 { margin: 0 0 6px; font-size: 12px; font-weight: 500; }
+.lg p, .lg-empty { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+.gleg { display: flex; flex-wrap: wrap; gap: 3px 10px; font-size: 11.5px; color: var(--muted); }
+.gleg i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; outline: 1px solid var(--line-strong); outline-offset: -1px; }
+.gleg img { width: 16px; height: 16px; vertical-align: -4px; margin-right: 4px; }
+#plLeg { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 8px; }
+#plLeg span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hist { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; align-items: end; height: 34px; }
+.hist div { border-radius: 2px 2px 0 0; min-height: 2px; }
+.ramp { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; height: 10px; margin-top: 2px; }
+.ramp span { border-radius: 1px; }
+.ticks { display: grid; grid-template-columns: repeat(7, 1fr); font: 10px/1.2 var(--mono); color: var(--muted); margin-top: 3px; font-variant-numeric: tabular-nums; }
+.ticks span { transform: translateX(-50%); white-space: nowrap; }
+.ticks span:first-child { visibility: hidden; }
+.legend-note { display: flex; justify-content: space-between; color: var(--muted); font-size: 11px; margin-top: 5px; gap: 8px; }
+.legend-note i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--nodata); vertical-align: -1px; margin-right: 4px; }
+
+.tip { position: absolute; pointer-events: none; z-index: 4; background: var(--panel); color: var(--ink); border: 1px solid var(--line-strong); border-radius: 4px; padding: 6px 9px; font-size: 12.5px; box-shadow: var(--shadow); max-width: 260px; }
 .tip b { display: block; font-weight: 600; }
 .tip small { color: var(--muted); }
 .tip .tv { font: 500 12px var(--mono); margin-top: 3px; }
 
-.card { position: absolute; z-index: 3; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(12px + env(safe-area-inset-bottom, 0px)); width: min(330px, calc(100% - 24px)); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.22); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.card { position: absolute; z-index: 3; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(30px + env(safe-area-inset-bottom, 0px)); width: min(340px, calc(100% - 24px)); max-height: calc(100% - 120px); overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
 .card header { display: flex; justify-content: space-between; gap: 10px; align-items: start; }
-.card h2 { font: 720 21px/1.08 var(--display); font-stretch: 82%; margin: 0; text-wrap: balance; }
+.card h2 { font: 600 20px/1.1 var(--cond); margin: 0; text-wrap: balance; }
 .card .where { color: var(--muted); font-size: 12.5px; margin-top: 3px; }
-.card .x { border: 0; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
-.card .x:hover { color: var(--ink); background: var(--bg); }
-.comp { display: flex; height: 14px; border-radius: 3px; overflow: hidden; outline: 1px solid var(--line); }
+.card .x { border: 0; background: transparent; color: var(--muted); font-size: 20px; line-height: 1; cursor: pointer; padding: 2px 5px; border-radius: 4px; }
+.card .x:hover { color: var(--ink); background: var(--sunk); }
+.card .links { display: flex; gap: 12px; font-size: 12.5px; }
+.card .links a { color: var(--accent); }
+.comp { display: flex; height: 12px; border-radius: 2px; overflow: hidden; outline: 1px solid var(--line-strong); outline-offset: -1px; }
 .comp span { height: 100%; }
-.cls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; font: 10.5px/1.25 var(--body); color: var(--muted); }
+.cls { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; font: 10.5px/1.25 var(--sans); color: var(--muted); }
 .cls div { display: flex; flex-direction: column; gap: 1px; }
 .cls b { font: 500 12px var(--mono); color: var(--ink); }
 .cls i { display: block; width: 100%; height: 3px; border-radius: 2px; margin-bottom: 3px; }
 .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin: 0; }
 .facts dt { color: var(--muted); font-size: 11.5px; }
 .facts dd { margin: 0; font: 500 13px var(--mono); font-variant-numeric: tabular-nums; }
-.flag { font-size: 12px; color: var(--muted); background: var(--bg); border-radius: 6px; padding: 6px 8px; }
+.flag { font-size: 12px; color: var(--muted); background: var(--sunk); border-radius: 4px; padding: 6px 8px; }
+.chip { display: inline-block; padding: 1px 7px; border-radius: 3px; font: 500 12px var(--mono); color: #13201d; }
+.ctab { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ctab th { text-align: left; font-weight: 500; color: var(--muted); font-size: 11px; padding: 2px 4px 3px 0; }
+.ctab td { font: 500 12px var(--mono); padding: 3px 4px 3px 0; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.ctab tr.on td { color: var(--accent); font-weight: 600; }
+.ctab td small { color: var(--muted); font-weight: 400; }
+.ctab td:first-child { white-space: nowrap; }
 
-.attrib { position: absolute; z-index: 2; left: max(8px, env(safe-area-inset-left, 0px)); bottom: calc(6px + env(safe-area-inset-bottom, 0px)); font-size: 10.5px; color: var(--muted); background: var(--panel); opacity: .85; padding: 2px 6px; border-radius: 4px; }
+.attrib { position: absolute; z-index: 2; right: max(8px, env(safe-area-inset-right, 0px)); bottom: calc(6px + env(safe-area-inset-bottom, 0px)); font-size: 10.5px; color: var(--muted); background: var(--panel); opacity: .85; padding: 2px 6px; border-radius: 3px; }
 .attrib a { color: inherit; }
 .loading { position: absolute; inset: 0; display: grid; place-items: center; z-index: 6; background: var(--map-bg); color: var(--muted); font: 500 13px var(--mono); }
 
 @media (max-width: 760px) {
   body { overflow: auto; }
-  .app { grid-template-columns: 1fr; grid-template-rows: 62vh auto; height: auto; min-height: 100%; }
-  .stage { order: -1; height: 62vh; }
-  .panel { border-right: 0; border-top: 1px solid var(--line); overflow: visible; padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); }
+  .app { grid-template-columns: 1fr; grid-template-rows: auto 62vh auto; height: auto; min-height: 100%; }
+  .bar .title span { display: none; }
+  .stage { grid-row: 2; }
+  .side { grid-row: 3; border-right: 0; border-top: 1px solid var(--line); overflow: visible; }
+  .tabs { position: static; }
+  .legend-box { width: min(300px, calc(100% - 70px)); max-height: calc(100% - 80px); }
   .card { left: 12px; right: 12px; width: auto; bottom: 12px; padding: 12px 14px; }
+  .attrib { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
 </style>
 
 <div class="app">
-  <aside class="panel" aria-label="Map controls">
-    <div class="brand">
-      <p class="eyebrow">GFSM v1 · 30 m · sub-district</p>
-      <h1>India Tehsil Flood Atlas</h1>
-      <p>Flood susceptibility, and the people living with it, for 6,820 tehsils, talukas and mandals, summarised from the Global Flood Susceptibility Map.</p>
-    </div>
+  <header class="bar">
+    <svg viewBox="0 0 28 28" width="28" height="28" aria-hidden="true"><rect width="28" height="28" rx="5" fill="#2f7cf6"/>
+      <path d="M5 10.5c2.2 0 2.2-2 4.5-2s2.3 2 4.5 2 2.3-2 4.5-2 2.3 2 4.5 2M5 15.5c2.2 0 2.2-2 4.5-2s2.3 2 4.5 2 2.3-2 4.5-2 2.3 2 4.5 2M5 20.5c2.2 0 2.2-2 4.5-2s2.3 2 4.5 2 2.3-2 4.5-2 2.3 2 4.5 2" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <div class="title"><h1>India Tehsil Flood Atlas</h1><span>Flood susceptibility, people exposed and the climate outlook for 6,820 sub-districts</span></div>
+    <button type="button" class="theme" id="themeBtn" aria-label="Switch colour theme">
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.8a6.2 6.2 0 0 1 0 12.4z" fill="currentColor"/></svg>
+      <span id="themeTxt">Auto</span></button>
+  </header>
 
-    <section class="summary" aria-live="polite">
-      <div class="big"><div class="v" id="sumPct">–</div><div class="k" id="sumPctK">of land rated High or Very High</div></div>
-      <div id="sumXBox"><div class="v" id="sumX">–</div><div class="k">people in High or Very High areas</div></div>
-      <div id="sumXpBox"><div class="v" id="sumXp">–</div><div class="k">of the population</div></div>
-      <div><div class="v" id="sumKm">–</div><div class="k">km² High or Very High</div></div>
-      <div><div class="v" id="sumN">–</div><div class="k" id="sumNK">sub-districts over half High+</div></div>
-      <div class="src" id="sumSrc"></div>
-    </section>
-
-    <div class="field">
-      <label class="eyebrow" for="q">Find a sub-district</label>
+  <aside class="side" aria-label="Map controls">
+    <div class="finder">
       <div class="search">
-        <input type="search" id="q" placeholder="e.g. Majuli, Sonawari, Gosaba" autocomplete="off" aria-controls="results">
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><circle cx="7" cy="7" r="4.8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.6 10.6L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input type="search" id="q" placeholder="Find a sub-district, e.g. Majuli, Gosaba" autocomplete="off" aria-label="Find a sub-district" aria-controls="results">
         <div class="results" id="results" hidden></div>
       </div>
+      <select id="st" aria-label="State or union territory"><option value="">All India</option></select>
     </div>
 
-    <div class="field">
-      <span class="eyebrow" id="layerLbl">Layers</span>
-      <div class="seg" role="group" aria-labelledby="layerLbl" id="layerSeg">
-        <button type="button" data-v="summary" aria-pressed="true">Sub-district summary</button>
-        <button type="button" data-v="raster" aria-pressed="false">GFSM 30 m</button>
-        <button type="button" data-v="overlay" aria-pressed="false">GFSM over summary</button>
-        <button type="button" data-v="pop" aria-pressed="false">Population 1 km</button>
-        <button type="button" data-v="clim" aria-pressed="false" hidden>Rainfall change 0.25°</button>
-      </div>
-      <div class="raster-ctl" id="rasterCtl" hidden>
-        <div class="seg" role="group" aria-label="Population shown" id="popKindSeg" hidden>
-          <button type="button" data-k="high" aria-pressed="true">In High + Very High</button>
-          <button type="button" data-k="all" aria-pressed="false">All people</button>
-        </div>
-        <div class="thr-row"><label class="eyebrow" for="rop" style="margin:0" id="ropLbl">GFSM opacity</label><output id="ropOut" for="rop">70%</output></div>
-        <input type="range" id="rop" min="0" max="100" step="5" value="70">
-        <div class="gleg" id="popLeg" aria-label="People per km²" hidden>
-          <span><i style="background:var(--d1)"></i>1–10</span><span><i style="background:var(--d2)"></i>10–50</span>
-          <span><i style="background:var(--d3)"></i>50–250</span><span><i style="background:var(--d4)"></i>250–1k</span>
-          <span><i style="background:var(--d5)"></i>1k–5k</span><span><i style="background:var(--d6)"></i>5k+ people/km²</span>
-        </div>
-        <div class="gleg" id="climLeg" aria-label="Change in 5-day maximum rainfall" hidden></div>
-        <div class="gleg" id="gfsmLeg" aria-label="GFSM classes">
-          <span><i style="background:var(--g1)"></i>Very Low</span><span><i style="background:var(--g2)"></i>Low</span>
-          <span><i style="background:var(--g3)"></i>Moderate</span><span><i style="background:var(--g4)"></i>High</span>
-          <span><i style="background:var(--g5)"></i>Very High</span>
-        </div>
-        <p class="hint" id="rasterHint">Pixels are about 150 m at zoom 10 (most common 30 m class per pixel). Zooming further enlarges them.</p>
-      </div>
-      <label class="check" id="ctxRow" hidden><input type="checkbox" id="ctx" checked> Place names and rivers (OpenStreetMap)</label>
+    <nav class="tabs" role="tablist" aria-label="Sidebar">
+      <button type="button" role="tab" id="tabL" aria-selected="true" aria-controls="tab-layers">Layers</button>
+      <button type="button" role="tab" id="tabS" aria-selected="false" aria-controls="tab-stats">Statistics</button>
+      <button type="button" role="tab" id="tabA" aria-selected="false" aria-controls="tab-about">About</button>
+    </nav>
+
+    <!-- Layers: listed in drawing order, top of the list draws on top of the map -->
+    <div class="tabpanel" id="tab-layers" role="tabpanel" aria-labelledby="tabL">
+      <p class="note">Layers higher in the list draw on top. Click a layer name for its settings.</p>
+      <ol class="stack">
+        <li class="lyr off" data-layer="places" id="lyrPlaces" hidden>
+          <div class="lyr-head">
+            <span class="thumb"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.2 7 12 7 12s7-6.8 7-12a7 7 0 0 0-7-7zm0 9.6a2.6 2.6 0 1 1 0-5.2 2.6 2.6 0 0 1 0 5.2z" fill="currentColor"/></svg></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrPlacesBody"><b>Places to visit</b><small id="metaPlaces">Notable sites from OpenStreetMap</small></button>
+            <label class="switch"><input type="checkbox" id="plOn" aria-label="Show places to visit"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrPlacesBody" hidden>
+            <div class="cats" id="plCats" role="group" aria-label="Site types"></div>
+            <label class="check"><input type="checkbox" id="plHigh"> Only sites on High or Very High land</label>
+            <p class="hint" id="plHint"></p>
+          </div>
+        </li>
+        <li class="lyr" data-layer="ctx" id="ctxRow" hidden>
+          <div class="lyr-head">
+            <span class="thumb" style="font:600 11px var(--sans)">Aa</span>
+            <div class="lyr-name"><b>Place names and rivers</b><small>OpenStreetMap</small></div>
+            <label class="switch"><input type="checkbox" id="ctx" checked aria-label="Show place names and rivers"><span></span></label>
+          </div>
+        </li>
+        <li class="lyr" data-layer="bounds">
+          <div class="lyr-head">
+            <span class="thumb"><svg viewBox="0 0 30 22" width="30" height="22" aria-hidden="true"><path d="M3 4l9 2 3 8-8 5-4-6zM12 6l13-2 2 9-12 1M15 14l12-1-2 6-17 0" fill="none" stroke="currentColor" stroke-width="1.1"/></svg></span>
+            <div class="lyr-name"><b>Sub-district boundaries</b><small>State lines always shown</small></div>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="bounds" checked aria-label="Show sub-district boundaries"><span></span></label>
+          </div>
+        </li>
+        <li class="lyr off" data-layer="clim" id="lyrClim" hidden>
+          <div class="lyr-head">
+            <span class="thumb t-clim"></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrClimBody"><b>Rainfall change</b><small id="metaClim"></small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="clim" aria-label="Show rainfall change"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrClimBody" hidden>
+            <p class="hint">Projected change in the wettest 5-day rainfall of the year against 1995–2014, in 0.25° cells (about 27 km), median of about 30 CMIP6 models.
+              Faded cells: fewer than 90% of models project an increase.</p>
+            <button type="button" class="linkbtn scen-open">Change scenario or period</button>
+            <div class="ctl"><div class="row"><label for="opClim">Opacity</label><output id="opClimOut">85%</output></div>
+              <input type="range" class="op" id="opClim" data-layer="clim" min="5" max="100" step="5" value="85"></div>
+          </div>
+        </li>
+        <li class="lyr off" data-layer="pop" id="lyrPop">
+          <div class="lyr-head">
+            <span class="thumb t-pop"></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrPopBody"><b>Population density</b><small id="metaPop"></small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="pop" aria-label="Show population density"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrPopBody" hidden>
+            <div class="ctl"><span class="lbl" id="popKindLbl">People shown</span>
+              <div class="seg" role="group" aria-labelledby="popKindLbl" id="popKindSeg">
+                <button type="button" data-k="high" aria-pressed="true">On High+ land</button>
+                <button type="button" data-k="all" aria-pressed="false">Everyone</button>
+              </div></div>
+            <div class="ctl"><label for="srcSelPop">Population data (2020)</label><select class="srcSel" id="srcSelPop"></select></div>
+            <p class="hint srcHint"></p>
+            <div class="ctl"><div class="row"><label for="opPop">Opacity</label><output id="opPopOut">90%</output></div>
+              <input type="range" class="op" id="opPop" data-layer="pop" min="5" max="100" step="5" value="90"></div>
+          </div>
+        </li>
+        <li class="lyr off" data-layer="gfsm">
+          <div class="lyr-head">
+            <span class="thumb t-gfsm"></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrGfsmBody"><b>Flood susceptibility 30 m</b><small>GFSM v1 classes</small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="gfsm" aria-label="Show GFSM 30 m"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrGfsmBody" hidden>
+            <p class="hint">Pixels are about 150 m at zoom 10 (most common 30 m class per pixel). Zooming further enlarges them.</p>
+            <div class="ctl"><div class="row"><label for="opGfsm">Opacity</label><output id="opGfsmOut">85%</output></div>
+              <input type="range" class="op" id="opGfsm" data-layer="gfsm" min="5" max="100" step="5" value="85"></div>
+          </div>
+        </li>
+        <li class="lyr open" data-layer="choro">
+          <div class="lyr-head">
+            <span class="thumb t-choro"></span>
+            <button type="button" class="lyr-name" aria-expanded="true" aria-controls="lyrChoroBody"><b>Sub-district statistics</b><small id="metaChoro"></small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="choro" checked aria-label="Show sub-district statistics"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrChoroBody">
+            <div class="ctl"><label for="metricSel">Colour by</label><select class="metricSel" id="metricSel"></select></div>
+            <div class="ctl"><span class="lbl" id="modeLbl">Class breaks</span>
+              <div class="seg" role="group" aria-labelledby="modeLbl" id="modeSeg">
+                <button type="button" data-k="quantile" aria-pressed="true">Relative (quantiles)</button>
+                <button type="button" data-k="fixed" aria-pressed="false">Absolute (fixed)</button>
+              </div></div>
+            <div class="ctl"><div class="row"><label for="thr">Fade sub-districts below</label><output id="thrOut" for="thr">off</output></div>
+              <input type="range" id="thr" min="0" max="100" step="1" value="0"></div>
+            <div class="ctl"><div class="row"><label for="opChoro">Opacity</label><output id="opChoroOut">90%</output></div>
+              <input type="range" class="op" id="opChoro" data-layer="choro" min="5" max="100" step="5" value="90"></div>
+          </div>
+        </li>
+      </ol>
     </div>
 
-    <section class="field" id="climField" hidden>
-      <span class="eyebrow" id="climLbl">Climate projection · CMIP6 · extreme rainfall</span>
-      <div class="seg ssp" role="group" aria-label="Emissions scenario" id="sspSeg"></div>
-      <div class="seg four" role="group" aria-label="Period" id="perSeg"></div>
-      <div class="clim-sum" id="climSum" aria-live="polite"></div>
-      <p class="hint">Change in the wettest 5-day rainfall of the year against 1995–2014, median of about 30 models.
-        Flood pressure = today's % High+ land × (1 + that change). A screening index, not a flood forecast: GFSM is static, and river flow, dams and land use are not modelled.</p>
-    </section>
+    <div class="tabpanel" id="tab-stats" role="tabpanel" aria-labelledby="tabS" hidden>
+      <section class="block" aria-live="polite">
+        <div class="summary">
+          <div class="big"><div class="v" id="sumPct">–</div><div class="k" id="sumPctK">of land rated High or Very High</div></div>
+          <div id="sumXBox"><div class="v" id="sumX">–</div><div class="k">people in High or Very High areas</div></div>
+          <div id="sumXpBox"><div class="v" id="sumXp">–</div><div class="k">of the population</div></div>
+          <div><div class="v" id="sumKm">–</div><div class="k">km² High or Very High</div></div>
+          <div><div class="v" id="sumN">–</div><div class="k" id="sumNK">sub-districts over half High+</div></div>
+          <div class="src" id="sumSrc"></div>
+        </div>
+        <div class="ctl" id="srcRow"><label for="srcSelStats">Population data (2020)</label><select class="srcSel" id="srcSelStats"></select>
+          <p class="hint srcHint"></p></div>
+      </section>
 
-    <section class="field places" id="placesField" hidden>
-      <div class="thr-row">
-        <span class="eyebrow" style="margin:0" id="placesLbl">Places to visit</span>
-        <label class="check" style="margin:0"><input type="checkbox" id="plOn"> Show</label>
-      </div>
-      <div class="cats" id="plCats" role="group" aria-labelledby="placesLbl"></div>
-      <label class="check"><input type="checkbox" id="plHigh"> Only sites on High or Very High land</label>
-      <p class="hint" id="plHint"></p>
-      <div class="top">
-        <p class="eyebrow" id="plTopLbl" style="margin-top:6px">Best-known sites on High+ land</p>
+      <section class="block" id="climField" hidden>
+        <h2>Climate outlook <button type="button" class="linkbtn scen-open scenTxt"></button></h2>
+        <div class="clim-sum" id="climSum" aria-live="polite"></div>
+        <p class="hint">Change in the wettest 5-day rainfall of the year against 1995–2014, median of about 30 models.
+          Flood pressure = today's % High+ land × (1 + that change). A screening index, not a flood forecast: GFSM is static, and river flow, dams and land use are not modelled.</p>
+      </section>
+
+      <section class="block top">
+        <h2 id="topLbl">Highest in India</h2>
+        <div class="ctl"><label for="metricSelTop">Rank by</label><select class="metricSel" id="metricSelTop"></select></div>
+        <ol id="topList"></ol>
+      </section>
+
+      <section class="block top" id="plTopBlock" hidden>
+        <h2 id="plTopLbl">Best-known sites on High+ land</h2>
         <ol id="plTop"></ol>
-      </div>
-    </section>
-
-    <div class="field">
-      <span class="eyebrow" id="metricLbl">Colour by</span>
-      <div class="seg" role="group" aria-labelledby="metricLbl" id="metricSeg">
-        <button type="button" data-m="h" aria-pressed="true">% High + Very High</button>
-        <button type="button" data-m="p5" aria-pressed="false">% Very High</button>
-        <button type="button" data-m="m" aria-pressed="false">Mean class (1–5)</button>
-        <button type="button" data-m="hk" aria-pressed="false">High-risk area km²</button>
-        <button type="button" data-m="x" aria-pressed="false">People in High+</button>
-        <button type="button" data-m="xp" aria-pressed="false">% people in High+</button>
-        <button type="button" data-m="c5" aria-pressed="false" hidden>Δ 5-day max rain</button>
-        <button type="button" data-m="cf" aria-pressed="false" hidden>Flood pressure (climate)</button>
-      </div>
+      </section>
     </div>
 
-    <div class="field" id="srcField" hidden>
-      <span class="eyebrow" id="srcLbl">Population data (2020)</span>
-      <div class="seg" role="group" aria-labelledby="srcLbl" id="srcSeg"></div>
-      <p class="hint" id="srcHint"></p>
-    </div>
-
-    <div class="field">
-      <label class="eyebrow" for="st">State / UT</label>
-      <select id="st"><option value="">All India</option></select>
-    </div>
-
-    <div class="field">
-      <span class="eyebrow" id="modeLbl">Class breaks</span>
-      <div class="seg two" role="group" aria-labelledby="modeLbl" id="modeSeg">
-        <button type="button" data-k="quantile" aria-pressed="true">Relative (quantiles)</button>
-        <button type="button" data-k="fixed" aria-pressed="false">Absolute (fixed)</button>
+    <div class="tabpanel about" id="tab-about" role="tabpanel" aria-labelledby="tabA" hidden>
+      <p>Flood susceptibility, and the people living with it, for 6,820 tehsils, talukas and mandals, summarised from the 30 m Global Flood Susceptibility Map (GFSM v1).</p>
+      <p>Susceptibility shows where flooding is likely given terrain, rivers and climate today. It is a baseline, not a forecast. The climate outlook scales today's susceptibility by projected changes in extreme rainfall. It is a screening index, not a flood probability.</p>
+      <h2>Sources</h2>
+      <div class="credits">
+        <span>Susceptibility: GFSM v1, Waleed et al. (2026), <a href="https://doi.org/10.1038/s41597-026-08338-1" target="_blank" rel="noopener">Scientific Data</a>, CC BY 4.0.</span>
+        <span>Boundaries: <a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoBoundaries</a> IND ADM3 (LGD 2018), ODbL.</span>
+        <span>Population 2020: <a href="https://doi.org/10.7927/H4PN93PB" target="_blank" rel="noopener">GPW v4.11</a> (CIESIN, NASA SEDAC) and
+          <a href="https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE" target="_blank" rel="noopener">GHS-POP R2023A</a> (EC JRC), CC BY 4.0.
+          Each 1 km cell's people are split across the 30 m GFSM land area inside it.</span>
+        <span>Climate: <a href="https://climateknowledgeportal.worldbank.org/" target="_blank" rel="noopener">World Bank CCKP</a> CMIP6 0.25° multi-model ensemble, CC BY 4.0.</span>
+        <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
+        <span>Basemap labels: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
+        <span>Areas are true ground areas, corrected for Mercator distortion. Raster tiles built with gdal2tiles.</span>
+        <span><a href="https://github.com/stardustcafe/india-tehsil-flood-atlas" target="_blank" rel="noopener">Code and data on GitHub</a></span>
       </div>
     </div>
-
-    <div class="field">
-      <div class="legend" id="legend">
-        <div class="hist" id="hist" aria-hidden="true"></div>
-        <div class="ramp" id="ramp"></div>
-        <div class="ticks" id="ticks"></div>
-        <div class="legend-note"><span id="legendCap">Sub-districts per class</span><span><i></i>No GFSM data</span></div>
-      </div>
-    </div>
-
-    <div class="field">
-      <div class="thr-row"><label class="eyebrow" for="thr" style="margin:0">Fade below</label><output id="thrOut" for="thr">off</output></div>
-      <input type="range" id="thr" min="0" max="100" step="1" value="0">
-    </div>
-
-    <section class="top">
-      <p class="eyebrow" id="topLbl">Highest in India</p>
-      <ol id="topList"></ol>
-    </section>
-
-    <footer class="credits">
-      Susceptibility: GFSM v1, Waleed et al. (2026), <a href="https://doi.org/10.1038/s41597-026-08338-1" target="_blank" rel="noopener">Scientific Data</a>, CC BY 4.0.
-      Boundaries: <a href="https://www.geoboundaries.org" target="_blank" rel="noopener">geoBoundaries</a> IND ADM3 (LGD 2018), ODbL.
-      Population 2020: <a href="https://doi.org/10.7927/H4PN93PB" target="_blank" rel="noopener">GPW v4.11</a> (CIESIN, NASA SEDAC) and
-      <a href="https://doi.org/10.2905/2FF68A52-5B5B-4A22-8F40-C41DA8332CFE" target="_blank" rel="noopener">GHS-POP R2023A</a> (EC JRC), CC BY 4.0.
-      Each 1 km cell's people are split across the 30 m GFSM land area inside it.
-      Climate: <a href="https://climateknowledgeportal.worldbank.org/" target="_blank" rel="noopener">World Bank CCKP</a> CMIP6 0.25° multi-model ensemble, CC BY 4.0.
-      Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).
-      Areas are true ground areas, corrected for Mercator distortion. Raster tiles built with gdal2tiles.
-      Susceptibility is a baseline, not a forecast.
-    </footer>
   </aside>
 
   <main class="stage">
     <div id="map" aria-label="Flood susceptibility map of India by sub-district"></div>
-    <div class="zoom">
+    <div class="zoom float">
       <button type="button" id="zin" aria-label="Zoom in">+</button>
       <button type="button" id="zout" aria-label="Zoom out">−</button>
       <button type="button" id="zfit" aria-label="Fit to selection" style="font-size:13px">⤢</button>
     </div>
+
+    <div class="scen float" id="scen" hidden>
+      <button type="button" class="scen-btn" id="scenBtn" aria-expanded="false" aria-controls="scenPop">
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M5.5 12.5a3.5 3.5 0 0 1 .4-7 4.5 4.5 0 0 1 8.6 1.2 3 3 0 0 1-.5 5.8z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M7 14.5l-1 2.5M10.5 14.5l-1 2.5M14 14.5l-1 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <span><span class="k">Climate scenario</span><b class="scenTxt"></b></span></button>
+      <div class="scen-pop" id="scenPop" hidden>
+        <div class="ctl"><span class="lbl">Emissions pathway</span><div class="seg ssp" role="group" aria-label="Emissions scenario" id="sspSeg"></div></div>
+        <div class="ctl"><span class="lbl">Period</span><div class="seg four" role="group" aria-label="Period" id="perSeg"></div></div>
+        <p class="hint">Applies to the rainfall layer, the climate colour-by options, the Statistics tab and sub-district details.</p>
+      </div>
+    </div>
+
+    <section class="legend-box float" id="legendBox" aria-label="Legend">
+      <button type="button" class="lg-toggle" id="lgToggle" aria-expanded="true" aria-controls="lgBody">Legend</button>
+      <div class="lg-body" id="lgBody">
+        <div class="lg" id="lgPlaces" hidden><h3>Places to visit</h3><div class="gleg" id="plLeg"></div><p>Gold ring: UNESCO World Heritage.</p></div>
+        <div class="lg" id="lgClim" hidden><h3 id="lgClimT">Change in wettest 5-day rain</h3><div class="gleg" id="climLeg"></div><p>Faded cells: fewer than 90% of models project an increase.</p></div>
+        <div class="lg" id="lgPop" hidden><h3 id="lgPopT">People per km²</h3>
+          <div class="gleg"><span><i style="background:var(--d1)"></i>1–10</span><span><i style="background:var(--d2)"></i>10–50</span>
+          <span><i style="background:var(--d3)"></i>50–250</span><span><i style="background:var(--d4)"></i>250–1k</span>
+          <span><i style="background:var(--d5)"></i>1k–5k</span><span><i style="background:var(--d6)"></i>5k+</span></div></div>
+        <div class="lg" id="lgGfsm" hidden><h3>Flood susceptibility (GFSM 30 m)</h3>
+          <div class="gleg"><span><i style="background:var(--g1)"></i>Very Low</span><span><i style="background:var(--g2)"></i>Low</span>
+          <span><i style="background:var(--g3)"></i>Moderate</span><span><i style="background:var(--g4)"></i>High</span>
+          <span><i style="background:var(--g5)"></i>Very High</span></div></div>
+        <div class="lg" id="lgChoro"><h3 id="lgChoroT">Share of land High + Very High</h3>
+          <div class="hist" id="hist" aria-hidden="true"></div>
+          <div class="ramp" id="ramp"></div>
+          <div class="ticks" id="ticks"></div>
+          <div class="legend-note"><span id="legendCap">Sub-districts per class</span><span><i></i>No data</span></div></div>
+        <p class="lg-empty" id="lgEmpty" hidden>No layers switched on.</p>
+      </div>
+    </section>
+
     <div class="tip" id="tip" hidden></div>
-    <article class="card" id="card" hidden aria-live="polite"></article>
+    <article class="card float" id="card" hidden aria-live="polite"></article>
     <div class="attrib" id="attrib" hidden><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> · <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">© OpenMapTiles</a> · Data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors</div>
     <div class="loading" id="loading">Loading 6,820 sub-districts…</div>
   </main>
@@ -336,22 +482,25 @@ input[type="range"] { width: 100%; accent-color: var(--accent); }
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <script>
 const METRICS = {
-  h:  { label: "% High + Very High", fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1 },
-  p5: { label: "% Very High",        fmt: v => v.toFixed(1) + "%", fixed: [2, 5, 10, 20, 35, 60], step: 1 },
-  m:  { label: "Mean class",         fmt: v => v.toFixed(2),       fixed: [1.2, 1.4, 1.7, 2, 2.5, 3], step: 0.05 },
-  hk: { label: "High-risk area",     fmt: v => fmtNum(v, v < 10 ? 1 : 0) + " km²", tick: v => fmtNum(v), fixed: [5, 15, 40, 100, 250, 600], step: 5, max: 1000 },
-  x:  { label: "People in High+",    fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true },
-  xp: { label: "% people in High+",  fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1, pop: true },
-  c5: { label: "Δ 5-day max rain",   fmt: v => signed(v, 1), tick: v => signed(v), fixed: [0, 5, 10, 15, 20, 30], step: 1, max: 60, clim: true },
-  cf: { label: "Flood pressure",     fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
+  h:  { label: "% High + Very High", opt: "Share of land High + Very High", fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1 },
+  p5: { label: "% Very High",        opt: "Share of land Very High", fmt: v => v.toFixed(1) + "%", fixed: [2, 5, 10, 20, 35, 60], step: 1 },
+  m:  { label: "Mean class",         opt: "Mean susceptibility class (1–5)", fmt: v => v.toFixed(2), fixed: [1.2, 1.4, 1.7, 2, 2.5, 3], step: 0.05 },
+  hk: { label: "High-risk area",     opt: "High-risk area (km²)", fmt: v => fmtNum(v, v < 10 ? 1 : 0) + " km²", tick: v => fmtNum(v), fixed: [5, 15, 40, 100, 250, 600], step: 5, max: 1000 },
+  x:  { label: "People in High+",    opt: "People on High+ land", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true },
+  xp: { label: "% people in High+",  opt: "Share of people on High+ land", fmt: v => v.toFixed(1) + "%", fixed: [5, 10, 20, 35, 50, 75], step: 1, pop: true },
+  c5: { label: "Δ 5-day max rain",   opt: "Change in wettest 5-day rain", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [0, 5, 10, 15, 20, 30], step: 1, max: 60, clim: true },
+  cf: { label: "Flood pressure",     opt: "Flood pressure (climate-adjusted)", fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
+const METRIC_GROUPS = [["Flood susceptibility", ["h", "p5", "m", "hk"]], ["People exposed", ["x", "xp"]], ["Climate outlook", ["c5", "cf"]]];
 const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
   gpw: { label: "GPW v4.11", hint: "GPW spreads each census sub-district's count evenly over its area, so it cannot tell whether settlements sit on the floodplain or above it." },
   ghs: { label: "GHS-POP", hint: "GHS-POP places people by built-up volume mapped from satellite imagery, so it follows where settlements actually are." },
 };
 const CLASS_NAMES = ["Very Low", "Low", "Moderate", "High", "Very High"];
-const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], view: "summary", rop: 0.7, src: "gpw", popKind: "high", srcs: [] };
+const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], src: "gpw", popKind: "high", srcs: [],
+  // map layers, each with its own switch and opacity (places and OSM context are handled by their own sections)
+  L: { choro: { on: true, op: 0.9 }, gfsm: { on: false, op: 0.85 }, pop: { on: false, op: 0.9 }, clim: { on: false, op: 0.85 }, bounds: { on: true } } };
 
 /* ---------- raster tiles: gdal2tiles output packed into bundles (scripts/05_bundle_gfsm_tiles.py), URL tiles://{set}/{z}/{x}/{y} ---------- */
 const TILESETS = new Map(), BUNDLES = new Map();
@@ -434,35 +583,73 @@ function applyPaint() {
   const conds = [];
   if (S.state) conds.push(["==", ["get", "s"], S.state]);
   if (S.thr > 0) conds.push([">=", metricExpr(), S.thr]);
-  const bare = S.view === "raster" || S.view === "pop" || S.view === "clim", on = bare ? 0 : 0.95, off = bare ? 0 : 0.12;
+  // the fill stays rendered when switched off (opacity 0) so hover and click still find sub-districts
+  const on = S.L.choro.on ? S.L.choro.op : 0, off = on * 0.13;
   map.setPaintProperty("adm3-fill", "fill-opacity", conds.length ? ["case", ["all", ...conds], on, off] : on);
   applyRaster();
 }
 let POP_LAYERS = [];
 function applyRaster() {
-  const show = S.view === "raster" || S.view === "overlay", popSet = `pop_${S.src}_${S.popKind}`;
-  map.setLayoutProperty("gfsm", "visibility", show ? "visible" : "none");
-  map.setPaintProperty("gfsm", "raster-opacity", S.view === "raster" ? Math.max(S.rop, 0.05) : S.rop);
+  const L = S.L, popSet = `pop_${S.src}_${S.popKind}`, vis = on => on ? "visible" : "none";
+  map.setLayoutProperty("gfsm", "visibility", vis(L.gfsm.on));
+  map.setPaintProperty("gfsm", "raster-opacity", L.gfsm.op);
   for (const id of POP_LAYERS) {
-    map.setLayoutProperty(id, "visibility", S.view === "pop" && id === popSet ? "visible" : "none");
-    map.setPaintProperty(id, "raster-opacity", Math.max(S.rop, 0.05));
+    map.setLayoutProperty(id, "visibility", vis(L.pop.on && id === popSet));
+    map.setPaintProperty(id, "raster-opacity", L.pop.op);
   }
   if (map.getLayer("clim")) {
-    map.setLayoutProperty("clim", "visibility", S.view === "clim" ? "visible" : "none");
-    map.setPaintProperty("clim", "raster-opacity", Math.max(S.rop, 0.05));
+    map.setLayoutProperty("clim", "visibility", vis(L.clim.on));
+    map.setPaintProperty("clim", "raster-opacity", L.clim.op);
   }
+  map.setLayoutProperty("adm3-edges", "visibility", vis(L.bounds.on));
 }
-function renderRasterCtl() {
-  const pop = S.view === "pop", clim = S.view === "clim";
-  $("rasterCtl").hidden = S.view === "summary";
-  $("popKindSeg").hidden = $("popLeg").hidden = !pop;
-  $("climLeg").hidden = !clim;
-  $("gfsmLeg").hidden = pop || clim;
-  $("ropLbl").textContent = pop ? "Population opacity" : clim ? "Rainfall layer opacity" : "GFSM opacity";
-  $("rasterHint").textContent = pop
-    ? `${POP_SOURCES[S.src]?.label ?? S.src} people per km² of each 1 km cell${S.popKind === "high" ? ", counting only people on land rated High or Very High" : ""}.`
-    : clim ? `${SSP_INFO[CL.ssp][0]}, ${perLabel(CL.per)}: change in the wettest 5-day rainfall of the year against 1995–2014, in 0.25° cells (about 27 km). Faded cells: fewer than 90% of models project an increase.`
-    : "Pixels are about 150 m at zoom 10 (most common 30 m class per pixel). Zooming further enlarges them.";
+const scenLabel = () => `${SSP_INFO[CL.ssp][0]} · ${perLabel(CL.per)}`;
+const layerOn = k => k === "places" ? PL.on : k === "ctx" ? $("ctx").checked : S.L[k].on;
+// one-line state under each layer name, and dimmed rows for layers that are off
+function renderLayerMeta() {
+  const m = METRICS[S.metric];
+  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : "");
+  if (S.srcs.length) $("metaPop").textContent = `${POP_SOURCES[S.src].label} · ${S.popKind === "high" ? "people on High+ land" : "everyone"}`;
+  $("metaClim").textContent = scenLabel();
+  document.querySelectorAll(".scenTxt").forEach(e => e.textContent = scenLabel());
+  document.querySelectorAll(".lyr").forEach(li => li.classList.toggle("off", !layerOn(li.dataset.layer)));
+}
+// map legend: one entry per visible layer, in the same order as the layer stack
+function renderLegendBox() {
+  const L = S.L, m = METRICS[S.metric];
+  $("lgChoro").hidden = !L.choro.on; $("lgGfsm").hidden = !L.gfsm.on; $("lgPop").hidden = !L.pop.on;
+  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on;
+  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on;
+  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.pop ? ", " + POP_SOURCES[S.src].label : "");
+  if (S.srcs.length) $("lgPopT").textContent = `People per km², ${POP_SOURCES[S.src].label}${S.popKind === "high" ? ", on High+ land only" : ""}`;
+  $("lgClimT").textContent = `Change in wettest 5-day rain, ${scenLabel()}`;
+}
+function buildMetricSelects() {
+  const have = k => (!METRICS[k].pop || S.srcs.length) && (!METRICS[k].clim || CL.data);
+  const html = METRIC_GROUPS.map(([g, ks]) => ks.filter(have)).map((ks, i) => ks.length
+    ? `<optgroup label="${METRIC_GROUPS[i][0]}">${ks.map(k => `<option value="${k}">${METRICS[k].opt}</option>`).join("")}</optgroup>` : "").join("");
+  document.querySelectorAll(".metricSel").forEach(s => { s.innerHTML = html; s.value = S.metric; });
+}
+function setMetric(k) {
+  S.metric = k; S.thr = 0;
+  document.querySelectorAll(".metricSel").forEach(s => s.value = k);
+  computeRanks(); renderThreshold(); refresh(); renderLayerMeta(); renderLegendBox();
+}
+function setSource(k) {
+  S.src = k;
+  document.querySelectorAll(".srcSel").forEach(s => s.value = k);
+  document.querySelectorAll(".srcHint").forEach(e => e.textContent = POP_SOURCES[k].hint);
+  deriveSource(); computeRanks(); refresh(); renderClimate(); renderLayerMeta(); renderLegendBox();
+}
+function toggleScen(open) {
+  const o = open ?? $("scenPop").hidden;
+  $("scenPop").hidden = !o; $("scenBtn").setAttribute("aria-expanded", o);
+}
+const THEMES = { auto: "Auto", light: "Light", dark: "Dark" };
+function setTheme(t) {
+  if (t === "auto") delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+  $("themeTxt").textContent = THEMES[t]; $("themeBtn").dataset.t = t;
+  try { localStorage.setItem("atlas-theme", t); } catch {}
 }
 function applyTheme() {
   if (!map) return;
@@ -498,7 +685,7 @@ function renderLegend() {
   const counts = new Array(7).fill(0);
   P.forEach(p => { if (valid(p) && inScope(p)) counts[binOf(p[S.metric])]++; });
   const max = Math.max(...counts, 1), C = ramp();
-  $("hist").innerHTML = counts.map((c, i) => `<div style="height:${Math.max(3, 100 * c / max)}%;background:${C[i]};opacity:.55" title="${c} sub-districts"></div>`).join("");
+  $("hist").innerHTML = counts.map((c, i) => `<div style="height:${Math.max(3, 100 * c / max)}%;background:${C[i]};opacity:.6" title="${c} sub-districts"></div>`).join("");
   $("ramp").innerHTML = C.map((c, i) => `<span style="background:var(--r${i})"></span>`).join("");
   const f = METRICS[S.metric].fmt;
   const tick = METRICS[S.metric].tick ?? f;
@@ -565,35 +752,50 @@ function fitScope() {
 }
 
 function bindUI() {
-  $("metricSeg").addEventListener("click", e => {
-    const b = e.target.closest("button"); if (!b) return;
-    S.metric = b.dataset.m; S.thr = 0;
-    [...$("metricSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
-    computeRanks(); renderThreshold(); refresh();
-  });
-  $("layerSeg").addEventListener("click", e => {
-    const b = e.target.closest("button"); if (!b) return;
-    S.view = b.dataset.v;
-    [...$("layerSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
-    if (S.view === "clim") updateClimImage();
-    if ((S.view === "raster" || S.view === "pop" || S.view === "clim") && S.rop < 0.5) { S.rop = 1; $("rop").value = 100; $("ropOut").textContent = "100%"; }
-    renderRasterCtl(); applyPaint();
-  });
+  document.querySelectorAll(".metricSel").forEach(s => s.addEventListener("change", () => setMetric(s.value)));
+  document.querySelectorAll(".srcSel").forEach(s => s.addEventListener("change", () => setSource(s.value)));
+  // layer stack: switches, opacity sliders, expandable settings
+  document.querySelectorAll(".lyr-on").forEach(inp => inp.addEventListener("change", () => {
+    const k = inp.dataset.layer; S.L[k].on = inp.checked;
+    if (k === "clim" && inp.checked) updateClimImage();
+    applyPaint(); renderLegendBox(); renderLayerMeta();
+  }));
+  document.querySelectorAll(".op").forEach(r => r.addEventListener("input", () => {
+    S.L[r.dataset.layer].op = r.value / 100; $(r.id + "Out").textContent = r.value + "%"; applyPaint();
+  }));
+  document.querySelectorAll("button.lyr-name").forEach(b => b.addEventListener("click", () => {
+    const open = b.getAttribute("aria-expanded") !== "true";
+    b.setAttribute("aria-expanded", open); $(b.getAttribute("aria-controls")).hidden = !open;
+    b.closest(".lyr").classList.toggle("open", open);
+  }));
   $("popKindSeg").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     S.popKind = b.dataset.k;
     [...$("popKindSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
-    renderRasterCtl(); applyRaster();
+    applyRaster(); renderLayerMeta(); renderLegendBox();
   });
-  $("srcSeg").addEventListener("click", e => {
-    const b = e.target.closest("button"); if (!b) return;
-    S.src = b.dataset.s;
-    [...$("srcSeg").children].forEach(x => x.setAttribute("aria-pressed", x === b));
-    $("srcHint").textContent = POP_SOURCES[S.src].hint;
-    deriveSource(); computeRanks(); renderRasterCtl(); refresh(); renderClimate();
+  $("ctx").addEventListener("change", e => {
+    CONTEXT_LAYERS.forEach(id => map.getLayer(id) && map.setLayoutProperty(id, "visibility", e.target.checked ? "visible" : "none"));
+    renderLayerMeta();
   });
-  $("ctx").addEventListener("change", e => CONTEXT_LAYERS.forEach(id => map.getLayer(id) && map.setLayoutProperty(id, "visibility", e.target.checked ? "visible" : "none")));
-  $("rop").addEventListener("input", e => { S.rop = e.target.value / 100; $("ropOut").textContent = e.target.value + "%"; applyRaster(); });
+  // sidebar tabs
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
+  tabs.forEach(t => t.addEventListener("click", () => tabs.forEach(x => {
+    x.setAttribute("aria-selected", x === t); $(x.getAttribute("aria-controls")).hidden = x !== t;
+  })));
+  // climate scenario popover on the map; "change scenario" links elsewhere open it
+  $("scenBtn").addEventListener("click", () => toggleScen());
+  document.addEventListener("click", e => {
+    if (e.target.closest(".scen-open")) toggleScen(true);
+    else if (!e.target.closest("#scen")) toggleScen(false);
+  });
+  // legend collapses (starts collapsed on phones, where the map is small)
+  const lgSet = open => { $("lgToggle").setAttribute("aria-expanded", open); $("lgBody").hidden = !open; };
+  $("lgToggle").addEventListener("click", () => lgSet($("lgBody").hidden));
+  if (matchMedia("(max-width: 760px)").matches) lgSet(false);
+  let saved = "auto"; try { saved = localStorage.getItem("atlas-theme") || "auto"; } catch {}
+  setTheme(THEMES[saved] ? saved : "auto");
+  $("themeBtn").addEventListener("click", () => { const k = Object.keys(THEMES); setTheme(k[(k.indexOf($("themeBtn").dataset.t) + 1) % k.length]); });
   $("modeSeg").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
     S.mode = b.dataset.k;
@@ -755,12 +957,12 @@ function setClimate(ssp = CL.ssp, per = CL.per) {
   [...$("perSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.p === per));
   deriveClimate();
   if (METRICS[S.metric].clim) computeRanks();
-  if (S.view === "clim") updateClimImage();
-  renderRasterCtl(); refresh(); renderClimate();
+  if (S.L.clim.on) updateClimImage();
+  refresh(); renderClimate(); renderLayerMeta(); renderLegendBox();
 }
 async function addClimate() {
   try { CL.data = await fetchOk("data/climate.json", "json"); } catch { return; }
-  $("sspSeg").innerHTML = Object.entries(SSP_INFO).map(([k, [a, b]]) => `<button type="button" data-s="${k}" aria-pressed="${k === CL.ssp}">${a}<small>${b}</small></button>`).join("");
+  $("sspSeg").innerHTML = Object.entries(SSP_INFO).map(([k, [a, b]]) => `<button type="button" data-s="${k}" aria-pressed="${k === CL.ssp}">${a}<small>${b.replace(" · ", "<br>")}</small></button>`).join("");
   $("perSeg").innerHTML = CL.data.periods.map(p => p.slice(0, 4)).map(p => `<button type="button" data-p="${p}" aria-pressed="${p === CL.per}">${perLabel(p)}</button>`).join("");
   $("sspSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setClimate(b.dataset.s); });
   $("perSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setClimate(undefined, b.dataset.p); });
@@ -769,9 +971,8 @@ async function addClimate() {
   map.addSource("clim", { type: "image", url: climImage(), coordinates: [[g.west, g.north], [east, g.north], [east, south], [g.west, south]] });
   map.addLayer({ id: "clim", type: "raster", source: "clim", layout: { visibility: "none" },
     paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": 0.85 } }, "adm3-edges");
-  document.querySelectorAll('[data-m="c5"], [data-m="cf"], [data-v="clim"]').forEach(b => b.hidden = false);
-  $("climField").hidden = false;
-  deriveClimate(); renderClimate(); renderCard();
+  $("lyrClim").hidden = $("climField").hidden = $("scen").hidden = false;
+  buildMetricSelects(); deriveClimate(); renderClimate(); renderCard(); renderLayerMeta(); renderLegendBox();
 }
 
 /* ---------- places to visit (scripts/08_tourism_places.py): OSM features with Wikidata links ---------- */
@@ -872,7 +1073,9 @@ async function addPlaces() {
       "text-field": ["step", ["zoom"], "", 8, ["get", "n"]], "text-font": ["Noto Sans Regular"], "text-size": 11,
       "text-offset": [0, 1.25], "text-anchor": "top", "text-optional": true, "text-max-width": 9, "text-padding": 3 },
     paint: { ...labelPaint(), "icon-opacity": ["case", ["boolean", ["feature-state", "sel"], false], 1, 0.96] } });
-  $("placesField").hidden = false;
+  $("lyrPlaces").hidden = $("plTopBlock").hidden = false;
+  $("metaPlaces").textContent = `${fmtNum(PL.data.length)} notable sites, 10 types`;
+  $("plLeg").innerHTML = Object.values(PLACE_CATS).map(c => `<span><img src="${svgUrl(badgeSvg(c))}" alt="">${esc(c.label.split(",")[0])}</span>`).join("");
   renderPlaces();
   map.on("mousemove", "places-pt", e => {
     const p = e.features[0]?.properties; if (!p) return;
@@ -885,7 +1088,7 @@ async function addPlaces() {
   map.on("mouseleave", "places-pt", () => { map.getCanvas().style.cursor = ""; $("tip").hidden = true; });
 }
 function bindPlacesUI() {
-  $("plOn").addEventListener("change", e => { PL.on = e.target.checked; applyPlaces(); });
+  $("plOn").addEventListener("change", e => { PL.on = e.target.checked; applyPlaces(); renderLegendBox(); renderLayerMeta(); });
   $("plHigh").addEventListener("change", e => { PL.high = e.target.checked; applyPlaces(); });
   $("plCats").addEventListener("change", e => {
     const k = e.target.dataset.c; if (!k) return;
@@ -893,7 +1096,7 @@ function bindPlacesUI() {
   });
   $("plTop").addEventListener("click", e => {
     const b = e.target.closest("button"); if (!b) return;
-    if (!PL.on) { PL.on = $("plOn").checked = true; applyPlaces(); }  // show the layer so the picked site is visible
+    if (!PL.on) { PL.on = $("plOn").checked = true; applyPlaces(); renderLegendBox(); renderLayerMeta(); }  // show the layer so the picked site is visible
     selectPlace(+b.dataset.p, true);
   });
 }
@@ -920,13 +1123,12 @@ function bindPlacesUI() {
   S.srcs = Object.keys(POP_SOURCES).filter(k => (k + "T") in P[0]);
   if (!S.srcs.includes(S.src)) S.src = S.srcs[0] ?? "";
   if (S.srcs.length) {
-    $("srcSeg").innerHTML = S.srcs.map(k => `<button type="button" data-s="${k}" aria-pressed="${k === S.src}">${POP_SOURCES[k].label}</button>`).join("");
-    $("srcHint").textContent = POP_SOURCES[S.src].hint;
-    $("srcField").hidden = false;
+    document.querySelectorAll(".srcSel").forEach(s => { s.innerHTML = S.srcs.map(k => `<option value="${k}">${POP_SOURCES[k].label}</option>`).join(""); s.value = S.src; });
+    document.querySelectorAll(".srcHint").forEach(e => e.textContent = POP_SOURCES[S.src].hint);
   } else {  // data built without population
-    document.querySelectorAll('[data-m="x"], [data-m="xp"], [data-v="pop"], #sumXBox, #sumXpBox').forEach(el => el.remove());
+    document.querySelectorAll("#lyrPop, #lgPop, #srcRow, #sumXBox, #sumXpBox").forEach(el => el.remove());
   }
-  deriveSource(); computeRanks(); computeBreaks(); renderThreshold(); bindUI();
+  buildMetricSelects(); deriveSource(); computeRanks(); computeBreaks(); renderThreshold(); bindUI(); renderLayerMeta(); renderLegendBox();
 
   map = new maplibregl.Map({
     container: "map",
@@ -945,7 +1147,7 @@ function bindPlacesUI() {
     POP_LAYERS.forEach(id => map.addSource(id, { type: "raster", tiles: [`tiles://${id}/{z}/{x}/{y}`], tileSize: 256, minzoom: 4, maxzoom: 8, bounds: [68, 6.3, 97.6, 37.3] }));
     map.addLayer({ id: "adm3-fill", type: "fill", source: "adm3", paint: { "fill-color": css("--r0"), "fill-antialias": false } });
     map.addLayer({ id: "gfsm", type: "raster", source: "gfsm", layout: { visibility: "none" },
-      paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.rop } });
+      paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": S.L.gfsm.op } });
     POP_LAYERS.forEach(id => map.addLayer({ id, type: "raster", source: id, layout: { visibility: "none" },
       paint: { "raster-resampling": "nearest", "raster-fade-duration": 0, "raster-opacity": 1 } }));
     tileIndex("gfsm").catch(() => {});  // warm the index so the first toggle is instant
