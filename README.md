@@ -247,6 +247,24 @@ with an increase are reported. SSP2-4.5 is the mean of SSP1-2.6 and SSP3-7.0.
 Monsoon soils get 2–5% wetter in the median sub-district. In dry regions the runoff percentages run high
 because they start from small baselines.
 
+### Building on flood-prone land and urban flooding
+
+`scripts/17_urban_landuse.py` → `data/processed/india_adm3_urban.csv`, `viewer/data/urban.json`
+
+GHS-BUILT-S R2023A built-up surface (EC JRC, CC BY 4.0) at 30″ for 2000 and 2020, and the 2030 projection that
+extends 1975–2020 trends. Built-up land is compared with today's 1-in-100-year river and coastal flood zone (WRI
+Aqueduct, scripts/10). The built-up share of land in 2020 serves as the urban flash-flood proxy, shown alongside
+the wettest-day rainfall change.
+
+| India | 2000 | 2020 | 2030 (projected) |
+|---|---|---|---|
+| Built-up land (km²) | 22,376 | 38,522 | 45,305 |
+| … in the flood zone (km²) | 2,104 | 3,386 | 3,901 |
+
+Of the land built on between 2000 and 2020, 7.9% lies in the flood zone, about the zone's 7.7% share of all land:
+building has not avoided flood-prone land. Chennai's southern and western suburbs lead in new building inside
+the zone. 53 sub-districts are over 25% built up, home to about 4 crore people.
+
 ## Reproduce
 
 ```bash
@@ -272,6 +290,7 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/python .venv/Scripts/python scripts/15_runoff_soil.py --workers 6  # ISIMIP monthly runoff + soil moisture (100 India cut-outs, ~1 h)
 scripts/14_cyclone_wind.py             # STORM cyclone wind return periods (~5 MB of GeoTIFFs)
 .venv/Scripts/python scripts/16_glof.py                     # glacial lake outburst hazard (7 MB from Zenodo)
+.venv/Scripts/python scripts/17_urban_landuse.py           # GHSL built-up 2000/2020/2030 (~550 MB of zips)
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size
@@ -291,11 +310,11 @@ The sidebar has four tabs. **Layers** lists every map layer in drawing order (pl
 boundaries, rainfall change, 1-in-100-year flood zone, river flood frequency, cyclone wind, dangerous glacial lakes, low-lying coastal land, population, GFSM 30 m, sub-district statistics, and a
 Sentinel-2 cloudless satellite basemap by EOX for 2024 or 2016), each with its own switch, opacity and settings.
 **Findings** gives headline numbers as plain sentences for India or the chosen state, today and under the chosen
-scenario, plus rankings. **Glossary** defines the terms; underlined terms anywhere in the viewer link to it.
+scenario, grouped by hazard (rain, people, rivers, towns, mountains, coast), plus rankings. **Glossary** defines the terms; underlined terms anywhere in the viewer link to it.
 **About** holds the purpose, caveats and sources. Clicking a sub-district opens a profile with Today and Future tabs.
 
 For speed on GitHub Pages the first view loads only the boundaries (0.9 MB gzipped). Climate (0.9 MB),
-flood-zone (0.6 MB), projected population (0.5 MB), river flood frequency (0.4 MB), runoff and soil wetness (0.6 MB), cyclone wind (0.05 MB), glacial lakes (0.1 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
+flood-zone (0.6 MB), projected population (0.5 MB), river flood frequency (0.4 MB), runoff and soil wetness (0.6 MB), cyclone wind (0.05 MB), glacial lakes (0.1 MB), built-up land (0.05 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
 raster layers fetch only the tile bundles in view.
 
 Tiles are selected by intersecting the GFSM tile index with India's boundary buffered by 0.1°,

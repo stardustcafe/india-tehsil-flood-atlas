@@ -14,6 +14,7 @@ third-party datasets and carry their licences:
 | `data/processed/india_adm3_cyclone.csv`, `viewer/data/cyclone.json`, `viewer/data/wind_*/*` | STORM tropical cyclone wind return periods, with GPW / GHS-POP | **CC BY 4.0** (STORM itself is CC0) |
 | `data/processed/india_adm3_glof.csv`, `viewer/data/glof.json`, `viewer/data/glof_lakes.geojson` | Zheng et al. (2021) GLOF hazard, DDM30 river network | **CC BY 4.0** |
 | `data/processed/india_adm3_runoff.csv`, `viewer/data/runoff.json` | ISIMIP3b monthly runoff and soil moisture | **CC BY 4.0** |
+| `data/processed/india_adm3_urban.csv`, `viewer/data/urban.json` | GHS-BUILT-S R2023A, with WRI Aqueduct flood zones | **CC BY 4.0** |
 | `data/processed/india_adm3_sealevel.csv`, `viewer/data/slr.json`, `viewer/data/lowland/*` | IPCC AR6 sea-level projections + DeltaDTM v1.1, with GPW / GHS-POP | **CC BY 4.0** |
 
 ## Required attribution
@@ -44,6 +45,9 @@ third-party datasets and carry their licences:
   risk, Science Advances 8, eabm8438. Data: https://doi.org/10.4121/12705164 and https://doi.org/10.4121/14510817, CC0.
 - Glacial lakes: Zheng, G., Allen, S.K., Bao, A., et al. (2021), Increasing risk of glacial lake outburst floods from future
   Third Pole deglaciation, Nature Climate Change 11, 411–417. Data: https://doi.org/10.5281/zenodo.4477945, CC BY 4.0.
+- Built-up land: Pesaresi, M., Politis, P. (2023), GHS-BUILT-S R2023A - GHS built-up surface grid, derived from Sentinel-2 composite
+  and Landsat, multitemporal (1975-2030). European Commission, Joint Research Centre (JRC).
+  https://doi.org/10.2905/9F06F36F-4B11-47EC-ABB0-4F8B7B1D72EA. CC BY 4.0.
 - Sea level: Garner, G.G., Hermans, T., Kopp, R.E., et al. (2021), IPCC AR6 Sea Level Projections, regional confidence files,
   https://doi.org/10.5281/zenodo.6382554, CC BY 4.0; Fox-Kemper, B., et al. (2021), Ocean, Cryosphere and Sea Level Change,
   in Climate Change 2021: The Physical Science Basis, IPCC AR6 WGI, Chapter 9.

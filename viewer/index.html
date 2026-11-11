@@ -244,7 +244,9 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 /* findings: one number + one plain sentence per row */
 .kfs { display: flex; flex-direction: column; }
 .kf { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); }
-.kf:first-child { border-top: 0; padding-top: 2px; }
+.kf:first-child, .kf-h + .kf { border-top: 0; padding-top: 2px; }
+.kf-h { margin: 14px 0 2px; font: 600 11px/1.2 var(--sans, inherit); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.kf-h:first-child { margin-top: 0; }
 .kf b { font: 600 19px/1.1 var(--cond); font-variant-numeric: tabular-nums; color: var(--accent); }
 .kf span { font-size: 13px; }
 .kf small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
@@ -565,6 +567,7 @@ a.term:hover { color: var(--accent); }
         <div class="ge" id="g-cyclone"><dt>1-in-100-year cyclone wind</dt><dd>The highest sustained wind (10-minute average, 10 m above ground) that a tropical cyclone brings to a place once in 100 years on average, from 10,000 years of synthetic cyclones (STORM). Wind drives storm surge and damage to housing, power and crops; cyclone rain adds to river and urban flooding. The 2015–2050 values add the change simulated by 4 high-resolution climate models under high emissions; in the Bay of Bengal they project fewer intense cyclones, so values there fall.</dd></div>
         <div class="ge" id="g-imdcat"><dt>Cyclone categories (IMD)</dt><dd>The India Meteorological Department's scale: cyclonic storm 62–88 km/h (17–24 m/s), severe 89–117 km/h, very severe 118–165 km/h (33–46 m/s), extremely severe 166–220 km/h and super cyclonic above 220 km/h. IMD uses 3-minute winds, slightly stronger than the 10-minute winds here, so the atlas's categories are a little conservative.</dd></div>
         <div class="ge" id="g-glof"><dt>Glacial lake outburst flood (GLOF)</dt><dd>A sudden release of water from a lake held back by a glacier or a loose moraine, often set off by ice or rock falling into it. The flood surge can run hundreds of kilometres down the valley, as on the Teesta in October 2023. Hazard scores (Zheng et al. 2021) combine lake volume, dam type, slopes and the chance of ice or rock falls. As glaciers retreat, new lakes form in the hollows they leave. The atlas links a sub-district to lakes within 250 km upstream along the river network, at about 50 km resolution, so it shows which places lie down-valley from dangerous lakes, not how deep a flood would be.</dd></div>
+        <div class="ge" id="g-builtup"><dt>Built-up land</dt><dd>Ground covered by buildings, mapped from Landsat and Sentinel-2 imagery by the EU's Global Human Settlement Layer (GHSL) for 2000 and 2020, with a 2030 projection that extends 1975–2020 trends. Building in the flood zone puts more homes and assets in harm's way. A high built-up share also seals the ground, so heavy rain runs straight into drains, the main cause of urban flooding.</dd></div>
         <div class="ge" id="g-pluvial"><dt>Flash and urban flooding</dt><dd>Intense local rain that overwhelms drains and small streams. The flood-zone maps do not cover it; the wettest-day rainfall indicator is the closest guide here.</dd></div>
       </dl>
       <h3>Climate projections</h3>
@@ -607,6 +610,7 @@ a.term:hover { color: var(--accent); }
         <span>River flow, runoff and soil moisture: <a href="https://www.isimip.org" target="_blank" rel="noopener">ISIMIP3b</a> daily discharge and monthly runoff and soil moisture, CWatM, WaterGAP2-2e and MIROC-INTEG-LAND with five CMIP6 models, CC BY 4.0. Return periods after Hirabayashi et al. (2013).</span>
         <span>Cyclone wind: <a href="https://doi.org/10.4121/12705164" target="_blank" rel="noopener">STORM</a> 10 km wind-speed return periods, present and <a href="https://doi.org/10.4121/14510817" target="_blank" rel="noopener">2015–2050</a> (Bloemendaal et al. 2020, 2022), CC0.</span>
         <span>Glacial lakes: <a href="https://doi.org/10.5281/zenodo.4477945" target="_blank" rel="noopener">Zheng et al. (2021)</a> GLOF hazard for present and projected Third Pole lakes, CC BY 4.0.</span>
+        <span>Built-up land: <a href="https://doi.org/10.2905/9F06F36F-4B11-47EC-ABB0-4F8B7B1D72EA" target="_blank" rel="noopener">GHS-BUILT-S R2023A</a> (EC JRC), 2000, 2020 and 2030 projection, CC BY 4.0.</span>
         <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
         <span>Satellite imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, 2018 onwards CC BY-NC-SA 4.0.</span>
         <span>Basemap labels: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
@@ -705,11 +709,13 @@ const METRICS = {
   gl:  { label: "Dangerous glacial lakes, future", opt: "Dangerous glacial lakes upstream, future", fmt: v => fmtNum(v), tick: v => fmtNum(v), fixed: [1, 2, 5, 10, 20, 50], step: 1, max: 100, glof: true },
   ro:  { label: "Δ wettest-month runoff", opt: "Change in wettest-month runoff", fmt: v => signed(v), tick: v => signed(v), fixed: [-10, 0, 10, 20, 35, 50], step: 1, max: 100, ro: true },
   sm:  { label: "Δ monsoon soil wetness", opt: "Change in monsoon soil wetness", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [-5, -2, 0, 2, 5, 10], step: 0.5, max: 20, ro: true },
+  ub:  { label: "New building in flood zone", opt: "New building in the flood zone, 2000–2020", fmt: v => fmtNum(v, v < 10 ? 2 : 1) + " km²", tick: v => v < 0.1 ? v.toFixed(2) : v < 1 ? v.toFixed(1) : fmtNum(v), fixed: [0.05, 0.2, 0.5, 1, 2, 5], step: 0.05, max: 10, urb: true, zero: true },
+  us:  { label: "Built-up share", opt: "Built-up share of land, 2020 (urban flash floods)", fmt: v => v.toFixed(1) + "%", fixed: [1, 2, 5, 10, 25, 50], step: 0.5, max: 100, urb: true },
   rf:  { label: "River flood frequency", opt: "How much more often today's 100-year river flood comes", fmt: v => "×" + v.toFixed(v < 10 ? 1 : 0), tick: v => "×" + (v < 10 ? +v.toFixed(1) : v.toFixed(0)), fixed: [0.8, 1, 1.25, 2, 4, 10], step: 0.1, max: 10, rp: true },
   pg:  { label: "Population change", opt: "Projected population change since 2020", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [-10, 0, 10, 20, 40, 60], step: 1, max: 100, flood: true, ssp: true },
   cf: { label: "Flood pressure",     opt: "Flood pressure (climate-adjusted)", fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
-const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People", ["x", "xp", "pg"]],
+const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People", ["x", "xp", "pg"]], ["Building and urban floods", ["ub", "us"]],
   ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["River flood frequency", ["rf"]], ["Runoff and soil wetness", ["ro", "sm"]], ["Cyclone wind", ["cw", "cwd"]], ["Glacial lake outburst floods", ["gl0", "gl"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
 const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
@@ -760,7 +766,7 @@ function bboxOf(g) {
 }
 const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
 const inScope = p => !S.state || p.s === S.state;
-const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr || METRICS[m].rp || METRICS[m].cyc || METRICS[m].glof || METRICS[m].ro;  // values arrive with lazily loaded projections
+const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr || METRICS[m].rp || METRICS[m].cyc || METRICS[m].glof || METRICS[m].ro || METRICS[m].urb;  // values arrive with lazily loaded projections
 const valid = p => p.q === 0 && (!isData(S.metric) || Number.isFinite(p[S.metric]));
 
 /* population per source: {src}T people, {src}X people in High + Very High (scripts/06_population_exposure.py) */
@@ -905,6 +911,7 @@ async function setMetric(k) {
   if (METRICS[k].cyc) await loadCyclone();
   if (METRICS[k].glof) await loadGlof();
   if (METRICS[k].ro) await loadRunoff();
+  if (METRICS[k].urb) await loadUrban();
   S.metric = k; S.thr = 0;
   document.querySelectorAll(".metricSel").forEach(s => s.value = k);
   computeRanks(); renderThreshold(); refresh(); renderLayerMeta(); renderLegendBox();
@@ -913,14 +920,14 @@ function setSource(k) {
   S.src = k;
   document.querySelectorAll(".srcSel").forEach(s => s.value = k);
   document.querySelectorAll(".srcHint").forEach(e => e.textContent = POP_SOURCES[k].hint);
-  deriveSource(); deriveFlood(); deriveSlr(); deriveRp(); deriveRunoff(); deriveCyclone(); deriveGlof(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
+  deriveSource(); deriveFlood(); deriveSlr(); deriveRp(); deriveRunoff(); deriveCyclone(); deriveGlof(); deriveUrban(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
 }
 function showTab(id) {
   document.querySelectorAll('[role="tab"]').forEach(x => {
     if (!x.closest(".tabs")) return;
     x.setAttribute("aria-selected", x.id === id); $(x.getAttribute("aria-controls")).hidden = x.id !== id;
   });
-  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadRp(); loadRunoff(); loadCyclone(); loadGlof(); loadPlaces(); }
+  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadRp(); loadRunoff(); loadCyclone(); loadGlof(); loadUrban(); loadPlaces(); }
 }
 function filterGlossary() {
   const q = $("glossQ").value.trim().toLowerCase();
@@ -958,6 +965,14 @@ function applyTheme() {
 // one headline number and one plain sentence per row; terms link to the glossary
 const term = (id, text) => `<a class="term" href="#g-${id}">${text}</a>`;
 const kfRow = ([v, text, note]) => `<div class="kf"><b>${v}</b><span>${text}${note ? `<small>${note}</small>` : ""}</span></div>`;
+// Findings grouped by hazard, named by the first glossary term in each row
+const KF_GROUPS = [["Rain", ["rx5day", "rx1day", "agree"]], ["People", ["ssppop"]], ["Rivers", ["floodzone", "rp", "rpshift", "runoff"]],
+  ["Towns", ["builtup"]], ["Mountains", ["glof"]], ["Coast", ["cyclone", "slr", "bathtub"]]];
+function kfGrouped(rows) {
+  const groupOf = r => { const id = (r[1].match(/href="#g-([a-z0-9]+)"/) || [])[1]; return KF_GROUPS.findIndex(([, ids]) => ids.includes(id)); };
+  return KF_GROUPS.map(([name], gi) => { const rs = rows.filter(r => groupOf(r) === gi); return rs.length ? `<h4 class="kf-h">${name}</h4>` + rs.map(kfRow).join("") : ""; }).join("")
+    + rows.filter(r => groupOf(r) < 0).map(kfRow).join("");
+}
 const sumOf = (list, f) => list.reduce((s, p) => s + (f(p) || 0), 0);
 function renderToday() {
   const sc = P.filter(p => p.q === 0 && inScope(p)), where = S.state || "India";
@@ -968,6 +983,11 @@ function renderToday() {
     const d = FL.data.data.today, fz = sumOf(sc, p => d[S.src][p.i]);
     rows.push([fmtPeople(fz), `people live in the ${term("floodzone", "1-in-100-year flood zone")} of rivers and the coast.`,
       `River ${fmtPeople(sumOf(sc, p => d[S.src + "R"][p.i]))}, coast ${fmtPeople(sumOf(sc, p => d[S.src + "C"][p.i]))} (overlapping). No flood defences assumed.`]);
+  }
+  if (UR.data) {
+    const D = UR.data, s = k => sumOf(sc, p => D[k][p.i]) / 100, nw = s("b2020") - s("b2000"), nz = s("z2020") - s("z2000");
+    if (nw > 0) rows.push([`${fmtNum(nz, 0)} km²`, `of land ${term("builtup", "built on")} between 2000 and 2020 lies in the ${term("floodzone", "1-in-100-year flood zone")}, ${(100 * nz / nw).toFixed(0)}% of all new building in ${esc(where)}.`,
+      `Built-up land in the zone: ${fmtNum(s("z2000"), 0)} km² in 2000, ${fmtNum(s("z2020"), 0)} km² in 2020. GHSL, no flood defences.`]);
   }
   if (GL.data) {
     const ks = sc.map(p => GL.k.get(p.i)).filter(k => k != null && GL.data.nown[k] > 0);
@@ -1028,7 +1048,7 @@ function renderCard() {
       <div><dt>Rank in ${esc(p.s)}</dt><dd>${fmtNum(p._rs)} <small>of ${fmtNum(S.perState[p.s])}</small></dd></div>` : ""}
     </dl>
     <div class="where">Ranks by ${m.opt.toLowerCase()}${m.pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`;
-  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + rpBlock(p) + roBlock(p) + glofBlock(p) + slrBlock(p) + windBlock(p) + climBlock(p);
+  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + urbanBlock(p) + rpBlock(p) + roBlock(p) + glofBlock(p) + slrBlock(p) + windBlock(p) + climBlock(p);
   card.innerHTML = `
     <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
       <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
@@ -1038,7 +1058,7 @@ function renderCard() {
   $("cardX").onclick = () => select(null);
   card.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { CARD_TAB = b.dataset.ct; renderCard(); });
   if (!FL.data) loadFlood();
-  if (CARD_TAB === "future") { loadClimate(); loadSlr(); loadRp(); loadRunoff(); loadCyclone(); loadGlof(); }
+  if (CARD_TAB === "future") { loadClimate(); loadSlr(); loadRp(); loadRunoff(); loadCyclone(); loadGlof(); loadUrban(); }
 }
 function refresh({ breaks = true } = {}) {
   if (breaks) computeBreaks();
@@ -1294,6 +1314,12 @@ function renderFuture() {
           `Median: every ${years(med)}. ${fmtPeople(sumOf(twice, p => p.fz0))} people live in their river and coastal flood zones today.`]);
       }
     }
+    if (UR.data) {
+      const D = UR.data, s = k => sumOf(all, p => D[k][p.i]) / 100;
+      const urb = all.filter(p => D.s[p.i] >= 2500 && d.d1[p.i] != null), pu = sumOf(urb, p => p.pt);
+      rows.push([`${fmtNum(s("z2030") - s("z2020"), 0)} km²`, `more ${term("builtup", "built-up land")} in today's flood zone by 2030 if 1975–2020 trends continue (GHSL projection).`,
+        urb.length ? `${fmtNum(urb.length)} sub-districts are over 25% built up, home to ${fmtPeople(pu)}; their ${term("rx1day", "wettest-day rain")} changes by ${signed(sumOf(urb, p => d.d1[p.i] * p.pt) / Math.max(pu, 1))} (${scenLabel()}), the main driver of ${term("pluvial", "urban flooding")}.` : ""]);
+    }
     if (RO.data) {
       const D = RO.data.data[CL.ssp], k = CL.per, sc2 = all.filter(p => Number.isFinite(p.ro));
       if (sc2.length) {
@@ -1329,7 +1355,7 @@ function renderFuture() {
     const x = sumOf(sc, p => p.x), xRob = sumOf(sc.filter(p => d.lo[p.i] > 0), p => p.x);
     rows.push([fmtPeople(xRob), `people live on flood-prone land where ${term("agree", "models agree")} extreme rain will increase${x ? `, ${(100 * xRob / x).toFixed(0)}% of all on such land` : ""}.`]);
   }
-  $("kfFuture").innerHTML = rows.map(kfRow).join("") +
+  $("kfFuture").innerHTML = kfGrouped(rows) +
     `<p class="hint">Rainfall: median of about 30 CMIP6 models against 1995–2014. Flood zone: WRI Aqueduct, median of 5 models,
       with SSP population from Wang et al. (2022). River flood frequency and runoff: ISIMIP, 15 hydrological model runs. Cyclone wind: STORM. Glacial lakes: Zheng et al. (2021). Sea level: IPCC AR6, with DeltaDTM elevation.
       ${term("screening", "Screening figures, not forecasts.")}</p>`;
@@ -1449,6 +1475,28 @@ function rpBlock(p) {
     <table class="ctab"><tr><th>Scenario</th>${per.map(y => `<th>${perLabel(y)}</th>`).join("")}</tr>${rows}</table>
     <div class="where" style="margin-top:4px">${rpSsp()}, ${perLabel(k)}: every ${years(d["med" + k][i] / 10)} (${term("range", "likely")} ${years(d["lo" + k][i] / 10)} to ${years(d["hi" + k][i] / 10)});
       ${d["agree" + k][i]}% of 15 ${term("ghm", "model runs")} show it coming more often. *SSP2-4.5 estimated from SSP1-2.6 and SSP3-7.0.</div></div>`;
+}
+/* ---------- urban growth on flood-prone land (scripts/17_urban_landuse.py): GHS-BUILT-S 2000 / 2020 / 2030 ---------- */
+const UR = { data: null };
+const loadUrban = () => once("urban", async () => {
+  UR.data = await fetchOk("data/urban.json", "json");
+  deriveUrban(); dataLoaded();
+});
+function deriveUrban() {
+  if (!UR.data) return;
+  const D = UR.data;
+  P.forEach(p => { p.ub = Math.max(0, D.z2020[p.i] - D.z2000[p.i]) / 100; p.us = D.s[p.i] / 100; });
+  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i }, { ub: p.ub, us: p.us }));
+}
+function urbanBlock(p) {
+  if (!UR.data || !UR.data.b2020[p.i]) return "";
+  const D = UR.data, i = p.i, km = v => fmtNum(v / 100, v < 1000 ? 2 : 1);
+  const rows = [2000, 2020, 2030].map(y => `<tr><td>${y}${y === 2030 ? "*" : ""}</td><td>${km(D["b" + y][i])} km²</td>
+    <td>${km(D["z" + y][i])} km² <small>${D["b" + y][i] ? Math.round(100 * D["z" + y][i] / D["b" + y][i]) + "%" : ""}</small></td></tr>`).join("");
+  const r1 = CL.data && CL.data.data[climKey()].d1[i];
+  return `<div><h3>${term("builtup", "Built-up land")} and the flood zone</h3>
+    <table class="ctab"><tr><th>Year</th><th>Built up</th><th>In ${term("floodzone", "flood zone")}</th></tr>${rows}</table>
+    <div class="where" style="margin-top:4px">${(D.s[i] / 100).toFixed(1)}% of land built up in 2020${r1 != null ? `; wettest-day rain ${signed(r1)} (${scenLabel()}), the main driver of ${term("pluvial", "urban flooding")}` : ""}. *2030 extends 1975–2020 trends (GHSL).</div></div>`;
 }
 /* ---------- runoff and soil wetness (scripts/15_runoff_soil.py): ISIMIP3b monthly qtot and soilmoist ---------- */
 const RO = { data: null };
