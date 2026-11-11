@@ -156,6 +156,32 @@ bathtub estimate with 2020 population: no check that land connects to the sea, a
 embankments, so it shows land that depends on protection rather than land that will flood. Tides and surges
 are in the Aqueduct coastal flood zone. The viewer scales these counts by SSP growth.
 
+### River flood frequency (return-period shift)
+
+`scripts/13_return_period.py` → `data/processed/india_adm3_returnperiod.csv`, `viewer/data/rp.json`, `viewer/data/rivers.geojson`
+
+ISIMIP3b daily river discharge (CC BY 4.0) from three global hydrological models (CWatM, WaterGAP2-2e,
+MIROC-INTEG-LAND), each driven by five bias-adjusted CMIP6 models: 15 runs at 0.5°. The ISIMIP files API masks
+each file to India on the server, so about 20 MB per decade is downloaded instead of about 1 GB, and only annual
+maxima are kept. For every run and river cell, Gumbel distributions (L-moments) are fitted to the annual maximum
+daily flow of 1985–2014 and of each future 20-year period. The future return period of today's 100-year flow is
+then compared with the run's own past, so model bias largely cancels (after Hirabayashi et al. 2013). River cells
+drain at least 10,000 km² on the DDM30 network the models route on. Each sub-district takes the largest river
+cell covering at least 10% of its area, which gives 3,613 sub-districts. ISIMIP3b has no SSP2-4.5 runs, so
+SSP2-4.5 is the geometric mean of SSP1-2.6 and SSP3-7.0, labelled as an estimate.
+
+| Median river sub-district: today's 100-year flood comes every … years | 2020–39 | 2040–59 | 2060–79 | 2080–99 |
+|---|---|---|---|---|
+| SSP1-2.6 | 89 | 57 | 42 | 48 |
+| SSP2-4.5 (estimated) | 80 | 61 | 43 | 44 |
+| SSP3-7.0 | 73 | 75 | 38 | 41 |
+| SSP5-8.5 | 58 | 78 | 30 | 13 |
+
+By 2080–99, today's 100-year flood comes more often in 83–100% of river sub-districts, depending on the
+scenario. Values for individual 20-year periods are noisy: a 100-year event estimated from 20 years of maxima
+varies, so read trends across periods and scenarios rather than single cells. The models leave out dams and
+embankments, and the indicator covers river flow only, not exposure.
+
 ## Reproduce
 
 ```bash
@@ -177,6 +203,7 @@ bash scripts/04_build_gfsm_tiles.sh 10                          # GFSM raster ti
 .venv/Scripts/python scripts/11_ssp_population.py            # SSP population growth (streams ~3 GB of the figshare zips)
 .venv/Scripts/pip install h5py
 .venv/Scripts/python scripts/12_sea_level.py --workers 8     # AR6 sea level + DeltaDTM (~1.4 GB download, ~1 h)
+.venv/Scripts/python scripts/13_return_period.py --workers 8 # ISIMIP river flow, 465 India cut-outs (~10 GB, ~2 h)
 ```
 
 The raster overlay is built by warping the 30 m tiles once to EPSG:3857 at the z10 pixel size
@@ -193,14 +220,14 @@ Serve the folder rather than opening the file directly: `python -m http.server -
 It can be hosted as-is on GitHub Pages or any static host.
 
 The sidebar has four tabs. **Layers** lists every map layer in drawing order (places, labels and rivers,
-boundaries, rainfall change, 1-in-100-year flood zone, low-lying coastal land, population, GFSM 30 m, sub-district statistics, and a
+boundaries, rainfall change, 1-in-100-year flood zone, river flood frequency, low-lying coastal land, population, GFSM 30 m, sub-district statistics, and a
 Sentinel-2 cloudless satellite basemap by EOX for 2024 or 2016), each with its own switch, opacity and settings.
 **Findings** gives headline numbers as plain sentences for India or the chosen state, today and under the chosen
 scenario, plus rankings. **Glossary** defines the terms; underlined terms anywhere in the viewer link to it.
 **About** holds the purpose, caveats and sources. Clicking a sub-district opens a profile with Today and Future tabs.
 
 For speed on GitHub Pages the first view loads only the boundaries (0.9 MB gzipped). Climate (0.9 MB),
-flood-zone (0.6 MB), projected population (0.5 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
+flood-zone (0.6 MB), projected population (0.5 MB), river flood frequency (0.4 MB), sea-level (0.2 MB) and places (0.1 MB) data load the first time a layer, metric, tab or profile needs them, and
 raster layers fetch only the tile bundles in view.
 
 Tiles are selected by intersecting the GFSM tile index with India's boundary buffered by 0.1°,

@@ -10,6 +10,7 @@ third-party datasets and carry their licences:
 | `data/processed/india_adm3_climate.csv`, `viewer/data/climate.json` | World Bank CCKP CMIP6 0.25° ensemble, with GFSM v1 | **CC BY 4.0** |
 | `data/processed/india_places.*`, `viewer/data/places.geojson` | OpenStreetMap + Wikidata, with GFSM v1 class | **ODbL 1.0** (from OpenStreetMap) |
 | `data/processed/*2020_india_pop*.tif`, `viewer/data/pop_*/*` | GPW v4.11 or GHS-POP R2023A, split by GFSM v1 | **CC BY 4.0** |
+| `data/processed/india_adm3_returnperiod.csv`, `viewer/data/rp.json`, `viewer/data/rivers.geojson` | ISIMIP3b daily discharge (3 hydrological × 5 climate models), DDM30 river network | **CC BY 4.0** |
 | `data/processed/india_adm3_sealevel.csv`, `viewer/data/slr.json`, `viewer/data/lowland/*` | IPCC AR6 sea-level projections + DeltaDTM v1.1, with GPW / GHS-POP | **CC BY 4.0** |
 
 ## Required attribution
@@ -32,6 +33,9 @@ third-party datasets and carry their licences:
   Aqueduct Floods Methodology, Technical Note, World Resources Institute. www.wri.org/publication/aqueduct-floods-methodology
 - Projected population: Wang, X., Meng, X., Long, Y. (2022), Projecting 1 km-grid population distributions from 2020
   to 2100 globally under shared socioeconomic pathways, Scientific Data 9, 563. https://doi.org/10.6084/m9.figshare.19608594, CC BY 4.0.
+- River flow: ISIMIP3b water_global output (CWatM, WaterGAP2-2e, MIROC-INTEG-LAND), daily discharge, CC BY 4.0, https://data.isimip.org (Inter-Sectoral Impact Model Intercomparison Project, www.isimip.org).
+  River network: DDM30 (Döll, P. & Lehner, B. 2002, J. Hydrol. 258, 214–231), as distributed by ISIMIP.
+  Method after Hirabayashi, Y., et al. (2013), Global flood risk under climate change, Nature Climate Change 3, 816–821.
 - Sea level: Garner, G.G., Hermans, T., Kopp, R.E., et al. (2021), IPCC AR6 Sea Level Projections, regional confidence files,
   https://doi.org/10.5281/zenodo.6382554, CC BY 4.0; Fox-Kemper, B., et al. (2021), Ocean, Cryosphere and Sea Level Change,
   in Climate Change 2021: The Physical Science Basis, IPCC AR6 WGI, Chapter 9.

@@ -120,6 +120,7 @@ button.lyr-name[aria-expanded="true"] b::after { transform: rotate(-135deg) tran
 .t-gfsm { background: linear-gradient(90deg, var(--g1), var(--g2), var(--g3), var(--g4), var(--g5)); }
 .t-pop { background: linear-gradient(90deg, var(--d1), var(--d3), var(--d6)); }
 .t-clim { background: linear-gradient(90deg, #a6611a, #e4ecee, #5b9bd5, #0b3a75); }
+.t-rivers { background: linear-gradient(90deg, #4f86c6, #a5adb8, #f2b84b, #e8743b, #c63b2d, #7a1426); }
 .t-lowland { background: linear-gradient(90deg, #6a1b6a, #d6619a, #f8d8e4); }
 .t-flood { background: linear-gradient(90deg, #bfe6f0, #3a9ac2, #0b3d6e); }
 .t-sat { background: linear-gradient(135deg, #3d5a2a, #7d7348 40%, #a89a72 55%, #2e4f63); }
@@ -368,6 +369,21 @@ a.term:hover { color: var(--accent); }
               <input type="range" class="op" id="opFlood" data-layer="flood" min="5" max="100" step="5" value="90"></div>
           </div>
         </li>
+        <li class="lyr off" data-layer="rivers" id="lyrRivers">
+          <div class="lyr-head">
+            <span class="thumb t-rivers"></span>
+            <button type="button" class="lyr-name" aria-expanded="false" aria-controls="lyrRiversBody"><b>River flood frequency</b><small id="metaRivers"></small></button>
+            <label class="switch"><input type="checkbox" class="lyr-on" data-layer="rivers" aria-label="Show river flood frequency"><span></span></label>
+          </div>
+          <div class="lyr-body" id="lyrRiversBody" hidden>
+            <p class="hint">How often today's <a class="term" href="#g-rp">1-in-100-year</a> river flood would come in the chosen scenario and period,
+              on the larger rivers (dots on a 50 km grid, sized by flow). Median of 15 runs of
+              <a class="term" href="#g-ghm">hydrological models</a> (<a class="term" href="#g-rpshift">how to read this</a>).</p>
+            <button type="button" class="linkbtn scen-open">Change scenario or period</button>
+            <div class="ctl"><div class="row"><label for="opRivers">Opacity</label><output id="opRiversOut">90%</output></div>
+              <input type="range" class="op" id="opRivers" data-layer="rivers" min="5" max="100" step="5" value="90"></div>
+          </div>
+        </li>
         <li class="lyr off" data-layer="lowland" id="lyrLowland">
           <div class="lyr-head">
             <span class="thumb t-lowland"></span>
@@ -496,6 +512,7 @@ a.term:hover { color: var(--accent); }
         <div class="ge" id="g-gfsm"><dt>GFSM</dt><dd>Global Flood Susceptibility Map v1 (Waleed et al., 2026): a 30 m map built from satellite and geospatial data that rates land in five classes. It is the basis of today's figures in this atlas.</dd></div>
         <div class="ge" id="g-classes"><dt>Flood-prone land (High+)</dt><dd>Land in GFSM's High or Very High classes, the top two of five (Very Low, Low, Moderate, High, Very High).</dd></div>
         <div class="ge" id="g-rp"><dt>1-in-100-year flood (return period)</dt><dd>A flood with a 1% chance of happening in any given year. It is not "once a century": over 30 years the chance of at least one is about 26%. A larger return period means a rarer, bigger flood.</dd></div>
+        <div class="ge" id="g-rpshift"><dt>River flood frequency (return-period shift)</dt><dd>How often today's 1-in-100-year river flood would come in future. "Every 25 years" means four times as often as today; "every 200 years" means half as often. Computed from daily river flow on the larger rivers (about 50 km cells), comparing each model run's future with its own 1985–2014 past, so model biases largely cancel. Each sub-district takes the largest river crossing it; places without one have no value. It shows the change in river flow only, not in who lives on the floodplain.</dd></div>
         <div class="ge" id="g-floodzone"><dt>Flood zone</dt><dd>Land that WRI Aqueduct Floods models as under water in a 1-in-100-year river or coastal flood, at about 1 km, with no flood defences. A cell counts if any depth is modelled. Future coastal maps include median sea-level rise and land subsidence.</dd></div>
         <div class="ge" id="g-slr"><dt>Sea-level rise</dt><dd>The projected rise of mean sea level relative to the land, against 1995–2014, from the IPCC's Sixth Assessment (AR6). The atlas uses the nearest point on AR6's 1° grid; local land sinking measured at tide gauges is left out because the estimates disagree sharply, so delta areas may see more.</dd></div>
         <div class="ge" id="g-bathtub"><dt>Land below sea level</dt><dd>Land whose ground height (30 m DeltaDTM model) is below today's or the projected mean sea level. A simple "bathtub" estimate: it ignores whether the land connects to the sea, and much of it is already behind embankments, as in the Sundarbans and Kuttanad. Read it as land that depends on protection and drainage, not land that will flood. Tides and storm surges come on top; see Flood zone.</dd></div>
@@ -510,7 +527,8 @@ a.term:hover { color: var(--accent); }
         <div class="ge" id="g-scenario"><dt>Emissions scenario (SSP, RCP)</dt><dd>A storyline of future greenhouse-gas emissions. The current SSPs (CMIP6) replaced the older RCPs (CMIP5); SSP2-4.5 is roughly RCP4.5. Here SSP1-2.6 is low, SSP2-4.5 middle, SSP3-7.0 high and SSP5-8.5 very high. Each SSP also has its own population path (see Projected population). Flood-zone maps exist only for RCP4.5 and RCP8.5, so the atlas shows RCP4.5 for SSP1-2.6 and SSP2-4.5, and RCP8.5 for SSP3-7.0 and SSP5-8.5.</dd></div>
         <div class="ge" id="g-period"><dt>Period and baseline</dt><dd>Rainfall changes are 20-year averages (2020–39 to 2080–99) compared with 1995–2014. Flood-zone maps are centred on 2030, 2050 and 2080 and compared with a 1960–1999 baseline; 2060–79 and 2080–99 both use the 2080 map.</dd></div>
         <div class="ge" id="g-model"><dt>Climate model</dt><dd>A computer simulation of the global climate. Rainfall projections use about 30 CMIP6 models; flood-zone maps use 5 CMIP5 models. Models differ, so the atlas shows the middle value (median) and a range.</dd></div>
-        <div class="ge" id="g-range"><dt>Model range</dt><dd>For rainfall, the 10th to 90th percentile across models: 8 in 10 models fall inside it. For flood zones, the lowest to highest of the 5 models.</dd></div>
+        <div class="ge" id="g-ghm"><dt>Hydrological model</dt><dd>A model that turns rain and snowmelt into soil moisture, runoff and river flow. River flood frequency uses three global hydrological models from ISIMIP (CWatM, WaterGAP2, MIROC-INTEG-LAND), each driven by five CMIP6 climate models: 15 runs. ISIMIP has no SSP2-4.5 runs, so for SSP2-4.5 the atlas shows the geometric mean of SSP1-2.6 and SSP3-7.0, marked as estimated.</dd></div>
+        <div class="ge" id="g-range"><dt>Model range</dt><dd>For rainfall, the 10th to 90th percentile across models: 8 in 10 models fall inside it. For flood zones, the lowest to highest of the 5 models. For river flood frequency, the 17th to 83rd percentile of the 15 runs (the "likely" range).</dd></div>
         <div class="ge" id="g-agree"><dt>Models agree</dt><dd>At least 90% of models project an increase. Where they don't, the direction of change is uncertain.</dd></div>
         <div class="ge" id="g-rx5day"><dt>Wettest 5-day rainfall (Rx5day)</dt><dd>The year's largest rainfall total over 5 consecutive days, averaged over the period. Linked to river flooding.</dd></div>
         <div class="ge" id="g-rx1day"><dt>Wettest day (Rx1day)</dt><dd>The year's largest single-day rainfall, averaged over the period. Linked to flash and urban flooding.</dd></div>
@@ -541,6 +559,7 @@ a.term:hover { color: var(--accent); }
         <span>Flood zones: <a href="https://www.wri.org/data/aqueduct-floods-hazard-maps" target="_blank" rel="noopener">WRI Aqueduct Floods</a> v2 hazard maps (Ward et al. 2020), 1-in-100-year river (5 CMIP5 models) and coastal (median sea-level rise, with subsidence) inundation, no flood defences.</span>
         <span>Projected population: Wang, Meng &amp; Long (2022), <a href="https://doi.org/10.6084/m9.figshare.19608594" target="_blank" rel="noopener">1 km SSP population 2020–2100</a>, Scientific Data, CC BY 4.0. Used as growth rates on the 2020 counts.</span>
         <span>Sea level: <a href="https://doi.org/10.5281/zenodo.6382554" target="_blank" rel="noopener">IPCC AR6 sea-level projections</a> (Fox-Kemper et al. 2021; Garner et al. 2021), CC BY 4.0. Elevation: <a href="https://doi.org/10.4121/21997565" target="_blank" rel="noopener">DeltaDTM</a> (Pronk et al. 2024), CC BY 4.0, built from Copernicus GLO-30 © DLR e.V.</span>
+        <span>River flow: <a href="https://www.isimip.org" target="_blank" rel="noopener">ISIMIP3b</a> daily discharge, CWatM, WaterGAP2-2e and MIROC-INTEG-LAND with five CMIP6 models, CC BY 4.0. Return periods after Hirabayashi et al. (2013).</span>
         <span>Places: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> features with a Wikidata link (ODbL), ranked by Wikipedia language editions (Wikidata, CC0).</span>
         <span>Satellite imagery: <a href="https://s2maps.eu" target="_blank" rel="noopener">Sentinel-2 cloudless</a> by EOX IT Services GmbH (contains modified Copernicus Sentinel data); 2016 CC BY 4.0, 2018 onwards CC BY-NC-SA 4.0.</span>
         <span>Basemap labels: <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a>, © OpenMapTiles, data © OpenStreetMap contributors.</span>
@@ -578,6 +597,9 @@ a.term:hover { color: var(--accent); }
           <div class="gleg"><span><i style="background:#bfe6f0"></i>up to 0.5 m</span><span><i style="background:#7cc4dc"></i>0.5–1 m</span>
           <span><i style="background:#3a9ac2"></i>1–2 m</span><span><i style="background:#1c6aa0"></i>2–4 m</span><span><i style="background:#0b3d6e"></i>over 4 m</span></div>
           <p>No flood defences. WRI Aqueduct Floods.</p></div>
+        <div class="lg" id="lgRivers" hidden><h3 id="lgRiversT">Today's 100-year river flood comes</h3>
+          <div class="gleg" id="riversLeg"></div>
+          <p id="lgRiversNote">Median of 15 model runs; dot size shows river flow.</p></div>
         <div class="lg" id="lgLowland" hidden><h3>Height above today's sea level</h3>
           <div class="gleg"><span><i style="background:#6a1b6a"></i>below 0 m</span><span><i style="background:#a8327f"></i>0–0.5 m</span>
           <span><i style="background:#d6619a"></i>0.5–1 m</span><span><i style="background:#eea2bf"></i>1–2 m</span><span><i style="background:#f8d8e4"></i>2–3 m</span></div>
@@ -622,11 +644,12 @@ const METRICS = {
   fz:  { label: "People in 100-yr flood zone, future", opt: "People in 1-in-100-year flood zone, future (projected population)", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [1e3, 5e3, 2e4, 5e4, 1e5, 2.5e5], step: 1000, max: 500000, pop: true, flood: true, zero: true },
   fzd: { label: "Change in people in flood zone", opt: "Change in people in flood zone vs today", fmt: v => (v > 0 ? "+" : v < 0 ? "−" : "") + fmtPeople(Math.abs(v)), tick: v => (v < 0 ? "−" : "") + fmtShort(Math.abs(v)), fixed: [0, 500, 2000, 5000, 20000, 50000], step: 500, max: 100000, pop: true, flood: true, zero: true },
   sl:  { label: "People below future sea level", opt: "People on land below the future mean sea level", fmt: v => fmtPeople(v), tick: v => fmtShort(v), fixed: [100, 1000, 5000, 2e4, 5e4, 1e5], step: 100, max: 200000, pop: true, slr: true, zero: true },
+  rf:  { label: "River flood frequency", opt: "How much more often today's 100-year river flood comes", fmt: v => "×" + v.toFixed(v < 10 ? 1 : 0), tick: v => "×" + (v < 10 ? +v.toFixed(1) : v.toFixed(0)), fixed: [0.8, 1, 1.25, 2, 4, 10], step: 0.1, max: 10, rp: true },
   pg:  { label: "Population change", opt: "Projected population change since 2020", fmt: v => signed(v, 1), tick: v => signed(v), fixed: [-10, 0, 10, 20, 40, 60], step: 1, max: 100, flood: true, ssp: true },
   cf: { label: "Flood pressure",     opt: "Flood pressure (climate-adjusted)", fmt: v => v.toFixed(1), fixed: [5, 10, 20, 35, 50, 75], step: 1, clim: true },
 };
 const METRIC_GROUPS = [["Flood susceptibility today", ["h", "p5", "m", "hk"]], ["People", ["x", "xp", "pg"]],
-  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
+  ["1-in-100-year flood zone", ["fz0", "fz", "fzd"]], ["River flood frequency", ["rf"]], ["Sea-level rise", ["sl"]], ["Rainfall outlook", ["c5", "cf"]]];
 const signed = (v, d = 0) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d) + "%";
 const POP_SOURCES = {
   gpw: { label: "GPW v4.11", hint: "GPW spreads each census sub-district's count evenly over its area, so it cannot tell whether settlements sit on the floodplain or above it." },
@@ -636,7 +659,7 @@ const CLASS_NAMES = ["Very Low", "Low", "Moderate", "High", "Very High"];
 const S = { metric: "h", mode: "quantile", state: "", thr: 0, hover: null, sel: null, breaks: [], src: "gpw", popKind: "high", srcs: [],
   // map layers, each with its own switch and opacity (places and OSM context are handled by their own sections)
   L: { choro: { on: true, op: 0.9 }, gfsm: { on: false, op: 0.85 }, pop: { on: false, op: 0.9 }, clim: { on: false, op: 0.85 }, bounds: { on: true },
-       flood: { on: false, op: 0.9, when: "future" }, lowland: { on: false, op: 0.9 },
+       flood: { on: false, op: 0.9, when: "future" }, rivers: { on: false, op: 0.9 }, lowland: { on: false, op: 0.9 },
        sat: { on: false, op: 1, year: "2024" } } };
 // Sentinel-2 cloudless mosaics by EOX (https://s2maps.eu); the 2016 layer has no year in its name
 const SAT_YEARS = { 2024: { layer: "s2cloudless-2024_3857", lic: "CC BY-NC-SA 4.0" }, 2016: { layer: "s2cloudless_3857", lic: "CC BY 4.0" } };
@@ -676,7 +699,7 @@ function bboxOf(g) {
 }
 const unionBox = list => list.reduce((a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])], [180, 90, -180, -90]);
 const inScope = p => !S.state || p.s === S.state;
-const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr;  // values arrive with lazily loaded projections
+const isData = m => METRICS[m].clim || METRICS[m].flood || METRICS[m].slr || METRICS[m].rp;  // values arrive with lazily loaded projections
 const valid = p => p.q === 0 && (!isData(S.metric) || Number.isFinite(p[S.metric]));
 
 /* population per source: {src}T people, {src}X people in High + Very High (scripts/06_population_exposure.py) */
@@ -720,7 +743,7 @@ function applyPaint() {
   if (!map || !map.getLayer("gfsm")) return;
   const C = ramp(), step = ["step", metricExpr(), C[0]];
   S.breaks.forEach((b, i) => step.push(b, C[i + 1]));
-  map.setPaintProperty("adm3-fill", "fill-color", ["case", ["==", ["get", "q"], 1], css("--nodata"), step]);
+  map.setPaintProperty("adm3-fill", "fill-color", ["case", ["==", ["get", "q"], 1], css("--nodata"), ["<", metricExpr(), -1e8], css("--nodata"), step]);
   const conds = [];
   if (S.state) conds.push(["==", ["get", "s"], S.state]);
   if (S.thr > 0) conds.push([">=", metricExpr(), S.thr]);
@@ -743,6 +766,11 @@ function applyRaster() {
     map.setPaintProperty("clim", "raster-opacity", L.clim.op);
   }
   map.setLayoutProperty("adm3-edges", "visibility", vis(L.bounds.on));
+  if (map.getLayer("rivfreq")) {
+    map.setLayoutProperty("rivfreq", "visibility", vis(L.rivers.on));
+    map.setPaintProperty("rivfreq", "circle-opacity", L.rivers.op);
+    map.setPaintProperty("rivfreq", "circle-color", riverColor());
+  }
   map.setLayoutProperty("lowland", "visibility", vis(L.lowland.on));
   map.setPaintProperty("lowland", "raster-opacity", L.lowland.op);
   const fk = floodKey();
@@ -762,10 +790,11 @@ const layerOn = k => k === "places" ? PL.on : k === "ctx" ? $("ctx").checked : S
 // one-line state under each layer name, and dimmed rows for layers that are off
 function renderLayerMeta() {
   const m = METRICS[S.metric];
-  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.ssp || m.slr ? ` · ${sspPopLabel()}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())} map, ${sspNum()} population` : "");
+  $("metaChoro").textContent = m.opt + (m.clim ? ` · ${scenLabel()}` : m.ssp || m.slr ? ` · ${sspPopLabel()}` : m.rp ? ` · ${rpLabel()}` : m.flood && S.metric !== "fz0" ? ` · ${aqLabel(aqKey())} map, ${sspNum()} population` : "");
   if (S.srcs.length) $("metaPop").textContent = `${POP_SOURCES[S.src].label} · ${S.popKind === "high" ? "people on High+ land" : "everyone"}`;
   $("metaClim").textContent = scenLabel();
   $("metaFlood").textContent = floodLabel();
+  $("metaRivers").textContent = rpLabel();
   $("metaSat").textContent = `Sentinel-2 cloudless ${S.L.sat.year} · EOX`;
   document.querySelectorAll(".scenTxt").forEach(e => e.textContent = scenLabel());
   document.querySelectorAll(".lyr").forEach(li => li.classList.toggle("off", !layerOn(li.dataset.layer)));
@@ -774,11 +803,12 @@ function renderLayerMeta() {
 function renderLegendBox() {
   const L = S.L, m = METRICS[S.metric];
   $("lgChoro").hidden = !L.choro.on; $("lgGfsm").hidden = !L.gfsm.on; $("lgPop").hidden = !L.pop.on;
-  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on; $("lgFlood").hidden = !L.flood.on; $("lgLowland").hidden = !L.lowland.on;
-  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on || L.lowland.on;
+  $("lgClim").hidden = !L.clim.on; $("lgPlaces").hidden = !PL.on; $("lgSat").hidden = !L.sat.on; $("lgFlood").hidden = !L.flood.on; $("lgLowland").hidden = !L.lowland.on; $("lgRivers").hidden = !L.rivers.on;
+  $("lgEmpty").hidden = L.choro.on || L.gfsm.on || L.pop.on || L.clim.on || PL.on || L.sat.on || L.flood.on || L.lowland.on || L.rivers.on;
+  $("lgRiversT").textContent = `Today's 100-year river flood comes, ${rpLabel()}`;
   $("lgFloodT").textContent = `Flood depth, 1-in-100-year, ${floodLabel()}`;
   $("satCredit").textContent = `Sentinel-2 cloudless ${L.sat.year} by EOX IT Services GmbH, contains modified Copernicus Sentinel data, ${SAT_YEARS[L.sat.year].lic}.`;
-  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.ssp || m.slr ? ", " + sspPopLabel() : S.metric === "fz0" ? "" : m.flood ? `, ${aqLabel(aqKey())} map, ${sspNum()} population` : "")
+  $("lgChoroT").textContent = m.opt + (m.clim ? ", " + scenLabel() : m.ssp || m.slr ? ", " + sspPopLabel() : m.rp ? ", " + rpLabel() : S.metric === "fz0" ? "" : m.flood ? `, ${aqLabel(aqKey())} map, ${sspNum()} population` : "")
     + (m.pop ? ", " + POP_SOURCES[S.src].label : "");
   if (S.srcs.length) $("lgPopT").textContent = `People per km², ${POP_SOURCES[S.src].label}${S.popKind === "high" ? ", on High+ land only" : ""}`;
   $("lgClimT").textContent = `Change in wettest 5-day rain, ${scenLabel()}`;
@@ -793,6 +823,7 @@ async function setMetric(k) {
   if (METRICS[k].clim) await loadClimate();
   if (METRICS[k].flood || METRICS[k].slr) await loadFlood();
   if (METRICS[k].slr) await loadSlr();
+  if (METRICS[k].rp) await loadRp();
   S.metric = k; S.thr = 0;
   document.querySelectorAll(".metricSel").forEach(s => s.value = k);
   computeRanks(); renderThreshold(); refresh(); renderLayerMeta(); renderLegendBox();
@@ -801,14 +832,14 @@ function setSource(k) {
   S.src = k;
   document.querySelectorAll(".srcSel").forEach(s => s.value = k);
   document.querySelectorAll(".srcHint").forEach(e => e.textContent = POP_SOURCES[k].hint);
-  deriveSource(); deriveFlood(); deriveSlr(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
+  deriveSource(); deriveFlood(); deriveSlr(); deriveRp(); computeRanks(); refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
 }
 function showTab(id) {
   document.querySelectorAll('[role="tab"]').forEach(x => {
     if (!x.closest(".tabs")) return;
     x.setAttribute("aria-selected", x.id === id); $(x.getAttribute("aria-controls")).hidden = x.id !== id;
   });
-  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadPlaces(); }
+  if (id === "tabS") { loadClimate(); loadFlood(); loadSlr(); loadRp(); loadPlaces(); }
 }
 function filterGlossary() {
   const q = $("glossQ").value.trim().toLowerCase();
@@ -906,7 +937,7 @@ function renderCard() {
       <div><dt>Rank in ${esc(p.s)}</dt><dd>${fmtNum(p._rs)} <small>of ${fmtNum(S.perState[p.s])}</small></dd></div>` : ""}
     </dl>
     <div class="where">Ranks by ${m.opt.toLowerCase()}${m.pop ? " (" + POP_SOURCES[S.src].label + ")" : ""}.</div>`;
-  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + slrBlock(p) + climBlock(p);
+  const future = !CL.data || !FL.data || !SL.data ? `<p class="hint">Loading projections…</p>` : floodBlock(p) + rpBlock(p) + slrBlock(p) + climBlock(p);
   card.innerHTML = `
     <header><div><h2>${esc(p.n)}</h2><div class="where">${esc(p.d)} district · ${esc(p.s)}</div></div>
       <button type="button" class="x" id="cardX" aria-label="Close details">×</button></header>
@@ -916,7 +947,7 @@ function renderCard() {
   $("cardX").onclick = () => select(null);
   card.querySelectorAll("[data-ct]").forEach(b => b.onclick = () => { CARD_TAB = b.dataset.ct; renderCard(); });
   if (!FL.data) loadFlood();
-  if (CARD_TAB === "future") { loadClimate(); loadSlr(); }
+  if (CARD_TAB === "future") { loadClimate(); loadSlr(); loadRp(); }
 }
 function refresh({ breaks = true } = {}) {
   if (breaks) computeBreaks();
@@ -942,6 +973,7 @@ function bindUI() {
   document.querySelectorAll(".lyr-on").forEach(inp => inp.addEventListener("change", () => {
     const k = inp.dataset.layer; S.L[k].on = inp.checked;
     if (k === "clim" && inp.checked) loadClimate().then(() => { updateClimImage(); applyRaster(); });
+    if (k === "rivers" && inp.checked) loadRivers().then(applyRaster);
     if (k === "sat" && inp.checked && S.L.choro.on && S.L.choro.op > 0.5) {  // let the imagery show through the fill
       S.L.choro.op = 0.5; $("opChoro").value = 50; $("opChoroOut").textContent = "50%";
     }
@@ -1150,6 +1182,14 @@ function renderFuture() {
     rows.push([signed(100 * (pop1 / pop0 - 1)), `${term("ssppop", "projected population")} change by ${G_YEAR[CL.per]} (${sspNum()}), to ${fmtPeople(pop1)}.`]);
     rows.push([fmtPeople(fut), `people would live in the ${term("floodzone", "1-in-100-year flood zone")} by ${AQ_YEAR[CL.per]}, ${more(fut - now)} than today.`,
       `Climate change: ${more(clim - now)} (${aqLabel(k)} flood map). Population change: ${more(fut - clim)}. ${term("defences", "No flood defences")}.`]);
+    if (RP.data) {
+      const rv = all.filter(p => Number.isFinite(p.rf)), twice = rv.filter(p => p.rf >= 2);
+      if (rv.length) {
+        const med = rv.map(p => 100 / p.rf).sort((a, b) => a - b)[rv.length >> 1];
+        rows.push([`${Math.round(100 * twice.length / rv.length)}%`, `of ${fmtNum(rv.length)} sub-districts on larger rivers would see today's ${term("rp", "100-year")} river flood ${term("rpshift", "at least twice as often")} in ${perLabel(CL.per)} (${rpSsp()}).`,
+          `Median: every ${years(med)}. ${fmtPeople(sumOf(twice, p => p.fz0))} people live in their river and coastal flood zones today.`]);
+      }
+    }
     if (SL.data) {
       const y = G_YEAR[CL.per], D = SL.data.data[CL.ssp], cs = all.map(p => SL.k.get(p.i)).filter(k => k != null);
       if (cs.length) {
@@ -1167,7 +1207,7 @@ function renderFuture() {
   }
   $("kfFuture").innerHTML = rows.map(kfRow).join("") +
     `<p class="hint">Rainfall: median of about 30 CMIP6 models against 1995–2014. Flood zone: WRI Aqueduct, median of 5 models,
-      with SSP population from Wang et al. (2022). Sea level: IPCC AR6, with DeltaDTM elevation.
+      with SSP population from Wang et al. (2022). River flood frequency: ISIMIP, 15 hydrological model runs. Sea level: IPCC AR6, with DeltaDTM elevation.
       ${term("screening", "Screening figures, not forecasts.")}</p>`;
 }
 function climBlock(p) {
@@ -1186,7 +1226,7 @@ function setClimate(ssp = CL.ssp, per = CL.per) {
   CL.ssp = ssp; CL.per = per;
   [...$("sspSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.s === ssp));
   [...$("perSeg").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.p === per));
-  deriveClimate(); deriveFlood(); deriveSlr();
+  deriveClimate(); deriveFlood(); deriveSlr(); deriveRp();
   if (isData(S.metric)) computeRanks();
   if (S.L.clim.on && CL.data) updateClimImage();
   refresh(); renderFuture(); renderLayerMeta(); renderLegendBox();
@@ -1197,6 +1237,7 @@ function initClimateUI() {
   $("perSeg").innerHTML = PERIODS.map(p => `<button type="button" data-p="${p}" aria-pressed="${p === CL.per}">${perLabel(p)}</button>`).join("");
   $("sspSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setClimate(b.dataset.s); });
   $("perSeg").addEventListener("click", e => { const b = e.target.closest("button"); if (b) setClimate(undefined, b.dataset.p); });
+  $("riversLeg").innerHTML = RP_COLORS.map((c, i) => `<span><i style="background:${c}"></i>${RP_LABELS[i]}</span>`).join("");
   $("climLeg").innerHTML = CLIM_COLORS.map((c, i) => `<span><i style="background:${c}"></i>${CLIM_LABELS[i]}</span>`).join("");
 }
 // projections are fetched the first time something needs them, so the first map view loads only the boundaries
@@ -1241,6 +1282,50 @@ const loadFlood = () => once("flood", async () => {
   [FL.data, FL.pop] = await Promise.all([fetchOk("data/flood.json", "json"), fetchOk("data/popssp.json", "json")]);
   deriveFlood(); deriveSlr(); dataLoaded();
 });
+/* ---------- river flood frequency (scripts/13_return_period.py): ISIMIP3b daily discharge, 3 hydrological x 5 climate models ---------- */
+const RP = { data: null, rivers: false };
+const RP_COLORS = ["#4f86c6", "#a5adb8", "#f2b84b", "#e8743b", "#c63b2d", "#7a1426"];
+const RP_BREAKS = [0.8, 1.25, 2, 4, 10];  // times as often as today
+const RP_LABELS = ["less often", "about as often", "1.25–2× as often", "2–4× as often", "4–10× as often", "over 10× as often"];
+// ISIMIP3b has no SSP2-4.5 runs: the data hold the geometric mean of SSP1-2.6 and SSP3-7.0
+const rpSsp = (s = CL.ssp) => s === "ssp245" ? "SSP2-4.5, estimated" : SSP_INFO[s][0];
+const rpLabel = () => `${rpSsp()} · ${perLabel(CL.per)}`;
+const years = v => v >= 1000 ? "over 1,000 years" : `${fmtNum(v < 10 ? +v.toFixed(1) : Math.round(v))} years`;
+const loadRp = () => once("rp", async () => {
+  RP.data = await fetchOk("data/rp.json", "json");
+  deriveRp(); dataLoaded();
+});
+// times as often as today = 100 / future return period of today's 100-year flow
+function deriveRp() {
+  if (!RP.data) return;
+  const d = RP.data.data[CL.ssp]["med" + CL.per];
+  P.forEach(p => { p.rf = d[p.i] ? 1000 / d[p.i] : NaN; });
+  if (map?.getSource("adm3")) P.forEach(p => map.setFeatureState({ source: "adm3", id: p.i }, { rf: Number.isFinite(p.rf) ? p.rf : null }));
+}
+function riverColor() {
+  const e = ["step", ["/", 100, ["max", 1, ["get", `${CL.ssp}_${CL.per}`]]], RP_COLORS[0]];
+  RP_BREAKS.forEach((b, i) => e.push(b, RP_COLORS[i + 1]));
+  return e;
+}
+const loadRivers = () => once("rivers", async () => {
+  map.addSource("rivfreq", { type: "geojson", data: await fetchOk("data/rivers.geojson", "json") });
+  map.addLayer({ id: "rivfreq", type: "circle", source: "rivfreq", layout: { visibility: "none" }, paint: {
+    "circle-color": riverColor(), "circle-opacity": S.L.rivers.op, "circle-stroke-color": css("--ink"), "circle-stroke-width": 0.4,
+    "circle-radius": ["interpolate", ["linear"], ["zoom"], 4, ["interpolate", ["linear"], ["sqrt", ["get", "q"]], 20, 2, 300, 7],
+      8, ["interpolate", ["linear"], ["sqrt", ["get", "q"]], 20, 6, 300, 18]] } }, "adm3-edges");
+});
+function rpBlock(p) {
+  if (!RP.data || !RP.data.q[p.i]) return "";
+  const i = p.i, D = RP.data.data, ssps = Object.keys(SSP_INFO), per = PERIODS;
+  const cell = (s, y) => { const v = D[s]["med" + y][i] / 10; return `<td class="${s === CL.ssp && y === CL.per ? "on" : ""}">${v >= 1000 ? "1000+" : fmtNum(v < 10 ? +v.toFixed(1) : Math.round(v))}</td>`; };
+  const rows = ssps.map(s => `<tr><td>${SSP_INFO[s][0]}${s === "ssp245" ? "*" : ""}</td>${per.map(y => cell(s, y)).join("")}</tr>`).join("");
+  const d = D[CL.ssp], k = CL.per;
+  return `<div><h3>${term("rpshift", "River flood frequency")}</h3>
+    <div class="where" style="margin:0 0 4px">Today's ${term("rp", "100-year")} flood on the largest river here (about ${fmtNum(RP.data.q[i])} m³/s) would come every … years:</div>
+    <table class="ctab"><tr><th>Scenario</th>${per.map(y => `<th>${perLabel(y)}</th>`).join("")}</tr>${rows}</table>
+    <div class="where" style="margin-top:4px">${rpSsp()}, ${perLabel(k)}: every ${years(d["med" + k][i] / 10)} (${term("range", "likely")} ${years(d["lo" + k][i] / 10)} to ${years(d["hi" + k][i] / 10)});
+      ${d["agree" + k][i]}% of 15 ${term("ghm", "model runs")} show it coming more often. *SSP2-4.5 estimated from SSP1-2.6 and SSP3-7.0.</div></div>`;
+}
 /* ---------- sea-level rise (scripts/12_sea_level.py): IPCC AR6 relative sea level, DeltaDTM elevation ---------- */
 const SL = { data: null, k: new Map() };
 const loadSlr = () => once("slr", async () => {
